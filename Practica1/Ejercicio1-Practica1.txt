@@ -1,0 +1,57 @@
+program Ejercicio1;
+Uses crt;
+
+type
+
+  archivo_nros = file of integer;
+
+procedure leer(var n : integer);
+begin
+
+  write('Ingrese un numero entero ');
+  readln(n);
+
+end;
+
+procedure cargarDatos(var nros : archivo_nros);
+var
+  num : integer;
+begin
+
+  leer(num);
+  while(num <> 3000) do begin
+
+    write(nros , num);
+
+    leer(num);
+  end;
+
+end;
+
+var
+   nros : archivo_nros;
+   nombreArchivo : String[12];
+   regN : integer;
+begin
+  clrscr;
+
+  write('Ingrese nombre del archivo ');
+  readln(nombreArchivo);
+
+  assign(nros, nombreArchivo);
+
+  rewrite(nros);
+  writeln;
+  cargarDatos(nros);
+  close(nros);
+
+  writeln;
+  reset(nros);
+  while(not eof(nros)) do begin
+    read(nros, regN);
+    write(regN,' ');
+  end;
+  close(nros);
+
+  readln;
+end.
