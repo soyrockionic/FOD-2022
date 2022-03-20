@@ -1,0 +1,200 @@
+program Ej3P1;
+Uses crt;
+const
+  valorAlto = '9999';
+type
+
+  empleado = record
+    nroEmp : String[4];
+    apellido : String[25];
+    nombre : String[25];
+    edad : integer;
+    dni : String[25];
+  end;
+
+  archivo_Empleados = file of empleado;
+
+procedure leer(var emp : empleado);
+begin
+
+  write('Ingrese apellido ');
+  readln(emp.apellido);
+  if(emp.apellido <> 'fin') then begin
+    write('Ingrese nro de empleado ');
+    readln(emp.nroEmp);
+    write('Ingrese nombre ');
+    readln(emp.nombre);
+    write('Ingrese edad ');
+    readln(emp.edad);
+    write('Ingrese dni ');
+    readln(emp.dni);
+  end;
+
+end;
+
+procedure cargarDatos(var empleados : archivo_Empleados);
+var
+ emp : empleado;
+begin
+  rewrite(empleados);
+
+  leer(emp);
+  while(emp.apellido <> 'fin') do begin
+    writeln;
+
+    write(empleados, emp);
+
+    leer(emp);
+  end;
+
+  close(empleados);
+end;
+
+
+procedure mostrarPorApellido(var empleados : archivo_Empleados);
+var
+  regE : empleado;
+  ape : String[25];
+begin
+  reset(empleados);
+  write('Ingrese apellido para mostrar datos ');
+  readln(ape);
+
+  writeln('Empleados con apellido ',ape);
+  while(not eof(empleados)) do begin
+    read(empleados, regE);
+    if(regE.apellido = ape) then
+      writeln(regE.apellido,' ',regE.dni);
+  end;
+  close(empleados);
+
+end;
+
+
+procedure mostrarEmpleados(var empleados : archivo_Empleados);
+var
+  regE : empleado;
+begin
+  writeln('Todos los empleados');
+  reset(empleados);
+  while(not eof(empleados)) do begin
+    read(empleados, regE);
+    writeln(regE.apellido,' ',regE.edad,' a¤os dni ',regE.dni);
+  end;
+  close(empleados);
+end;
+
+
+procedure prontoAJubilarse(var empleados : archivo_Empleados);
+var
+  regE : empleado;
+begin
+  writeln('Empleados mayores de 70 a¤os, proximos a jubilarse');
+  reset(empleados);
+  while(not eof(empleados)) do begin
+    read(empleados, regE);
+    if(regE.edad >= 70) then
+      writeln(regE.apellido,' ',regE.edad,' a¤os dni ',regE.dni);
+  end;
+  close(empleados);
+end;
+
+procedure leer(var emp : archivo_Empleados; var reg : empleado);
+begin
+  if(not(eof(emp))) then
+    read(emp, reg)
+  else
+    reg.nombre := valorAlto;
+end;
+
+procedure borrarEmpleado(var empleados : archivo_Empleados);
+var
+  archivoNuevo : archivo_Empleados;
+  reg : empleado;
+begin
+  assign (archivoNuevo, 'arch_nuevo');
+
+  reset (empleados);
+  rewrite (archivoNuevo);
+
+  leer (empleados, reg);
+  while (reg.nombre <> “Carlos Garcia”) do begin 
+    write (archivoNuevo, reg);
+    leer (empleados, reg);
+  end;
+
+  leer(empleados, reg);
+
+  while (reg.nombre <> valoralto) do begin	    
+    write(archivo_nuevo, reg);
+    leer(empleados, reg);
+  end;
+
+  close(archivoNuevo);
+  close(empleados);
+
+end;
+
+
+var
+   empleados : archivo_Empleados;
+   nombreArchivo : String[12];
+   op : integer;
+begin
+  clrscr;
+
+  write('Ingrese nombre del archivo ');
+  readln(nombreArchivo);
+
+  assign(empleados, nombreArchivo);
+
+  writeln;
+  writeln('1 para cargar datos');
+  writeln('2 para buscar por apellido');
+  writeln('3 para ver todos los empleados');
+  writeln('4 para ver los empleados proximos a jubilarse');
+  writeln('5 para eliminar un empleado');
+
+  writeln;
+  write('Ingrese la opcion que desea ');
+  readln(op);
+
+  case op of
+    1: begin
+         
+         writeln;
+         cargarDatos(empleados);
+
+       end;
+
+    2: begin
+          
+          writeln;
+          mostrarPorApellido(empleados);         
+
+       end;
+
+    3: begin
+
+         writeln;
+         mostrarEmpleados(empleados);
+
+       end;
+
+     4: begin
+
+          writeln;
+          prontoAJubilarse(empleados);
+          
+        end;
+
+    5 : begin
+          
+           writeln;
+           borrarEmpleado(empleados);
+
+         end;
+     end;
+
+  readln;
+end.

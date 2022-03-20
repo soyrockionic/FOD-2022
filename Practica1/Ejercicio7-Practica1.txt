@@ -1,0 +1,110 @@
+program Ejercicio7;
+Uses crt;
+
+type
+
+  novela = record
+    codigo : integer;
+    nombre : String[25];
+    genero : integer;
+    precio : real;
+  end;
+
+  archivo = file of novela;
+
+procedure leer(var n : novela);
+begin
+  writeln('Ingrese codigo , genero y precio');
+  readln(n.codigo,n.genero,n.precio);
+  write('Ingrese nombre ');
+  readln(n.nombre);
+end;
+
+var
+   novelas : archivo;
+   nombreArchivo : String[12];
+
+   op, cant, i, cod : integer;
+   carga : Text;
+   nov : novela;
+begin
+  clrscr;
+
+  write('Ingrese nombre del archivo ');
+  readln(nombreArchivo);
+
+  assign(novelas, nombreArchivo);
+
+  writeln;
+  writeln('1 Cargar datos');
+  writeln('2 Agregar novela');
+  writeln('3 Modificar una novela');
+
+  writeln;
+  write('Ingrese la opcion que desea ');
+  readln(op);
+
+  case op of
+    1: begin
+         assign(carga, 'novelas.txt');
+         reset(carga);
+         rewrite(novelas);
+
+         writeln;
+         while(not eof(carga)) do begin
+
+           readln(carga, nov.codigo, nov.genero, nov.precio);
+           readln(carga, nov.nombre);
+           write(novelas, nov);
+         end;
+
+         writeln('Archivo cargado');
+         close(novelas);
+         close(carga);
+       end;
+
+    2: begin
+         write('Ingrese cuantas novelas desea agregar ');
+         readln(cant);
+         reset(novelas);
+         seek(novelas, filesize(novelas));
+         for i := 1 to cant do begin
+           leer(nov);
+           write(novelas, nov);
+         end;
+         close(novelas);
+       end;
+
+    3: begin
+         write('Ingrese el codigo de novela que quiere modificar ');
+         readln(cod);
+         reset(novelas);
+         while(not eof(novelas)) do begin
+           read(novelas,nov);
+           if(nov.codigo = cod) then begin
+             write('Ingrese nuevo precio ');
+             readln(nov.precio);
+             seek(novelas, filePos(novelas)-1);
+             write(novelas, nov);
+           end;
+         end;
+
+         close(novelas);
+      end;
+
+    4: begin
+
+         writeln;
+         writeln('------------------------------------');
+         reset(novelas);
+         while(not eof(novelas)) do begin
+           read(novelas, nov);
+           writeln(nov.codigo,' ',nov.precio:2:2,' ',nov.nombre);
+         end;
+         close(novelas);
+       end;
+
+     end;
+
+  readln;
+end.

@@ -1,0 +1,45 @@
+program Ejercicio2;
+Uses crt;
+
+type
+
+  archivo_nros = file of integer;
+
+var
+   nros : archivo_nros;
+   nombreArchivo : String[12];
+   regN, cantMenores, suma, cant : integer;
+begin
+  clrscr;
+  cant := 0;
+  cantMenores := 0;
+
+  write('Ingrese nombre del archivo: ');
+  readln(nombreArchivo);
+
+  assign(nros, nombreArchivo);
+
+  writeln;
+  write('Numeros: ');
+  reset(nros);
+  while(not eof(nros)) do begin
+    read(nros, regN);
+    write(regN,' ');
+
+    cant := cant + 1;
+
+    if(regN < 1500) then
+      cantMenores := cantMenores + 1;
+
+    suma := suma + regN;
+
+  end;
+
+  writeln;
+  writeln('Cantidad de nros menores a 1500: ', cantMenores);
+  writeln('Promedio de todos los numeros: ', suma div cant);
+
+  close(nros);
+
+  readln;
+end.
