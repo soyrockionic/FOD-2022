@@ -1,0 +1,233 @@
+program Ej2P2;
+Uses crt;
+const
+  valorAlto = '9999';
+type
+  rango = 0..1;
+
+  alumno = record
+    codigo : String[4];
+    apellido : String[20];
+    nombre : String[20];
+    cantCursadas : integer;
+    cantFinales : integer;
+  end;
+
+  detAlum = record
+    codigo : String[4];
+    fin : rango;
+  end;
+
+  maestro = file of alumno;
+  detalle = file of detAlum;
+
+procedure cargoMaestro(var mae : maestro);
+var
+  cargaM : Text;
+  alum : alumno;
+begin
+
+  writeln('A Cargo el archivo maestro');
+  assign(cargaM, 'alumnos.txt');
+  reset(cargaM);
+  rewrite(mae);
+
+  while(not eof(cargaM)) do begin
+
+    readln(cargaM, alum.codigo);
+    readln(cargaM, alum.apellido);
+    readln(cargaM, alum.nombre);
+    readln(cargaM, alum.cantCursadas, alum.cantFinales);
+
+    write(mae, alum);
+  end;
+
+  close(mae);
+  close(cargaM);
+
+end;
+
+procedure cargoDetalle(var det : detalle);
+var
+  cargaD : Text;
+  detA : detAlum;
+begin
+
+  writeln('B Cargo el archivo detalle');
+  assign(cargaD, 'detalle.txt');
+  reset(cargaD);
+  rewrite(det);
+
+  while(not eof(cargaD)) do begin
+
+    readln(cargaD, detA.codigo, detA.fin);
+
+    write(det, detA);
+  end;
+
+  close(det);
+  close(cargaD);
+
+end;
+
+procedure creoReporteAlumnos(var mae : maestro);
+var
+  alum : alumno;
+  reporteMae : Text;
+begin
+
+  writeln('C Creo reporte txt de alumnos');
+  assign(reporteMae, 'reporteAlumnos.txt');
+  reset(mae);
+  rewrite(reporteMae);
+  while(not eof(mae)) do begin
+    read(mae,alum);
+    write(reporteMae, alum.codigo,' ',alum.apellido,' ',alum.nombre,' ',alum.cantCursadas,' ',alum.cantFinales);
+    write(reporteMae,' ');
+  end;
+  close(mae);
+  close(reporteMae);
+
+end;
+
+procedure creoReporteDetalle(var det : detalle);
+var
+  reporteDet : Text;
+  detA : detAlum;
+begin
+
+  writeln('D Creo reporte txt de detalles');
+  assign(reporteDet, 'reporteDetalle.txt');
+  reset(det);
+  rewrite(reporteDet);
+  while(not eof(det)) do begin
+    read(det,detA);
+    write(reporteDet, detA.codigo,' ', detA.fin);
+    write(reporteDet,' ');
+  end;
+  close(det);
+  close(reporteDet);
+
+end;
+
+procedure leer(var det : detalle; var detA : detAlum);
+begin
+  if(not(eof(det))) then
+    read(det, detA)
+  else
+    detA.codigo := valorAlto;
+end;
+
+procedure actualizoMaestro(var mae : maestro; var det : detalle);
+var
+  detA : detAlum;
+  alum : alumno;
+  totalC : integer;
+  totalF : integer;
+  aux : String[4];
+begin
+
+  writeln('E Actualizo el archivo maestro');
+  reset(mae);
+  reset(det);
+  read(mae, alum);
+  leer(det, detA);
+  while(detA.codigo <> valorAlto) do begin
+    aux := detA.codigo;
+    totalC := 0;
+    totalF := 0;
+
+    while(aux = detA.codigo) do begin
+      if(detA.fin = 0) then
+        totalC := totalC + 1
+      else
+        totalF := totalF + 1;
+
+      leer(det, detA);
+    end;
+
+    alum.cantCursadas := alum.cantCursadas + totalC;
+    alum.cantFinales := alum.cantFinales + totalF;
+
+    seek(mae, filepos(mae) - 1);
+
+    write(mae, alum);
+
+    if(not(eof(mae))) then
+      read(mae, alum);
+
+  end;
+  close(det);
+  close(mae);
+
+end;
+
+procedure creoReporteCuatroSinFinal(var mae : maestro);
+var
+  regA : alumno;
+  reporteCuatro : Text;
+begin
+
+  writeln('F Creo reporte txt de alumnos con 4 aprobadas sin final');
+  assign(reporteCuatro, 'reporteCuatro.txt');
+  reset(mae);
+  rewrite(reporteCuatro);
+  while(not eof(mae)) do begin
+    read(mae,regA);
+    if(regA.cantCursadas >= 4) then begin
+      write(reporteCuatro, regA.codigo,' ',regA.apellido,' ',regA.nombre,' ',regA.cantCursadas,' ',regA.cantFinales);
+      write(reporteCuatro,' ');
+    end;
+  end;
+  close(mae);
+  close(reporteCuatro);
+
+end;
+
+
+var
+  mae : maestro;
+  det : detalle;
+  nombreMaestro : String[20];
+  nombreDetalle : String[20];
+  regA : alumno;
+begin
+  clrscr;
+
+  write('Ingrese nombre del archivo maestro ');
+  readln(nombreMaestro);
+
+  write('Ingrese nombre del archivo detalle ');
+  readln(nombreDetalle);
+
+  assign(mae, nombreMaestro);
+  assign(det, nombreDetalle);
+
+  writeln;
+
+  cargoMaestro(mae);
+
+  cargoDetalle(det);
+
+  creoReporteAlumnos(mae);
+
+  creoReporteDetalle(det);
+
+  actualizoMaestro(mae,det);
+
+
+  writeln;
+  writeln('Archivo maestro actualizado');
+  reset(mae);
+  while(not eof(mae)) do begin
+    read(mae, regA);
+    writeln('Codigo ',regA.codigo,' nombre ',regA.nombre, ' cantidad cursadas ',regA.cantCursadas,' cantidad finales ',regA.cantFinales);
+  end;
+  close(mae);
+
+  writeln;
+  creoReporteCuatroSinFinal(mae);
+
+
+  readln;
+end.

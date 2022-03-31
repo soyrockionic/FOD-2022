@@ -1,0 +1,25 @@
+1242
+Ford Focus
+Naftero
+2019
+50
+1243
+Ford Ka
+Gasolero
+2015
+50
+1244
+Fiat Palio
+Naftero
+2017
+50
+1245
+Renault Clio
+A Gas
+2016
+50
+1246
+Peugeot Partner
+Gasolera
+2020
+50

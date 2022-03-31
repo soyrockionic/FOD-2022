@@ -1,0 +1,18 @@
+121
+Adidas
+Buzo
+4
+azul
+500 25 1200
+122
+Nike
+Zapatillas
+42
+Blanco
+400 25 2400
+123
+Adidas
+Pantalon
+38
+Celeste
+500 15 1800

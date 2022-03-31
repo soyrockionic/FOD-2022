@@ -1,0 +1,81 @@
+program Ej1P2;
+Uses crt;
+const
+  valorAlto = '9999';
+type
+
+  empleado = record
+    codigo : String[4];
+    nombre : String[25];
+    comision : real;
+  end;
+
+  archivo_Empleados = file of empleado;
+
+procedure leer(var empleados : archivo_Empleados; var em : empleado);
+begin
+  if(not(eof(empleados))) then
+    read(empleados,em)
+  else
+    em.codigo := valorAlto;
+end;
+
+var
+   empleados : archivo_Empleados;
+   compacto : archivo_Empleados;
+   nombreArchivo : String[12];
+   regE, regC : empleado;
+   act, em : empleado;
+begin
+  clrscr;
+
+  write('Ingrese nombre del archivo ');
+  readln(nombreArchivo);
+
+  assign(empleados, nombreArchivo);
+
+
+  writeln;
+  writeln('Todos los empleados');
+  reset(empleados);
+  while(not eof(empleados)) do begin
+    read(empleados, regE);
+    writeln('Codigo ',regE.codigo,' nombre ',regE.nombre,' comision ',regE.comision:2:2);
+  end;
+  close(empleados);
+
+
+  assign(compacto,'compacto');
+  reset(empleados);
+  rewrite(compacto);
+
+  leer(empleados,em);
+  while(em.codigo <> valorAlto) do begin
+
+    act.codigo := em.codigo;
+    act.comision := 0;
+    while(em.codigo = act.codigo) do begin
+      act.nombre := em.nombre;
+      act.comision := act.comision + em.comision;
+
+      leer(empleados,em);
+
+    end;
+
+    write(compacto,act);
+
+  end;
+  close(empleados);
+  close(compacto);
+
+  writeln;
+  writeln('Todos los empleados campactados');
+  reset(compacto);
+  while(not eof(compacto)) do begin
+    read(compacto, regC);
+    writeln('Codigo ',regC.codigo,' nombre ',regC.nombre,' comision ',regC.comision:2:2);
+  end;
+  close(compacto);
+
+  readln;
+end.

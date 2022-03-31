@@ -1,0 +1,108 @@
+program Ej9P2;
+Uses crt;
+const
+  valorAlto = '9999';
+type
+
+  mesa = record
+    codProv : String[4];
+    codloc : String[4];
+    nroMesa : String[4];
+    cantVotos : integer;
+  end;
+
+  maestro = file of mesa;
+
+
+procedure cargoMaestro(var mae : maestro);
+var
+  cargaM : Text;
+  regM : mesa;
+begin
+
+  writeln('Cargo el archivo maestro');
+  assign(cargaM, 'mesas.txt');
+  reset(cargaM);
+  rewrite(mae);
+
+  while(not eof(cargaM)) do begin
+
+    readln(cargaM, regM.codProv);
+    readln(cargaM, regM.codloc);
+    readln(cargaM, regM.nroMesa);
+    readln(cargaM, regM.cantVotos);
+
+    write(mae, regM);
+  end;
+
+  close(mae);
+  close(cargaM);
+
+end;
+
+
+procedure leer(var mae : maestro; var regM : mesa);
+begin
+  if(not(eof(mae))) then
+    read(mae, regM)
+  else
+    regM.codProv := valorAlto;
+end;
+
+procedure imprimirReporte(var mae : maestro);
+var
+  regM : mesa;
+  act : mesa;
+  totalloc, totalProv, total : integer;
+begin
+  total := 0;
+  reset(mae);
+  leer(mae,regM);
+
+  while(regM.codProv <> valorAlto) do begin
+    act := regM;
+    totalProv := 0;
+    writeln;
+    writeln('Codigo de provincia ',act.codProv);
+
+    while(regM.codProv <> valorAlto) and (act.codProv = regM.codProv) do begin
+      act.codloc := regM.codloc;
+      totalloc := 0;
+
+      while(regM.codProv <> valorAlto) and (act.codProv = regM.codProv) and (act.codloc = regM.codloc) do begin
+        totalloc := totalloc + regM.cantVotos;
+
+        leer(mae,regM);
+      end;
+
+      writeln('Codigo de localidad ',act.codloc,' total votos ',totalloc);
+      totalProv := totalProv + totalloc;
+
+    end;
+
+    writeln('Total de votos Provincia ',act.codProv,' ', totalProv);
+    total := total + totalProv;
+
+  end;
+
+  writeln;
+  write('Total general de votos ',total);
+
+  close(mae);
+end;
+
+
+var
+  mae : maestro;
+  regM : Mesa;
+begin
+  clrscr;
+
+  assign(mae, 'Mesas');
+
+  cargoMaestro(mae);
+
+  imprimirReporte(mae);
+
+  readln;
+end.

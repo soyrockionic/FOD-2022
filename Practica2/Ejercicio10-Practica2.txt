@@ -1,0 +1,117 @@
+program Ej10P2;
+Uses crt;
+const
+  valorAlto = '9999';
+  df = 15;
+type
+  rango = 1..df;
+
+  empleado = record
+    departamento : String[20];
+    division : String[20];
+    nroEmp : String[4];
+    categoria : rango;
+    cantHoras : integer;
+  end;
+
+  maestro = file of empleado;
+
+  vector = array[rango] of real;
+
+
+procedure cargarVector(var v : vector);
+var
+  cargaM : Text;
+  i : rango;
+  valor : real;
+begin
+
+  writeln('Cargo el vector');
+  assign(cargaM, 'categorias.txt');
+  reset(cargaM);
+
+  while(not eof(cargaM)) do begin
+
+    readln(cargaM, i,valor);
+    v[i] := valor;
+
+  end;
+
+  close(cargaM);
+
+end;
+
+
+procedure leer(var mae : maestro; var regM : empleado);
+begin
+  if(not(eof(mae))) then
+    read(mae, regM)
+  else
+    regM.departamento := valorAlto;
+end;
+
+procedure imprimirReporte(var mae : maestro; v : vector);
+var
+  regM : empleado;
+  act : empleado;
+  totalDiv, total : integer;
+  cobro, montoDiv, montoTotal : real;
+begin
+  total := 0;
+  reset(mae);
+  leer(mae,regM);
+
+  while(regM.departamento <> valorAlto) do begin
+    act := regM;
+    total := 0;
+    montoTotal := 0;
+    writeln;
+    writeln('Departamento ',act.departamento);
+
+    while(regM.departamento <> valorAlto) and (act.departamento = regM.departamento) do begin
+      act.division := regM.division;
+      totalDiv := 0;
+      montoDiv := 0;
+      cobro := 0;
+
+      writeln('Division ',act.division);
+
+      while(regM.departamento <> valorAlto) and (act.departamento = regM.departamento) and (act.division = regM.division) do begin
+
+         cobro := v[regM.categoria] * regM.cantHoras;
+         writeln('Nro ',regM.nroEmp,' total horas ',regM.cantHoras,' cobra ',cobro:2:2);
+
+         montoDiv := montoDiv + cobro;
+         totalDiv := totalDiv + regM.cantHoras;
+
+        leer(mae,regM);
+      end;
+
+      writeln('Total de horas division ',act.division,' ', totalDiv);
+      writeln('Monto total division ',act.division,' ',montoDiv:2:2);
+      total := total + totalDiv;
+      montoTotal := montoTotal + montoDiv;
+
+  end;
+
+  writeln;
+  writeln('Total de horas departamento ',act.departamento,' ',total);
+  writeln('Monto total departamento ',act.departamento,' ',montoTotal:2:2);
+  end;
+  close(mae);
+end;
+
+
+var
+  mae : maestro;
+  v : vector;
+begin
+  clrscr;
+  assign(mae, 'Empresa');
+
+  cargarVector(v);
+
+  imprimirReporte(mae,v);
+
+  readln;
+end.

@@ -1,0 +1,147 @@
+program Ej17p2;
+Uses crt;
+const
+  df = 2;
+  valoralto = 9999;
+type
+
+  vehiculo = record
+    codigo : integer;
+    nombre : string;
+    descripcion : string;
+    modelo : string;
+    stock : integer;
+  end;
+
+  venta = record
+    codigo : integer;
+    precio : real;
+    fecha : integer;
+  end;
+
+  maestro = file of vehiculo;
+
+  detalle = file of venta;
+
+  arrayDetalles = array[1..df] of detalle;
+  arrayRegistros = array[1..df] of venta;
+
+
+procedure imprimirReg(var v : vehiculo);
+begin
+  writeln('Codigo: ',v.codigo);
+  writeln('Nombre: ',v.nombre);
+  writeln('Descripcion: ',v.descripcion);
+  writeln('Modelo: ',v.modelo);
+  writeln('Stock Actual: ',v.stock);
+end;
+
+
+procedure leer(var arch:detalle; var dato:venta);
+begin
+  if (not eof(arch)) then
+    read(arch,dato)
+  else
+  dato.codigo := valoralto;
+end;
+
+procedure minimo(var vecDet : arrayDetalles; var regDet:arrayRegistros; var min:venta);
+var
+  i, pos : integer;
+begin
+  min.codigo := valoralto;
+
+  for i:=1 to df do begin
+    if (regDet[i].codigo < min.codigo) then begin
+      min := regDet[i];
+      pos := i;
+    end;
+  end;
+
+  if (min.codigo <> valoralto) then
+    leer(vecDet[pos],regDet[pos]);
+end;
+
+
+procedure actualizarMaestro(var mae : maestro; var vecDet : arrayDetalles; var masVendido:vehiculo);
+var
+  min : venta;
+  regDet : arrayRegistros;
+  regMae : vehiculo;
+  actual, contador, max, i : integer;
+begin
+  max := -1;
+
+  reset(mae);
+  read(mae,regMae);
+  for i:=1 to df do begin
+    reset(vecDet[i]);
+    leer(vecDet[i],regDet[i]);
+  end;	
+
+  minimo(vecDet,regDet,min);
+  while(min.codigo <> valoralto) do begin
+    actual := min.codigo;
+    contador:=0;
+
+    while(actual = min.codigo) do begin
+      contador := contador + 1;
+      minimo(vecDet,regDet,min);
+    end;
+
+    while(regMae.codigo <> actual) do
+      read(mae,regMae);
+
+    regMae.stock := regMae.stock - contador;
+    seek(mae,filepos(mae)-1);
+
+    write(mae,regMae);
+
+    if(contador > max) then begin
+      max := contador;
+      masVendido := regMae;
+    end;
+
+    if(not eof(mae)) then
+      read(mae,regMae);
+
+  end;
+
+  close(mae);
+  for i:=1 to df do
+    close(vecDet[i]);
+end;
+
+
+var
+  mae  : maestro;
+  vecDet : arrayDetalles;
+  i : integer;
+  num : string;
+  masVendido, reg : vehiculo;
+begin
+  clrscr;
+  assign(mae,'Vehiculos');
+  for i:=1 to df do begin
+    Str(i,num);
+    assign(vecDet[i],'Detalle'+num);
+  end;
+
+  actualizarMaestro(mae,vecDet,masVendido);
+	
+
+  writeln('Archivo maestro actualizado');
+  reset(mae);
+  while(not eof(mae)) do begin
+    read(mae, reg);
+    writeln('Codigo ',reg.codigo,' nombre ',reg.nombre, ' stock disponible ',reg.stock);
+  end;
+  close(mae);
+
+
+  writeln;
+  writeln('Vehiculo mas vendido:');
+  imprimirReg(masVendido);
+
+  readln;
+end.

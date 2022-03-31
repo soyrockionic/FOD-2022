@@ -1,0 +1,117 @@
+program Ej8P2;
+Uses crt;
+const
+  valorAlto = '9999';
+type
+
+  venta = record
+    codCliente : String[4];
+    nombre : String[20];
+    apellido : String[20];
+    anio : String[4];
+    mes : String[4];
+    dia : String[4];
+    monto : real;
+  end;
+
+  maestro = file of venta;
+
+
+procedure cargoMaestro(var mae : maestro);
+var
+  cargaM : Text;
+  regV : venta;
+begin
+
+  writeln('Cargo el archivo maestro');
+  assign(cargaM, 'clientes.txt');
+  reset(cargaM);
+  rewrite(mae);
+
+  while(not eof(cargaM)) do begin
+
+    readln(cargaM, regV.codCliente);
+    readln(cargaM, regV.anio);
+    readln(cargaM, regV.mes);
+    readln(cargaM, regV.dia);
+    readln(cargaM, regV.nombre);
+    readln(cargaM, regV.apellido);
+    readln(cargaM, regV.monto);
+
+    write(mae, regV);
+  end;
+
+  close(mae);
+  close(cargaM);
+
+end;
+
+
+procedure leer(var mae : maestro; var regV : venta);
+begin
+  if(not(eof(mae))) then
+    read(mae, regV)
+  else
+    regV.codCliente := valorAlto;
+end;
+
+procedure imprimirReporte(var mae : maestro);
+var
+  regV : venta;
+  act : venta;
+  totalMes, totalAnio, total : real;
+begin
+  total := 0;
+  reset(mae);
+  leer(mae,regV);
+
+  while(regV.codCliente <> valorAlto) do begin
+    act := regV;
+    writeln;
+    writeln('Cliente ',act.codCliente,' ',act.nombre,' ',act.apellido);
+
+    while(regV.codCliente <> valorAlto) and (act.codCliente = regV.codCliente) do begin
+      act.anio := regV.anio;
+      totalAnio := 0;
+
+      while(regV.codCliente <> valorAlto) and (act.codCliente = regV.codCliente) and (act.anio = regV.anio) do begin
+         act.mes := regV.mes;
+         totalMes := 0;
+
+         while(regV.codCliente <> valorAlto) and (act.codCliente = regV.codCliente) and (act.anio = regV.anio)  and (act.mes = regV.mes) do begin
+           totalMes := totalMes + regV.monto;
+
+           leer(mae,regV);
+         end;
+
+         writeln('Mes ',act.mes,' ',totalMes:2:2);
+         totalAnio := totalAnio + totalMes;
+
+       end;
+
+       writeln('Anio ',act.anio,' ',totalAnio:2:2);
+       total := total + totalAnio;
+
+    end;
+
+  end;
+  writeln;
+  writeln('Total ',total:2:2);
+  close(mae);
+end;
+
+
+var
+  mae : maestro;
+  regV : venta;
+begin
+  clrscr;
+
+  assign(mae, 'Clientes');
+
+  cargoMaestro(mae);
+
+  imprimirReporte(mae);
+
+  readln;
+end.

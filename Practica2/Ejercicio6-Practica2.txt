@@ -1,0 +1,211 @@
+program Ej6P2;
+Uses crt;
+const
+  valorAlto = '9999';
+
+type
+
+  articulo = record
+    codigo : String[4];
+    nombre : String[20];
+    descrip : String[20];
+    talle : String[4];
+    color : String[15];
+    stockDisp : integer;
+    stockMin : integer;
+    precio : real;
+  end;
+
+  detArt = record
+    codigo : String[4];
+    cantVen : integer;
+  end;
+
+  maestro = file of articulo;
+  detalle = file of detArt;
+
+
+procedure cargoMaestro(var mae : maestro); // Se Dispone
+var
+  cargaM : Text;
+  regA : articulo;
+begin
+
+  writeln('A Cargo el archivo maestro');
+  assign(cargaM, 'articulos.txt');
+  reset(cargaM);
+  rewrite(mae);
+
+  while(not eof(cargaM)) do begin
+
+    readln(cargaM, regA.codigo);
+    readln(cargaM, regA.nombre);
+    readln(cargaM, regA.descrip);
+    readln(cargaM, regA.talle);
+    readln(cargaM, regA.color);
+    readln(cargaM, regA.stockDisp, regA.stockMin, regA.precio);
+
+    write(mae, regA);
+  end;
+
+  close(mae);
+  close(cargaM);
+
+end;
+
+procedure leer(var detA : detArt);
+begin
+  write('Ingrese codigo de producto ');
+  readln(detA.codigo);
+  if(detA.codigo <> '9999') then begin
+    write('Ingrese cantidad vendida ');
+    readln(detA.cantVen);
+  end;
+end;
+
+procedure cargoDetalle(var det : detalle);
+var
+  detA : detArt;
+begin
+
+  writeln('Cargo el archivo detalle');
+  rewrite(det);
+
+  leer(detA);
+  while(detA.codigo <> '9999') do begin  
+
+    write(det, detA);
+
+    leer(detA);
+  end;
+
+  close(det);
+
+end;
+
+procedure leer(var det : detalle; var detA : detArt);
+begin
+  if(not(eof(det))) then
+    read(det, detA)
+  else
+    detA.codigo := valorAlto;
+end;
+
+
+procedure actualizoMaestro(var mae : maestro; var det : detalle);
+var
+  detA : detArt;
+  regA : articulo;
+  aux : String[4];
+  total, i : integer;
+begin
+
+  writeln('Actualizo el archivo maestro');
+  reset(mae);
+  reset(det);
+
+  read(mae, regA);
+  leer(det, detA);
+
+  while(detA.codigo <> valorAlto) do begin
+    aux := detA.codigo;
+    total := 0;
+
+    while(aux = detA.codigo) do begin
+      total := total + detA.cantVen;
+      leer(det, detA);
+    end;
+
+    while (regA.codigo <> aux) do
+      read (mae, regA);
+
+    regA.stockDisp := regA.stockDisp - total;
+
+    seek(mae, filepos(mae) - 1);
+
+    write(mae, regA);
+
+    if(not(eof(mae))) then
+      read(mae, regA);
+
+  end;
+
+  close(det);
+  close(mae);
+
+end;
+
+
+procedure actualizoArchivos(var mae : maestro; var det : detalle);
+var
+  i : integer;
+begin
+
+  for i := 1 to 15 do begin
+    writeln;
+    cargoDetalle(det);
+    writeln;
+    actualizoMaestro(mae,det);
+  end;
+
+end;
+
+
+procedure creoReporteArticulos(var mae : maestro);
+var
+  regA : articulo;
+  reporteArticulos : Text;
+begin
+
+  writeln('Creo reporte txt de articulos por debajo dek stock minimo');
+  assign(reporteArticulos, 'reporteArticulos.txt');
+  reset(mae);
+  rewrite(reporteArticulos);
+  while(not eof(mae)) do begin
+    read(mae,regA);
+    if(regA.stockDisp < regA.stockMin) then begin
+      write(reporteArticulos, regA.nombre,' ',regA.descrip,' ',regA.stockDisp,' ',regA.precio:2:2);
+      write(reporteArticulos,' ');
+    end;
+  end;
+  close(mae);
+  close(reporteArticulos);
+
+end;
+
+
+procedure imprimir(var mae : maestro);
+var
+  regA : articulo;
+begin
+  writeln;
+  writeln('Archivo maestro actualizado');
+  reset(mae);
+  while(not eof(mae)) do begin
+    read(mae, regA);
+    writeln('Codigo ',regA.codigo,' nombre ',regA.nombre, ' stock disponible ',regA.stockDisp);
+  end;
+  close(mae);
+end;
+
+
+var
+  mae : maestro;
+  det : detalle;
+begin
+  clrscr;
+
+  assign(mae, 'Articulos');
+  assign(det, 'DetalleArt');
+
+  cargoMaestro(mae); //Se Dispone
+
+  actualizoArchivos(mae,det);
+
+  writeln;
+  creoReporteArticulos(mae);
+
+  imprimir(mae);
+
+  readln;
+end.

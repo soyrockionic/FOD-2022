@@ -1,0 +1,211 @@
+program Ej7P2;
+Uses crt;
+const
+  valorAlto = '9999';
+type
+
+  producto = record
+    codigo : String[4];
+    nombre : String[20];
+    precio : real;
+    stockActual : integer;
+    stockMin : integer;
+  end;
+
+  venta = record
+    codigo : String[4];
+    cantVen : integer;
+  end;
+
+  maestro = file of producto;
+  detalle = file of venta;
+
+procedure cargoMaestro(var mae : maestro);
+var
+  cargaM : Text;
+  regP : producto;
+begin
+
+  writeln('A Cargo el archivo maestro');
+  assign(cargaM, 'productos.txt');
+  reset(cargaM);
+  rewrite(mae);
+
+  while(not eof(cargaM)) do begin
+
+    readln(cargaM, regP.codigo);
+    readln(cargaM, regP.nombre);
+    readln(cargaM, regP.precio, regP.stockActual, regP.stockMin);
+
+    write(mae, regP);
+  end;
+
+  close(mae);
+  close(cargaM);
+
+end;
+
+
+procedure creoReporteProd(var mae : maestro);
+var
+  regP : producto;
+  reporteMae : Text;
+begin
+
+  writeln('B Creo reporte txt de productos');
+  assign(reporteMae, 'reporte.txt');
+  reset(mae);
+  rewrite(reporteMae);
+  while(not eof(mae)) do begin
+    read(mae,regP);
+    write(reporteMae, regP.codigo,' ',regP.nombre,' ',regP.precio:2:2,' ',regP.stockActual,' ',regP.stockMin);
+    write(reporteMae,' ');
+  end;
+  close(mae);
+  close(reporteMae);
+
+end;
+
+
+procedure cargoDetalle(var det : detalle);
+var
+  cargaD : Text;
+  detV : venta;
+begin
+
+  writeln('C Cargo el archivo detalle');
+  assign(cargaD, 'ventas.txt');
+  reset(cargaD);
+  rewrite(det);
+
+  while(not eof(cargaD)) do begin
+
+    readln(cargaD, detV.codigo, detV.cantVen);
+
+    write(det, detV);
+  end;
+
+  close(det);
+  close(cargaD);
+
+end;
+
+
+procedure creoReporteVentas(var det : detalle);
+var
+  reporteDet : Text;
+  detV : venta;
+begin
+
+  writeln('D Creo reporte txt de ventas');
+  assign(reporteDet, 'reporteVenta.txt');
+  reset(det);
+  rewrite(reporteDet);
+  while(not eof(det)) do begin
+    read(det,detV);
+    write(reporteDet, detV.codigo,' ', detV.cantVen);
+    write(reporteDet,' ');
+  end;
+  close(det);
+  close(reporteDet);
+
+end;
+
+
+procedure leer(var det : detalle; var detV : venta);
+begin
+  if(not(eof(det))) then
+    read(det, detV)
+  else
+    detV.codigo := valorAlto;
+end;
+
+procedure actualizoMaestro(var mae : maestro; var det : detalle);
+var
+  detV : venta;
+  regP : producto;
+  total : integer;
+  aux : String[4];
+begin
+
+  writeln('E Actualizo el archivo maestro');
+  reset(mae);
+  reset(det);
+  read(mae, regP);
+  leer(det, detV);
+  while(detV.codigo <> valorAlto) do begin
+    aux := detV.codigo;
+    total := 0;
+
+    while(aux = detV.codigo) do begin
+      total := total + detV.cantVen;
+
+      leer(det, detV);
+    end;
+
+    while (regP.codigo <> aux) do
+      read (mae, regP);
+
+    regP.stockActual := regP.stockActual - total;
+
+    seek(mae, filepos(mae) - 1);
+
+    write(mae, regP);
+
+    if(not(eof(mae))) then
+      read(mae, regP);
+
+  end;
+  close(det);
+  close(mae);
+
+end;
+
+
+procedure creoReporteStockMin(var mae : maestro);
+var
+  regP : producto;
+  reporteStockMin : Text;
+begin
+
+  writeln('F Creo reporte txt de alumnos con 4 aprobadas sin final');
+  assign(reporteStockMin, 'stock_minimo.txt');
+  reset(mae);
+  rewrite(reporteStockMin);
+  while(not eof(mae)) do begin
+    read(mae,regP);
+    if(regP.stockActual < regP.stockMin) then begin
+      write(reporteStockMin, regP.codigo,' ',regP.nombre,' ',regP.precio:2:2,' ',regP.stockActual);
+      write(reporteStockMin,' ');
+    end;
+  end;
+  close(mae);
+  close(reporteStockMin);
+
+end;
+
+
+var
+  mae : maestro;
+  det : detalle;
+  regP : producto;
+begin
+  clrscr;
+
+  assign(mae, 'ProductosLimpieza');
+  assign(det, 'VentasLimpieza');
+
+  cargoMaestro(mae);
+
+  creoReporteProd(mae);
+
+  cargoDetalle(det);
+
+  creoReporteVentas(det);
+
+  actualizoMaestro(mae,det);
+
+  creoReporteStockMin(mae);
+
+  readln;
+end.
