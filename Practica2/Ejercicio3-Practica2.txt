@@ -2,7 +2,7 @@ program Eje3;
 Uses crt;
 const
   df = 5;
-  suc = 2;
+  suc = 30;
 type
 
    producto = record
