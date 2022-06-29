@@ -1,0 +1,127 @@
+program Ej12P2;
+Uses crt;
+const
+  valorAlto = '9999';
+type
+
+  usuario = record
+    id : integer;
+    duracion : real;
+    dia : String[2];
+    mes : String[2];
+    anio : String[4];
+  end;
+
+  maestro = file of usuario;
+  
+ procedure leerUsu(var reg : usuario);
+ begin
+   write('Ingrese anio ');
+   readln(reg.anio);
+   write('Ingrese mes ');
+   readln(reg.mes);
+   write('Ingrese dia ');
+   readln(reg.dia);
+   write('Ingrese id ');
+   readln(reg.id);
+   write('ingrese tiempo accedido ');
+   readln(reg.duracion);
+ end;
+ 
+procedure cargarMaestro(var mae : maestro);
+var
+  reg : usuario;
+  i : integer;
+begin
+  rewrite(mae);
+  for i := 1 to 5 do begin
+    leerUsu(reg);
+    write(mae,  reg);
+  end;
+  close(mae);
+end;
+  
+procedure leer(var mae : maestro; var reg : usuario);
+begin
+  if(not eof(mae)) then
+    read(mae, reg)
+  else
+    reg.anio := valorAlto;
+end;
+
+procedure reporte(var mae : maestro; anio : String);
+var
+  reg, act : usuario;
+  total_id, total_dia, total_mes, total_anio : real;
+begin
+  reset(mae);
+
+  leer(mae, reg);
+  while(reg.anio <> valorAlto) and (reg.anio <> anio) do
+    leer(mae, reg);
+  
+  if(reg.anio = anio) then begin
+
+    act := reg;
+    total_anio := 0;
+    writeln('Año: ',act.anio);
+    while(act.anio = reg.anio) do begin
+      act.mes := reg.mes;
+      total_mes := 0;
+
+      writeln;
+      writeln('    Mes: ',act.mes);
+      while(act.anio = reg.anio) and (act.mes = reg.mes) do begin
+        act.dia := reg.dia;
+        total_dia := 0;
+
+        writeln('      Dia: ',act.dia);
+        while(act.anio = reg.anio) and (act.mes = reg.mes) and (act.dia = reg.dia) do begin
+          act.id := reg.id;
+          total_id := 0;
+
+          while(act.anio = reg.anio) and (act.mes = reg.mes) and (act.dia = reg.dia) and (act.id = reg.id) do begin
+            total_id := total_id + act.duracion;
+            leer(mae, reg);
+          end; 
+
+          writeln;
+          writeln('        idUsuario ',act.id,' Tiempo de acceso total en el dia ',act.dia,' mes ',act.mes,' : ',total_id:2:2);
+          total_dia := total_dia + total_id;
+        end;
+        
+        writeln;
+        writeln('      Tiempo  total acceso dia ',act.dia,' mes ',act.mes,' : ',total_dia:2:2);
+        total_mes := total_mes + total_dia;
+      end;
+
+      writeln;
+      writeln('    Total tiempo de acceso mes ',act.mes,' ',total_mes:2:2);
+      total_anio := total_anio + total_mes;
+    end;
+    
+    writeln;
+    writeln('  Total tiempo de acceso anio ',act.anio,' ',total_anio:2:2);
+  end
+  else
+    writeln('Anio no encontrado');
+
+  close(mae);
+end;
+
+var
+  mae : maestro;
+  anio : String[4];
+begin
+  clrscr;
+
+  assign(mae, 'servidor');
+  //cargarMaestro(mae);
+  
+  write('Ingrese anio ');
+  readln(anio);
+
+  reporte(mae,anio);
+
+  readln;
+end.
