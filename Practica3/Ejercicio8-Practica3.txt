@@ -1,0 +1,164 @@
+program Ej8P3;
+Uses crt;
+const
+  valorAlto = 'zzz';
+type
+
+  distribucion = record
+    nombre : String[10];
+    anio : String[4];
+    kernel : String[10];
+    cantDes : integer;
+    descrip : String[30];
+  end;
+
+  maestro = file of distribucion;
+
+
+procedure leerDistro(var reg : distribucion);
+begin
+  write('Ingrese nombre ');
+  readln(reg.nombre);
+  if(reg.nombre <> 'f') then begin
+    write('Ingrese anio de salida ');
+    readln(reg.anio);
+    write('Ingrese kernel ');
+    readln(reg.kernel);
+    write('Ingrese cantidad de desarrolladores ');
+    readln(reg.cantDes);
+    write('Ingrese descripcion ');
+    readln(reg.descrip);
+  end;
+end;
+
+procedure cargoMaestro(var mae : maestro);
+var
+  reg : distribucion;
+begin
+  rewrite(mae);
+  reg.cantDes := 0;
+  write(mae, reg);
+  leerDistro(reg);
+  while(reg.nombre <> 'f') do begin
+    write(mae, reg);
+    leerDistro(reg);
+  end;
+  close(mae);
+end;
+
+procedure leer(var mae : maestro; var reg : distribucion);
+begin
+  if(not eof(mae)) then
+    read(mae, reg)
+  else
+    reg.nombre := valorAlto;
+end;
+
+function ExisteDistribucion(var mae : maestro; n : String) : boolean;
+var
+  reg : distribucion;
+begin
+  reset(mae);
+  leer(mae, reg);
+  while(reg.nombre <> valorAlto) and (reg.nombre <> n) do
+    leer(mae, reg);
+
+  if(reg.nombre = n) then
+    existeDistribucion := true
+  else
+    existeDistribucion := false;
+
+  close(mae);
+end;
+
+procedure AltaDistribucion(var mae : maestro);
+var
+ reg, ind, lin : distribucion;
+begin
+  leerDistro(reg);
+  if(not ExisteDistribucion(mae, reg.nombre)) then begin
+    reset(mae);
+    leer(mae, lin);
+    if(lin.cantDes < 0) then begin
+      seek(mae,abs(lin.cantDes)); //voy a la posicion con espacio libre
+      read(mae,ind); //leo el indice que esta en esa posicion y lo guardo en ind
+      seek(mae,filepos(mae)-1); //ubico el puntero
+      write(mae,reg); //escribo en la posicion donde habia espacio libre
+      seek(mae,0); //vuelvo al registro cabecera
+      write(mae,ind); //escribo el indice que tenia en la posicion que acabo de dar de alta
+    end
+    else
+      writeln('No hay espacio libre');
+    close(mae);
+  end
+  else
+    writeln('Ya existe la distribucion');
+end;
+
+procedure BajaDistribucion(var mae : maestro);
+var
+  n : String[10];
+  reg, ind : distribucion;
+  fin : boolean;
+begin
+  fin := false;
+  write('Ingrese distro que desea eliminar ');
+  readln(n);
+  if(ExisteDistribucion(mae,n)) then begin
+    reset(mae);
+    leer(mae, ind); //leo el indice que esta en cabecera
+    leer(mae, reg);
+    while(reg.nombre <> valorAlto) and (reg.nombre <> n) do
+      leer(mae, reg);
+
+    if(reg.nombre = n) then begin
+      reg.cantDes := ind.cantDes; //copio el indice que estaba en el reg 0 en el que elimino
+                                  //para tener la lista invertida
+      seek(mae, filepos(mae)-1);
+      ind.cantDes := filepos(mae) * -1; //paso e l indice a negativo
+      write(mae, reg);
+      seek(mae, 0);
+      write(mae, ind); //el indice que esta en e registro de cabecera lo reemplazo
+                       //con el del reg que acabo de eliminar
+      fin := true;
+      writeln('Distribucion eliminada');
+    end;
+
+    close(mae);
+  end
+  else
+    writeln('Destribucion no existente');
+end;
+
+procedure reporte(var mae : maestro);
+var
+  reg : distribucion;
+begin
+  reset(mae);
+  while(not eof(mae)) do begin
+    read(mae, reg);
+    writeln(reg.nombre,' ',reg.cantDes);
+  end;
+  close(mae);
+end;
+
+var
+  mae : maestro;
+begin
+  clrscr;
+
+  assign(mae, 'distribuciones');
+
+  //cargoMaestro(mae);
+
+  AltaDistribucion(mae);
+
+  reporte(mae);
+
+  BajaDistribucion(mae);
+
+  writeln;
+  reporte(mae);
+
+  readln;
+end.

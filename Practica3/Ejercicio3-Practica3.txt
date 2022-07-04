@@ -1,0 +1,168 @@
+program Ej3P3;
+Uses crt;
+const
+  valorAlto = 9999;
+type
+
+  novela = record
+    codigo : integer;
+    genero : String[12];
+    nombre : String[12];
+    duracion : real;
+    director : String[12];
+    precio : Real;
+  end;
+
+  maestro = file of novela;
+
+
+procedure leerNov(var reg : novela);
+begin
+  write('Ingrese codigo ');
+  readln(reg.codigo);
+  if(reg.codigo <> -1) then begin
+    write('Ingrese genero ');
+    readln(reg.genero);
+    write('Ingrese nombre ');
+    readln(reg.nombre);
+    write('Ingrese duracion ');
+    readln(reg.duracion);
+    write('Ingrese director ');
+    readln(reg.director);
+    write('Ingrese precio ');
+    readln(reg.precio);
+  end;
+end;
+
+procedure cargarArchivo(var mae : maestro);
+var
+  reg : novela;
+begin
+  rewrite(mae);
+  reg.codigo := 0;
+  write(mae, reg);
+  leerNov(reg);
+  while(reg.codigo <> -1) do begin
+    write(mae, reg);
+    leerNov(reg);
+  end;
+  close(mae);
+end;
+
+procedure leer(var mae : maestro; var reg : novela);
+begin
+  if(not eof(mae)) then
+    read(mae, reg)
+  else
+    reg.codigo := valorAlto;
+end;
+
+procedure darAlta(var mae : maestro);
+var
+  reg, ind : novela;
+begin
+  reset(mae);
+  leer(mae, reg);
+  if(reg.codigo < 0) then begin
+    seek(mae, abs(reg.codigo));
+    read(mae, ind);
+    seek(mae, filepos(mae)-1);
+    leerNov(reg);
+    write(mae, reg);
+    seek(mae, 0);
+    write(mae, ind);
+  end
+  else begin
+    seek(mae, filesize(mae));
+    leerNov(reg);
+    write(mae, reg);
+  end;
+  close(mae);
+end;
+
+procedure eliminar(var mae : maestro);
+var
+  cod : integer;
+  reg, ind : novela;
+begin
+  reset(mae);
+  write('ingrese codigo de novela ha eliminar ');
+  readln(cod);
+  leer(mae, ind);
+  leer(mae, reg);
+  while(reg.codigo <> 9999) and (reg.codigo <> cod) do begin
+    leer(mae, reg);
+  end;
+  if(reg.codigo = cod) then begin
+    reg.codigo := ind.codigo;
+    seek(mae, filepos(mae)-1);
+    ind.codigo := filepos(mae) * -1;
+    write(mae, reg);
+    seek(mae, 0);
+    write(mae, ind);
+  end
+  else
+    writeln('El codigo ingresado no se encuentra en el archivo');
+  close(mae);
+end;
+
+procedure reporte(var mae : maestro);
+var
+  reg : novela;
+begin
+  reset(mae);
+  while(not eof(mae)) do begin
+    read(mae, reg);
+    writeln(reg.codigo,' ',reg.nombre,' ',reg.precio:2:2);
+  end;
+  close(mae);
+end;
+
+procedure crearTxt(var mae : maestro);
+var
+  reg : novela;
+  carga : Text;
+begin
+  assign(carga, 'novelas.txt');
+  reset(mae);
+  rewrite(carga);
+  while(not eof(mae)) do begin
+    read(mae, reg);
+    writeln(carga, reg.codigo,' ',reg.nombre,' ',reg.director,' ',reg.precio:2:2);
+  end;
+  close(carga);
+  close(mae);
+end;
+
+var
+  mae : maestro;
+  op : integer;
+begin
+  clrscr;
+
+  writeln('1 para cargar el archivo');
+  writeln('2 para dar el alta a una novela');
+  writeln('3 dar de baja una novela');
+  writeln('4 ver registros del archivo');
+  readln(op);
+
+  assign(mae, 'novelas');
+  Case op of
+  1 : begin
+        cargarArchivo(mae);
+      end;
+  2 : begin
+        darAlta(mae);
+      end;
+  3 : begin
+        eliminar(mae);
+      end;
+  4 : begin
+        reporte(mae);
+      end;
+  end;
+
+  crearTxt(mae);
+
+  readln;
+end.

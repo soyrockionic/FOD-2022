@@ -1,0 +1,140 @@
+program Ej1P3;
+Uses crt;
+type
+
+  empleado = record
+    nroEmp : integer;
+    apellido : String[25];
+    nombre : String[25];
+    edad : integer;
+    dni : integer;
+  end;
+
+  archivo_Empleados = file of empleado;
+
+procedure leer(var emp : empleado);
+begin
+
+  write('Ingrese apellido ');
+  readln(emp.apellido);
+  if(emp.apellido <> 'fin') then begin
+    write('Ingrese nro de empleado ');
+    readln(emp.nroEmp);
+    write('Ingrese nombre ');
+    readln(emp.nombre);
+    write('Ingrese edad ');
+    readln(emp.edad);
+    write('Ingrese dni ');
+    readln(emp.dni);
+  end;
+
+end;
+
+procedure cargarDatos(var empleados : archivo_Empleados);
+var
+ emp : empleado;
+begin
+  rewrite(empleados);
+  
+  leer(emp);
+  while(emp.apellido <> 'fin') do begin
+    writeln;
+    write(empleados, emp);
+    leer(emp);
+  end;
+  
+  close(empleados);
+end;
+
+
+var
+   empleados : archivo_Empleados;
+   nombreArchivo : String[12];
+   regE, e : empleado;
+   op, cant, i, nro : integer;
+begin
+  clrscr;
+  cant := 0;
+
+  write('Ingrese nombre del archivo ');
+  readln(nombreArchivo);
+
+  assign(empleados, nombreArchivo);
+
+  writeln;
+  writeln('1 para cargar datos');
+  writeln('2 para ver todos los empleados');
+  writeln('3 para ver los empleados proximos a jubilarse');
+  writeln('4 para agregar empleados al archivo');
+  writeln('5 para eliminar un registro');
+  writeln;
+  write('Ingrese la opcion que desea ');
+  readln(op);
+
+  case op of
+    1: begin
+         writeln;
+         cargarDatos(empleados);
+       end;
+
+    2: begin
+         writeln;
+         writeln('Todos los empleados');
+         reset(empleados);
+         while(not eof(empleados)) do begin
+           read(empleados, regE);
+           writeln(regE.nroEmp,' ',regE.apellido,' ',regE.edad,' a¤os dni ',regE.dni);
+         end;
+         close(empleados);
+       end;
+
+     3: begin
+          writeln;
+          writeln('Empleados mayores de 70 a¤os, proximos a jubilarse');
+          reset(empleados);
+          while(not eof(empleados)) do begin
+            read(empleados, regE);
+            if(regE.edad >= 70) then
+              writeln(regE.apellido,' ',regE.edad,' a¤os dni ',regE.dni);
+          end;
+          close(empleados);
+        end;
+
+     4: begin
+           write('ingrese cuantos empleados quiere agregar ');
+           readln(cant);
+           reset(empleados);
+           seek(empleados, filesize(empleados));
+           for i := 1 to cant do begin
+             leer(e);
+             write(empleados, e);
+           end;
+           close(empleados);
+       end;
+
+       5:  begin
+              write('Ingrese nro de empleado ha eliminar ');
+              readln(nro);
+              reset(empleados);
+              seek(empleados , filesize(empleados)-1);
+              read(empleados, e);
+              seek(empleados,0);
+              while(not eof(empleados)) and (regE.nroEmp <> nro) do begin
+                read(empleados, regE);
+                if(regE.nroEmp = nro) then begin
+                  seek(empleados, filepos(empleados)-1);
+                  write(empleados,e);
+                  seek(empleados, filesize(empleados)-1);
+                  truncate(empleados);
+                end
+                else
+                  writeln('El empleado nro ',nro,' no se encuentra en el archivo');
+              end;
+              close(empleados);  
+           end
+       else
+           writeln('Opcion incorrecta');
+     end;
+
+  readln;
+end.

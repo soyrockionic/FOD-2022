@@ -1,0 +1,156 @@
+program Ej6P3;
+Uses crt;
+const
+  valorAlto = 9999;
+type
+
+  prenda = record
+    cod_prenda : integer;
+    descrip : String[50];
+    color : String[10];
+    tipo_prenda : String[4];
+    stock : integer;
+    precio_unit : real;
+  end;
+
+  maestro = file of prenda;
+
+  detalle = file of integer;
+
+
+procedure leerPrenda(var reg : prenda);
+begin
+  write('Ingrese codigo de prenda ');
+  readln(reg.cod_prenda);
+  if(reg.cod_prenda <> -1) then begin
+    write('Ingrese descripcion ');
+    readln(reg.descrip);
+    write('Ingrese color ');
+    readln(reg.color);
+    write('Ingrese tipo de prenda ');
+    readln(reg.tipo_prenda);
+    write('Ingrese stock ');
+    readln(reg.stock);
+    write('Ingrese precio ');
+    readln(reg.precio_unit);
+  end;
+end;
+
+procedure cargarMaestro(var mae : maestro);
+var
+  reg : prenda;
+begin
+  rewrite(mae);
+
+  leerPrenda(reg);
+  while(reg.cod_prenda <> -1) do begin
+    write(mae, reg);
+    leerPrenda(reg);
+  end;
+
+  close(mae);
+end;
+
+procedure cargarDetalle(var det : detalle);
+var
+  reg : integer;
+begin
+  rewrite(det);
+  write('Ingrese codigo ha actualizar ');
+  readln(reg);
+  while(reg <> 0) do begin
+    write(det, reg);
+    write('Ingrese codigo ha actualizar ');
+    readln(reg);
+  end;
+  close(det);
+end;
+
+procedure leer(var det : detalle; var regD : integer);
+begin
+  if(not eof(det)) then
+    read(det, regD)
+  else
+    regD := valorAlto;
+end;
+
+procedure actualizar(var mae : maestro; var det : detalle);
+var
+  regM : prenda;
+  regD : integer;
+begin
+  reset(mae);
+  reset(det);
+
+  leer(det, regD);
+  while(regD <> valorAlto) do begin
+    read(mae, regM);
+    while(regM.cod_prenda <> regD) do
+      read(mae, regM);
+
+    if(regM.stock > 0) then
+      regM.stock := regM.stock * -1;
+    seek(mae, filepos(mae)-1);
+    write(mae, regM);
+
+    leer(det, regD);
+  end;
+
+  close(det);
+  close(mae);
+end;
+
+procedure compactar(var mae : maestro; var new_mae : maestro);
+var
+  reg : prenda;
+begin
+  reset(mae);
+  rewrite(new_mae);
+
+  while(not eof(mae)) do begin
+    read(mae, reg);
+    if(reg.stock > 0) then
+      write(new_mae, reg);
+  end;
+
+  close(new_mae);
+  close(mae);
+end;
+
+procedure reporte(var m : maestro);
+var
+  reg : prenda;
+begin
+  reset(m);
+  while(not eof(m)) do begin
+    read(m, reg);
+    writeln(reg.cod_prenda,' ',reg.stock,' ',reg.precio_unit:2:2);
+  end;
+  close(m);
+end;
+
+var
+  mae, new_mae : maestro;
+  det : detalle;
+  reg : prenda;
+begin
+  clrscr;
+
+  assign(mae, 'prendas');
+  assign(det, 'det_prendas');
+
+  //cargarMaestro(mae);
+  //cargarDetalle(det);
+
+  //actualizar(mae,det);
+
+  assign(new_mae, 'new_prendas');
+  compactar(mae,new_mae);
+  Erase(mae);
+  Rename(new_mae, 'prendas');
+
+  writeln('Archivo compacto');
+  reporte(new_mae);
+
+  readln;
+end.

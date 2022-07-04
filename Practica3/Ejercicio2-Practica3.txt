@@ -1,0 +1,98 @@
+program Ej2P3;
+Uses crt;
+const
+  df = 5;
+type
+
+  asistente = record
+    codigo : integer;
+    apellido : String[12];
+    email : String[12];
+    telefono : String[12];
+    dni : String[12];
+  end;
+
+  maestro = file of asistente;
+
+procedure leerAs(var reg : asistente);
+begin
+  write('Ingrese nro de asistente ');
+  readln(reg.codigo);
+  write('Ingrese apellido ');
+  readln(reg.apellido);
+  write('Ingrese email ');
+  readln(reg.email);
+  write('Ingrese nro de telefono ');
+  readln(reg.telefono);
+  write('Ingrese dni ');
+  readln(reg.dni);
+end;
+
+procedure cargarArchivo(var mae : maestro);
+var
+  reg : asistente;
+  i : integer;
+begin
+  rewrite(mae);
+  for i := 1 to df do begin
+    leerAs(reg);
+    write(mae, reg);
+  end;
+  close(mae);
+end;
+
+procedure eliminar(var mae : maestro);
+var
+  reg : asistente;
+begin
+  reset(mae);
+  while(not eof(mae)) do begin
+    read(mae, reg);
+    if(reg.codigo < 143) then
+      reg.apellido := '@' + reg.apellido;
+    seek(mae, filepos(mae)-1);
+    write(mae, reg);
+  end;
+  close(mae);
+end;
+
+procedure reporte(var mae : maestro);
+var
+  reg : asistente;
+begin
+  reset(mae);
+  while(not eof(mae)) do begin
+    read(mae, reg);
+    writeln(reg.codigo,' ',reg.apellido,' ',reg.telefono);
+  end;
+  close(mae);
+end;
+
+var
+  mae : maestro;
+  op : integer;
+begin
+  clrscr;
+
+  assign(mae, 'asistentes');
+
+  writeln('1 para cargar el archivo');
+  writeln('2 para eliminacion logica');
+  writeln('3 para ver los asistentes');
+  readln(op);
+
+  Case op of
+  1 : begin
+        cargarArchivo(mae);
+  end;
+  2 : begin
+        eliminar(mae);
+      end;
+  3 : begin
+        writeln;
+        reporte(mae);
+      end;
+  end;
+
+  readln;
+end.
