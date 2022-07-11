@@ -1,0 +1,173 @@
+program ExamenNivelacion;
+Uses crt;
+const
+  valorAlto = '0';
+type
+
+  escuela = record
+    codProv : String[1];
+    distrito : String[2];
+    codEsc : String[2];
+    cantVar : integer;
+    cantMuj : integer;
+    cantCom : integer;
+  end;
+
+  provincia = record
+    codProv : String[1];
+    nombre : String[20];
+  end;
+
+  maestroEsc = file of escuela;
+
+  maestroProv = file of provincia;
+
+  maxEscuela = record
+    nombre : String[20];
+    distrito : String[2];
+    codEsc : String[2];
+  end;
+
+procedure leerEscuela(var reg : escuela);
+begin
+  write('Ingrese codigo de provincia ');
+  readln(reg.codProv);
+  if(reg.codProv <> '0') then begin
+    write('Ingrese distrito ');
+    readln(reg.distrito);
+    write('Ingrese codigo de escuela ');
+    readln(reg.codEsc);
+    write('Ingrese cantidad de varones ');
+    readln(reg.cantVar);
+    write('Ingrese cantidad de mujeres ');
+    readln(reg.cantMuj);
+    write('Cantidad que asisten al comedor ');
+    readln(reg.cantCom);
+  end;
+end;
+
+procedure cargarMaeEsc(var maeEsc : maestroEsc);
+var
+  reg : escuela;
+begin
+  rewrite(maeEsc);
+  leerEscuela(reg);
+  while(reg.codProv <> '0') do begin
+    write(maeEsc, reg);
+    leerEscuela(reg);
+  end;
+  close(maeEsc);
+end;
+
+procedure leerProvincia(var reg : provincia);
+begin
+  write('Ingrese codigo de pcia ');
+  readln(reg.codProv);
+  if(reg.codProv <> '0') then begin
+    write('Ingrese nombre de pcia ');
+    readln(reg.nombre);
+  end;
+end;
+
+procedure cargarMaeProv(var maeProv : maestroProv);
+var
+  reg : provincia;
+begin
+  rewrite(maeProv);
+  leerProvincia(reg);
+  while(reg.codProv <> '0') do begin
+    write(maeProv, reg);
+    leerProvincia(reg);
+  end;
+  close(maeProv);
+end;
+
+procedure leer(var maeEsc : maestroEsc; var regEsc : escuela);
+begin
+  if(not eof(maeEsc)) then
+    read(maeEsc,regEsc)
+  else
+    regEsc.codProv := valorAlto;
+end;
+
+procedure maximo(regEsc : escuela; n : string; var maxEsc : maxEscuela; var max : integer);
+begin
+  if((regEsc.cantVar + regEsc.cantMuj) > max) then begin
+    max := regEsc.cantVar + regEsc.cantMuj;
+    maxEsc.nombre := n;
+    maxEsc.distrito := regEsc.distrito;
+    maxEsc.codEsc := regEsc.codEsc;
+  end;
+end;
+
+procedure listado(var maeEsc : maestroEsc; var maeProv : maestroProv);
+var
+  regEsc : escuela;
+  regProv : provincia;
+  totalAlum, cantEsc, totalAlumProv, cantEscPais, totalAlumPais, max : integer;
+  actDist : String[2];
+  actProv : String[1];
+  maxEsc, maxEscProv : maxEscuela;
+  maxp : integer;
+begin
+  totalAlumPais := 0;
+  cantEscPais := 0;
+  max := -1;
+  reset(maeEsc);
+  reset(maeProv);
+  leer(maeEsc,regEsc);
+  while(regEsc.codProv <> valorAlto) do begin
+    read(maeProv,regProv);
+    while(regProv.codProv <> regEsc.codProv) do
+      read(maeProv,regProv);
+    writeln;
+    writeln('Provincia ',regProv.nombre);
+    cantEsc := 0;
+    totalAlumProv := 0;
+    maxp := -1;
+    while(regEsc.codProv <> valorAlto) and (regProv.codProv = regEsc.codProv) do begin
+      actDist := regEsc.distrito;
+      writeln('Distrito ',regEsc.distrito);
+      while(regEsc.codProv <> valorAlto) and (regProv.codProv = regEsc.codProv) and (regEsc.distrito = actDist) do begin
+        writeln('Escuela ',regEsc.codEsc);
+        writeln('Total de alumnos ',regEsc.cantVar + regEsc.cantMuj);
+        totalAlum := regEsc.cantVar + regEsc.cantMuj;
+        writeln('Porcentaje que asiste al comedor ',((regEsc.cantCom * 100) / totalAlum):2:2);
+        cantEsc := cantEsc + 1;
+        totalAlumProv := totalAlumProv + totalAlum;
+        maximo(regEsc,regProv.nombre,maxEsc,max); //Obtengo la escuela con mas alumnos del pais
+        maximo(regEsc,regProv.nombre,maxEscProv,maxp); //Obtengo la escuela con mas alumnos de cada pcia
+        leer(maeEsc,regEsc);
+      end;
+    end;
+    writeln('--- Datos a nivel pcia ---');
+    writeln('Total de escuelas en pcia ',cantEsc);
+    writeln('Total de alumnos en pcia ',totalAlumProv);
+    writeln('Dist: ',maxEscProv.distrito,' - escuela: ',maxEscProv.codEsc);
+    cantEscPais := cantEscPais + cantEsc;
+    totalAlumPais := totalAlumPais + totalAlumProv;
+  end;
+  writeln;
+  writeln('--- Datos a nivel pais ---');
+  writeln('Total de escuelas pais ',cantEscPais);
+  writeln('Total de alumnos pais ',totalAlumPais);
+  writeln('Pcia: ',maxEsc.nombre,' - dist: ',maxEsc.distrito,' - escuela: ',maxEsc.codEsc);
+  close(maeEsc);
+  close(maeProv);
+end;
+
+var
+  maeEsc : maestroEsc;
+  maeProv : maestroProv;
+begin
+  clrscr;
+  assign(maeEsc,'escuelas');
+  assign(maeProv,'provincias');
+
+  //cargarMaeEsc(maeEsc);
+  //cargarMaeProv(maeProv);
+
+  listado(maeEsc,maeProv);
+
+  readln;
+end.
