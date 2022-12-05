@@ -1,0 +1,9 @@
+Densidad de empaquetamiento : relacion entre el espacio disponible para el archivo
+                                                      de datos y la cantidad de registros que integran el 
+                                                      mismo.
+
+
+
+DE = n_registros / espacio_total
+
+.

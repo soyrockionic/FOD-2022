@@ -1,0 +1,33 @@
+Funcion de dispersion
+
+ : caja negra que convierte el parametro a un numero (si no lo es)
+casi aleatorio y se convierte a una dir de memoria.
+
+
+
+3 funciones hash:
+
+
+f(x) = x mod 5
+
+g(x) = x mod 7
+
+h(x) = x mod 11
+
+
+
+f : toma el valor de x y le aplica la operacion modular, devolviendo el resto de la division
+    entera entre x y 5.
+
+
+g : toma el valor de x y le aplica la operacion modular, devolviendo el resto de la division
+     entera entre x y 7.
+
+
+h : toma el valor de x y le aplica la operacion modular, devolviendo el resto de la division
+     entera entre x y 11.
+
+
+
+Hay infinitas funciones hash, pero no significa que todas sean aceptables o uniformes
+.
