@@ -1,0 +1,6 @@
+1042 15000 lg k4
+50 120 usado
+4096 24000 moto G6
+50 45 usado
+2048 18000 moto G3
+50 40 usado
