@@ -1,149 +1,185 @@
-program Ejercicio6;
+program Ej6P1;
 Uses crt;
-
 type
 
   celular = record
     codigo : integer;
-    descrip : String[25];
-    marcaNombre : String[25];
+    nombre : String[50];
+    descrip : String[50];
+    marca : String[50];
     precio : real;
     stockMin : integer;
-    stock : integer;
+    stockDisp : integer;
   end;
 
   archivo = file of celular;
 
-
-procedure leer(var cel : celular);
+procedure cargarArchivo(var arch : archivo);
+var
+  reg : celular;
+  carga : text;
 begin
+  assign(carga, 'celulares.txt');
+  rewrite(arch);
+  reset(carga);
+  while(not eof(carga)) do begin
+    readln(carga, reg.codigo,reg.precio,reg.nombre,reg.marca);
+    readln(carga, reg.stockMin,reg.stockDisp,reg.descrip);
+    write(arch, reg);
+  end;
+  close(carga);
+  close(arch);
+end;
 
-  writeln('Ingrese codigo, precio , marca y nombre');
-  readln(cel.codigo, cel.precio, cel.marcaNombre);
+procedure stockMenorAlMinimo(var arch : archivo);
+var
+  reg : celular;
+begin
+  reset(arch);
+  writeln('-------------------------');
+  while(not eof(arch)) do begin
+    read(arch, reg);
+    if(reg.stockDisp < reg.stockMin) then
+      writeln(reg.codigo,' ',reg.nombre,' ',reg.marca,' ',reg.precio:2:2,' ',reg.stockDisp);
+  end;
+  writeln('-------------------------');
+  close(arch);
+end;
 
-  writeln('Ingrese stock minimo, stock y descripcion');
-  readln(cel.stockMin, cel.stock, cel.descrip);
+procedure crearArchivoText(var arch : archivo);
+var
+  reg : celular;
+  phone : text;
+begin
+  assign(phone, 'celular.txt');
+  rewrite(phone);
+  reset(arch);
+  while(not eof(arch)) do begin
+    read(arch, reg);
+    write(phone, reg.codigo,' ',reg.nombre,' ',reg.marca,' ',reg.precio:2:2,' ',reg.stockDisp);
+    writeln(phone, ' ');
+  end;
+  close(phone);
+  close(arch);
+end;
 
+procedure contienenLosCharIngresados(var arch : archivo);
+var
+  reg : celular;
+  cadena : String;
+begin
+  reset(arch);
+  write('Ingrese la cadena de caracteres para verificar ');
+  readln(cadena);
+  while(not eof(arch)) do begin
+    read(arch, reg);
+    if(pos(cadena, reg.descrip) > 0) then
+      writeln(reg.codigo,' ',reg.nombre,' ',reg.marca,' ',reg.descrip);
+  end;
+  close(arch);
+end;
+
+procedure leer(var reg : celular);
+begin
+  write('Ingrese codigo ');
+  readln(reg.codigo);
+  write('Ingrese nombre ');
+  readln(reg.nombre);
+  write('Ingrese descripcion ');
+  readln(reg.descrip);
+  write('Ingrese marca ');
+  readln(reg.marca);
+  write('Ingrese precio ');
+  readln(reg.precio);
+  write('Ingrese stock minimo ');
+  readln(reg.stockMin);
+  write('Ingrese stock disponible ');
+  readln(reg.stockDisp);
+end;
+
+procedure agregarCelulares(var arch : archivo);
+var
+  reg : celular;
+  cant, i : integer;
+begin
+  write('Ingrese la cantidad que desea agregar ');
+  readln(cant);
+  reset(arch);
+  seek(arch, filesize(arch));
+  for i := 1 to cant do begin
+     leer(reg);
+     write(arch, reg);
+  end;
+  close(arch);
+end;
+
+procedure modificarStock(var arch : archivo);
+var
+  reg : celular;
+  n : String[50];
+begin
+  write('Ingrese  el nombre del celular que desa modificar su stock ');
+  readln(n);
+  reset(arch);
+  while(not eof(arch)) and (reg.nombre <> n) do
+    read(arch, reg);
+  if(reg.nombre = n) then begin
+    seek(arch, filepos(arch)-1);
+    write('Ingrese el nuevo stock ');
+    readln(reg.stockDisp);
+    write(arch, reg);
+  end;
+  close(arch);
+end;
+
+procedure celularesSinStock(var arch : archivo);
+var
+  reg : celular;
+  phone : text;
+begin
+  assign(phone, 'sinStock.txt');
+  rewrite(phone);
+  reset(arch);
+  while(not eof(arch)) do begin
+    read(arch, reg);
+    if(reg.stockDisp = 0) then begin
+      write(phone, reg.codigo,' ',reg.nombre,' ',reg.marca,' ',reg.descrip,' ',reg.precio:2:2,' ',reg.stockDisp);
+      writeln(phone, ' ');
+    end;
+  end;
+  close(arch);
+  close(phone);
 end;
 
 var
-   celulares : archivo;
-   nombreArchivo : String[12];
-   op, cont, i : integer;
-   carga : Text;
-   celu : Text;
-   phono : Text;
-   cel : celular;
-   cod : integer;
+  arch : archivo;
+  car : char;
+  n : String[50];
 begin
   clrscr;
 
-  write('Ingrese nombre del archivo ');
-  readln(nombreArchivo);
+  write('Ingrese el nombre del archivo: ');
+  readln(n);
 
-  assign(celulares, nombreArchivo);
-
-  writeln;
-  writeln('1 para cargar datos');
-  writeln('2 para ver los celulares con stock menor al minimo');
-  writeln('3 exportar el archivo del inciso A a un txt');
-  writeln('4 Agregar uno o mas celulares al archivo');
-  writeln('5 modificar el stock de un celular');
-  writeln('6 crear archivo .txt con los celulares sin stock');
-
-  writeln;
-  write('Ingrese la opcion que desea ');
-  readln(op);
-
-  case op of
-    1: begin
-         assign(carga, 'celulares.txt');
-         reset(carga);
-         rewrite(celulares);
-
-         writeln;
-         while(not eof(carga)) do begin
-
-           readln(carga, cel.codigo, cel.precio, cel.marcaNombre);
-           readln(carga, cel.stockMin, cel.stock, cel.descrip);
-           write(celulares, cel);
-         end;
-
-         writeln('Archivo cargado');
-         close(celulares);
-         close(carga);
-       end;
-
-    2: begin
-         writeln('Celulares con stock menor al minimo');
-         reset(celulares);
-         while(not eof(celulares)) do begin
-           read(celulares, cel);
-           if(cel.stock < cel.stockMin) then
-             writeln(cel.codigo,' ',cel.precio:2:2,' ',cel.marcaNombre,' ',cel.stock);
-         end;
-         close(celulares);
-       end;
-
-    3: begin
-         assign(celu, 'celular.txt');
-         reset(celulares);
-         rewrite(celu);
-         while(not eof(celulares)) do begin
-           read(celulares,cel);
-           write(celu, cel.codigo,' ',cel.precio:2:2,' ',cel.marcaNombre,' ',cel.stock);
-           writeln(celu,' ');
-         end;
-
-         close(celulares);
-         close(celu);
-      end;
-
-    4: begin
-         write('Ingresa la cantidad de celulares que quiere agregar ');
-         readln(cont);
-         reset(celulares);
-         seek(celulares, filesize(celulares));
-         for i := 1 to cont do begin
-           leer(cel);
-           write(celulares,cel);
-         end;
-         close(celulares);
-       end;
-
-    5: begin
-         write('Ingrese el celular que quiere modificar el stock ');
-         readln(cod);
-         reset(celulares);
-         while(not eof(celulares)) do begin
-           read(celulares,cel);
-
-           if(cel.codigo = cod) then begin
-             write('Ingrese el nuevo stock ');
-             readln(cel.stock);
-             seek(celulares, filePos(celulares)-1);
-             write(celulares,cel);
-           end;
-         end;
-         close(celulares);
-       end;
-
-    6: begin
-        assign(phono, 'SinStock.txt');
-        reset(celulares);
-        rewrite(phono);
-        while(not eof(celulares)) do begin
-          read(celulares,cel);
-          if(cel.stock = 0) then begin
-            write(phono, cel.codigo,' ',cel.precio:2:2,' ',cel.marcaNombre,' ',cel.stock);
-            writeln(phono,' ');
-          end;
-        end;
-        close(celulares);
-        close(phono);
-       end;
-
-     end;
+  assign(arch, n);
+  writeln('-------------------------');
+  writeln('a : Cargar archivo');
+  writeln('b : Celulares con stock menor al minimo');
+  writeln('c : crear archivo de txt');
+  writeln('d : celulares cuya descrip contiene los char ingresados');
+  writeln('e : Agregar mas celulares al archivo');
+  writeln('f : Modificar stock');
+  writeln('g : Crear archivo con los celulares sin stock');
+  readln(car);
+  case car of
+    'a' : cargarArchivo(arch);
+    'b' : stockMenorAlMinimo(arch);
+    'c' : crearArchivoText(arch);
+    'd' : contienenLosCharIngresados(arch);
+    'e' : agregarCelulares(arch);
+    'f' : modificarStock(arch);
+    'g' : celularesSinStock(arch);
+  end;
 
   readln;
 end.
