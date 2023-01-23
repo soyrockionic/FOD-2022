@@ -1,189 +1,208 @@
-program Ejercicio4;
+program Ej4P1;
 Uses crt;
-
 type
 
   empleado = record
-    nroEmp : integer;
+    nro : integer;
     apellido : String[25];
     nombre : String[25];
     edad : integer;
     dni : integer;
   end;
 
-  archivo_Empleados = file of empleado;
+  archivo = file of empleado;
 
-procedure leer(var emp : empleado);
+procedure leer(var reg : empleado);
+begin
+  write('Ingrese apellido: ');
+  readln(reg.apellido);
+  if(reg.apellido <> 'fin') then begin
+    write('Ingrese codigo: ');
+    readln(reg.nro);
+    write('Ingrese nombre: ');
+    read(reg.nombre);
+    write('Ingrese edad: ');
+    readln(reg.edad);
+    write('Ingrese dni: ');
+    readln(reg.dni);
+  end;
+end;
+
+procedure cargarArchivo(var arch : archivo);
+var
+  reg : empleado;
+begin
+  rewrite(arch);
+  leer(reg);
+  while(reg.apellido <> 'fin') do begin
+    write(arch, reg);
+    leer(reg);
+  end;
+  close(arch);
+end;
+
+procedure listaConElIngresado(var arch : archivo);
+var
+  reg : empleado;
+  n : String;
+begin
+  write('Ingrese nombre para mostrar en pantalla ');
+  readln(n);
+  reset(arch);
+  while(not eof(arch)) do begin
+    read(arch, reg);
+    if(reg.nombre = n) then
+      writeln(reg.apellido,' ',reg.dni);
+  end;
+  close(arch);
+end;
+
+procedure todosLosEmpleados(var arch : archivo);
+var
+  reg : empleado;
+begin
+  reset(arch);
+  while(not eof(arch)) do begin
+    read(arch, reg);
+    writeln(reg.nro,' ',reg.apellido,' ',reg.edad,' ',reg.dni);
+  end;
+  close(arch);
+end;
+
+procedure ProntoAJubilarse(var arch : archivo);
+var
+  reg : empleado;
+begin
+  reset(arch);
+  while(not eof(arch)) do begin
+    read(arch, reg);
+    if(reg.edad > 70) then
+      write(reg.nro,' ',reg.apellido);
+  end;
+  close(arch);
+end;
+
+procedure agregarNuevosEmpleados(var arch : archivo);
+var
+  reg : empleado;
+  cant, i : integer;
+begin
+  write('Ingrese la cant de empleados que desea agregar ');
+  readln(cant);
+  reset(arch);
+  seek(arch, filesize(arch));
+  for i := 1 to cant do begin
+    leer(reg);
+    write(arch, reg);
+  end;
+  close(arch);
+  todosLosEmpleados(arch);
+end;
+
+procedure modificarEdad(var arch : archivo);
+var
+  reg : empleado;
+  cant, i, cod : integer;
+begin
+  reset(arch);
+  write('Ingrese la cantidad de empledados que desea modificar la edad ');
+  read(cant);
+  for i := 1 to cant do begin
+    write('Ingrese el codigo del empleado ');
+    read(cod);
+    while(not eof(arch)) and (reg.nro <> cod) do
+      read(arch, reg);
+    if(reg.nro = cod) then begin
+      write('Ingrese la nueva edad ');
+      readln(reg.edad);
+      seek(arch, filepos(arch)-1);
+      write(arch, reg);
+    end;
+    seek(arch, 0);
+  end;
+  close(arch);
+  todosLosEmpleados(arch);
+end;
+
+procedure exportarArchivo(var arch : archivo);
+var
+  reg : empleado;
+  carga : text;
+begin
+  assign(carga, 'todos_empleados.txt');
+  rewrite(carga);
+  reset(arch);
+  while(not eof(arch)) do begin
+    read(arch, reg);
+    write(carga, reg.nro, ' ', reg.apellido, ' ', reg.edad, ' ', reg.dni);
+    writeln(carga, ' ');
+  end;
+  close(carga);
+  close(arch);
+end;
+
+procedure empleadosSinDni(var arch : archivo);
+var
+  carga : text;
+  reg : empleado;
 begin
 
-  write('Ingrese apellido ');
-  readln(emp.apellido);
-  if(emp.apellido <> 'fin') then begin
-    write('Ingrese nro de empleado ');
-    readln(emp.nroEmp);
-    write('Ingrese nombre ');
-    readln(emp.nombre);
-    write('Ingrese edad ');
-    readln(emp.edad);
-    write('Ingrese dni ');
-    readln(emp.dni);
+  assign(carga, 'faltaDniEmpleado.txt');
+
+  reset(arch);
+  rewrite(carga);
+  while(not eof(arch)) do begin
+    read(arch, reg);
+    if(reg.dni = 00) then begin
+      write(carga, reg.nro,' ',reg.apellido,' ',reg.edad,' ',reg.dni);
+      writeln(carga,' ');
+    end;
   end;
+  close(carga);
+  close(arch);
 
 end;
 
-procedure cargarDatos(var empleados : archivo_Empleados);
+procedure recorrerArchivo(var arch : archivo);
 var
- emp : empleado;
+  op : integer;
 begin
-
-  leer(emp);
-  while(emp.apellido <> 'fin') do begin
-    writeln;
-
-    write(empleados, emp);
-
-    leer(emp);
+  writeln();
+  writeln('1 : lista de empleados con el nombre ingresado');
+  writeln('2 : lista de todos los empleados');
+  writeln('3 : lista de los empleados pronto a jubilarse');
+  writeln('4 : agregar nuevos empleados');
+  writeln('5 : modificar edad');
+  writeln('6 : exportar a un txt');
+  writeln('7 : empleadosSinDni');
+  writeln();
+  write('Ingrese que eperacion desea ');
+  readln(op);
+  case op of
+    1 : listaConElIngresado(arch);
+    2 : todosLosEmpleados(arch);
+    3 : ProntoAJubilarse(arch);
+    4 : agregarNuevosEmpleados(arch);
+    5 : modificarEdad(arch);
+    6 : exportarArchivo(arch);
+    7 : empleadosSinDni(arch);
   end;
-
 end;
 
-
 var
-   empleados : archivo_Empleados;
-   nombreArchivo : String[12];
-   regE, e : empleado;
-   ape : String[25];
-   op, cant, i : integer;
-   carga : Text;
+  arch : archivo;
+  n : String;
 begin
   clrscr;
-  cant := 0;
 
-  write('Ingrese nombre del archivo ');
-  readln(nombreArchivo);
+  write('Ingrese el nombre del archivo ');
+  readln(n);
 
-  assign(empleados, nombreArchivo);
+  assign(arch, n);
 
-  writeln;
-  writeln('1 para cargar datos');
-  writeln('2 para buscar por apellido');
-  writeln('3 para ver todos los empleados');
-  writeln('4 para ver los empleados proximos a jubilarse');
-  writeln('5 para agregar empleados al archivo');
-  writeln('6 para cambiar la edad');
-  writeln('7 Exportar el contenido del archivo a un archivo de texto llamado todos_empleados.txt');
-  writeln('8 Exportar a un archivo de texto llamado: “faltaDNIEmpleado.txt”, los empleados que no tengan cargado el DNI');
+  cargarArchivo(arch);
 
-  writeln;
-  write('Ingrese la opcion que desea ');
-  readln(op);
-
-  case op of
-    1: begin
-         rewrite(empleados);
-
-         writeln;
-         cargarDatos(empleados);
-
-         close(empleados);
-       end;
-
-    2: begin
-         reset(empleados);
-         write('Ingrese apellido para mostrar datos ');
-         readln(ape);
-
-         writeln;
-         writeln('Empleados con apellido ',ape);
-         while(not eof(empleados)) do begin
-           read(empleados, regE);
-           if(regE.apellido = ape) then
-             writeln(regE.apellido,' ',regE.dni);
-         end;
-         close(empleados);
-       end;
-
-    3: begin
-         writeln;
-         writeln('Todos los empleados');
-         reset(empleados);
-         while(not eof(empleados)) do begin
-           read(empleados, regE);
-           writeln(regE.apellido,' ',regE.edad,' a¤os dni ',regE.dni);
-         end;
-         close(empleados);
-       end;
-
-     4: begin
-          writeln;
-          writeln('Empleados mayores de 70 a¤os, proximos a jubilarse');
-          reset(empleados);
-          while(not eof(empleados)) do begin
-            read(empleados, regE);
-            if(regE.edad >= 70) then
-              writeln(regE.apellido,' ',regE.edad,' a¤os dni ',regE.dni);
-          end;
-          close(empleados);
-        end;
-
-     5: begin
-           write('ingrese cuantos empleados quiere agregar ');
-           readln(cant);
-           reset(empleados);
-           seek(empleados, filesize(empleados));
-           for i := 1 to cant do begin
-             leer(e);
-             write(empleados, e);
-           end;
-           close(empleados);
-       end;
-
-       6: begin
-             write('ingrese el num del empleado que quiere cambiar la edad ');
-             readln(cant);
-             reset(empleados);
-             while (not EOF(empleados)) do begin
-               read(empleados,e);
-               if(e.nroEmp = cant) then begin
-                 write('ingrese nueva edad ');
-                 readln(e.edad);
-                 seek(empleados,filePos(empleados)-1);
-                 write(empleados,e)
-               end;
-             end;
-             close(empleados);
-           end;
-
-         7: begin
-              assign(carga,'todos_empleados.txt');
-              reset(empleados);
-              rewrite(carga);
-              while(not eof(empleados)) do begin
-                read(empleados,e);
-                write(carga,e.dni,' ',e.apellido,' ',e.nroEmp);
-                writeln(carga,' ');
-              end;
-              close(empleados);
-              close(carga);
-            end;
-
-            8: begin
-              //writeln;
-              assign(carga,'faltaDNIEmpleado.txt');
-              reset(empleados);
-              rewrite(carga);
-              while(not eof(empleados)) do begin
-                read(empleados,e);
-                if(e.dni = 00) then begin
-                  write(carga,e.dni,' ',e.apellido,' ',e.nroEmp);
-                   writeln(carga,' ');
-                end;
-              end;
-              close(empleados);
-              close(carga);
-            end;
-
-     end;
+  recorrerArchivo(arch);
 
   readln;
 end.
