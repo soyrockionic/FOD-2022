@@ -1,0 +1,107 @@
+program Ej5P1;
+Uses crt;
+type
+
+  celular = record
+    codigo : integer;
+    nombre : String[50];
+    descrip : String[50];
+    marca : String[50];
+    precio : real;
+    stockMin : integer;
+    stockDisp : integer;
+  end;
+
+  archivo = file of celular;
+
+procedure cargarArchivo(var arch : archivo);
+var
+  reg : celular;
+  carga : text;
+begin
+  assign(carga, 'celulares.txt');
+  rewrite(arch);
+  reset(carga);
+  while(not eof(carga)) do begin
+    readln(carga, reg.codigo,reg.precio,reg.nombre,reg.marca);
+    readln(carga, reg.stockMin,reg.stockDisp,reg.descrip);
+    write(arch, reg);
+  end;
+  close(carga);
+  close(arch);
+end;
+
+procedure stockMenorAlMinimo(var arch : archivo);
+var
+  reg : celular;
+begin
+  reset(arch);
+  writeln('-------------------------');
+  while(not eof(arch)) do begin
+    read(arch, reg);
+    if(reg.stockDisp < reg.stockMin) then
+      writeln(reg.codigo,' ',reg.nombre,' ',reg.marca,' ',reg.precio:2:2,' ',reg.stockDisp);
+  end;
+  writeln('-------------------------');
+  close(arch);
+end;
+
+procedure crearArchivoText(var arch : archivo);
+var
+  reg : celular;
+  phone : text;
+begin
+  assign(phone, 'celular.txt');
+  rewrite(phone);
+  reset(arch);
+  while(not eof(arch)) do begin
+    read(arch, reg);
+    write(phone, reg.codigo,' ',reg.nombre,' ',reg.marca,' ',reg.precio:2:2,' ',reg.stockDisp);
+    writeln(phone, ' ');
+  end;
+  close(phone);
+  close(arch);
+end;
+
+procedure contienenLosCharIngresados(var arch : archivo);
+var
+  reg : celular;
+  cadena : String;
+begin
+  reset(arch);
+  write('Ingrese la cadena de caracteres para verificar ');
+  readln(cadena);
+  while(not eof(arch)) do begin
+    read(arch, reg);
+    if(pos(cadena, reg.descrip) > 0) then
+      writeln(reg.codigo,' ',reg.nombre,' ',reg.marca,' ',reg.descrip);
+  end;
+  close(arch);
+end;
+
+var
+  arch : archivo;
+  car : char;
+  n : String[50];
+begin
+  clrscr;
+
+  write('Ingrese el nombre del archivo: ');
+  readln(n);
+
+  assign(arch, n);
+  writeln('-------------------------');
+  writeln('a : Cargar archivo');
+  writeln('b : Celulares con stock menor al minimo');
+  writeln('c : crear archivo de txt');
+  writeln('d : celulares cuya descrip contiene los char ingresados');
+  readln(car);
+  case car of
+    'a' : cargarArchivo(arch);
+    'b' : stockMenorAlMinimo(arch);
+    'c' : crearArchivoText(arch);
+    'd' : contienenLosCharIngresados(arch);
+  end;
+
+  readln;
+end.
