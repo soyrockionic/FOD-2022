@@ -1,110 +1,137 @@
-program Ejercicio7;
+program Ej7;
 Uses crt;
-
 type
 
   novela = record
     codigo : integer;
-    nombre : String[25];
-    genero : integer;
+    nombre : String;
+    genero : String;
     precio : real;
   end;
 
   archivo = file of novela;
 
-procedure leer(var n : novela);
+procedure cargarArchivo(var arch : archivo);
+var
+  reg : novela;
+  novels : text;
 begin
-  writeln('Ingrese codigo , genero y precio');
-  readln(n.codigo,n.genero,n.precio);
+  assign(novels, 'novelas.txt');
+  rewrite(arch);
+  reset(novels);
+  while(not eof(novels)) do begin
+    readln(novels, reg.codigo, reg.precio, reg.genero);
+    readln(novels, reg.nombre);
+    write(arch, reg);
+  end;
+  close(novels);
+  close(arch);
+end;
+
+procedure leer(var reg : novela);
+begin
+  write('Ingrese codigo ');
+  readln(reg.codigo);
   write('Ingrese nombre ');
-  readln(n.nombre);
+  readln(reg.nombre);
+  write('Ingrese genero ');
+  readln(reg.genero);
+  write('Ingrese precio ');
+  readln(reg.precio);
+end;
+
+procedure mostrarArchivo(var arch : archivo);
+var
+  reg : novela;
+begin
+  reset(arch);
+  while(not eof(arch)) do begin
+    read(arch, reg);
+    writeln(reg.codigo,' ',reg.nombre,' ',reg.genero,' ',reg.precio:2:2);
+  end;
+  close(arch);
+end;
+
+procedure agregarNovela(var arch : archivo);
+var
+  reg : novela;
+begin
+  reset(arch);
+  leer(reg);
+  seek(arch, filesize(arch));
+  write(arch, reg);
+  close(arch);
+  writeln();
+  mostrarArchivo(arch);
+end;
+
+procedure modificarRegistro(var reg : novela);
+var
+  op : integer;
+begin
+  writeln('1 : modificar nombre');
+  writeln('2 : modificar genero');
+  writeln('3 : modificar precio');
+  readln(op);
+  case op of
+    1 : begin
+          write('Ingrese nuevo nombre ');
+          readln(reg.nombre);
+        end;
+    2 : begin
+          write('Ingrese nuevo genero ');
+          readln(reg.genero);
+        end;
+    3 : begin
+          write('Ingrese nuevo precio ');
+          readln(reg.precio);
+        end;
+  end;
+end;
+
+procedure modificarNovela(var arch : archivo);
+var
+  reg : novela;
+  cod : integer;
+begin
+  write('ingrese codigo de la novela que desea modificar ');
+  readln(cod);
+  reset(arch);
+  while(not eof(arch)) and (reg.codigo <> cod) do
+    read(arch, reg);
+  if(reg.codigo = cod) then begin
+    modificarRegistro(reg);
+    seek(arch, filepos(arch)-1);
+    write(arch, reg);
+  end;
+  close(arch);
+  mostrarArchivo(arch);
+end;
+
+procedure actualizarArchivo(var arch : archivo);
+var
+  reg : novela;
+  op : integer;
+begin
+  writeln('1 : agregar nueva novela');
+  writeln('2 : modificar una novela');
+  write('Ingrese la opcion que desea ');
+  readln(op);
+  case op of
+    1 : agregarNovela(arch);
+    2 : modificarNovela(arch);
+  end;
 end;
 
 var
-   novelas : archivo;
-   nombreArchivo : String[12];
-
-   op, cant, i, cod : integer;
-   carga : Text;
-   nov : novela;
+  arch : archivo;
 begin
   clrscr;
+  assign(arch, 'novelas');
 
-  write('Ingrese nombre del archivo ');
-  readln(nombreArchivo);
+  cargarArchivo(arch);
 
-  assign(novelas, nombreArchivo);
-
-  writeln;
-  writeln('1 Cargar datos');
-  writeln('2 Agregar novela');
-  writeln('3 Modificar una novela');
-
-  writeln;
-  write('Ingrese la opcion que desea ');
-  readln(op);
-
-  case op of
-    1: begin
-         assign(carga, 'novelas.txt');
-         reset(carga);
-         rewrite(novelas);
-
-         writeln;
-         while(not eof(carga)) do begin
-
-           readln(carga, nov.codigo, nov.genero, nov.precio);
-           readln(carga, nov.nombre);
-           write(novelas, nov);
-         end;
-
-         writeln('Archivo cargado');
-         close(novelas);
-         close(carga);
-       end;
-
-    2: begin
-         write('Ingrese cuantas novelas desea agregar ');
-         readln(cant);
-         reset(novelas);
-         seek(novelas, filesize(novelas));
-         for i := 1 to cant do begin
-           leer(nov);
-           write(novelas, nov);
-         end;
-         close(novelas);
-       end;
-
-    3: begin
-         write('Ingrese el codigo de novela que quiere modificar ');
-         readln(cod);
-         reset(novelas);
-         while(not eof(novelas)) do begin
-           read(novelas,nov);
-           if(nov.codigo = cod) then begin
-             write('Ingrese nuevo precio ');
-             readln(nov.precio);
-             seek(novelas, filePos(novelas)-1);
-             write(novelas, nov);
-           end;
-         end;
-
-         close(novelas);
-      end;
-
-    4: begin
-
-         writeln;
-         writeln('------------------------------------');
-         reset(novelas);
-         while(not eof(novelas)) do begin
-           read(novelas, nov);
-           writeln(nov.codigo,' ',nov.precio:2:2,' ',nov.nombre);
-         end;
-         close(novelas);
-       end;
-
-     end;
+  actualizarArchivo(arch);
 
   readln;
 end.
