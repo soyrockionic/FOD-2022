@@ -1,4 +1,0 @@
-1042 8 3000
-Campeones
-1045 6 5000
-Simuladores
