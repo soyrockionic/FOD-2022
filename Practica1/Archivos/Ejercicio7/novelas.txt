@@ -1,0 +1,4 @@
+1042 3000 8
+Campeones
+1045 5000 6
+Simuladores
