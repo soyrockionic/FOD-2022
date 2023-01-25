@@ -6,76 +6,71 @@ type
 
   empleado = record
     codigo : String[4];
-    nombre : String[25];
-    comision : real;
+    nombre : String[50];
+    monto : real;
   end;
 
-  archivo_Empleados = file of empleado;
+  archivo = file of empleado;
 
-procedure leer(var empleados : archivo_Empleados; var em : empleado);
+procedure leer(var arch : archivo; var reg : empleado);
 begin
-  if(not(eof(empleados))) then
-    read(empleados,em)
+  if(not eof(arch)) then
+    read(arch, reg)
   else
-    em.codigo := valorAlto;
+    reg.codigo := valorAlto;
+end;
+
+procedure mostrarEnPantalla(var arch : archivo);
+var
+  reg : empleado;
+begin
+  reset(arch);
+  while(not eof(arch)) do begin
+    read(arch, reg);
+    writeln(reg.codigo,' ',reg.nombre,' ',reg.monto:2:2);
+  end;
+  close(arch);
+end;
+
+procedure compactar(var arch : archivo);
+var
+  reg, act : empleado;
+  compacto : archivo;
+begin
+
+  assign(compacto,'compacto');
+
+  reset(arch);
+  rewrite(compacto);
+  leer(arch, reg);
+  while(reg.codigo <> valorAlto) do begin
+    act.codigo := reg.codigo;
+    act.nombre := reg.nombre;
+    act.monto := 0;
+    while(reg.codigo = act.codigo) do begin
+      act.monto := act.monto + reg.monto;
+      leer(arch, reg);
+    end;
+    write(compacto, act);
+  end;
+  close(compacto);
+  close(arch);
+
+  mostrarEnPantalla(compacto);
+
 end;
 
 var
-   empleados : archivo_Empleados;
-   compacto : archivo_Empleados;
-   nombreArchivo : String[12];
-   regE, regC : empleado;
-   act, em : empleado;
+  arch : archivo;
 begin
   clrscr;
 
-  write('Ingrese nombre del archivo ');
-  readln(nombreArchivo);
+  assign(arch, 'comisiones');
 
-  assign(empleados, nombreArchivo);
-
+  mostrarEnPantalla(arch);
 
   writeln;
-  writeln('Todos los empleados');
-  reset(empleados);
-  while(not eof(empleados)) do begin
-    read(empleados, regE);
-    writeln('Codigo ',regE.codigo,' nombre ',regE.nombre,' comision ',regE.comision:2:2);
-  end;
-  close(empleados);
-
-
-  assign(compacto,'compacto');
-  reset(empleados);
-  rewrite(compacto);
-
-  leer(empleados,em);
-  while(em.codigo <> valorAlto) do begin
-
-    act.codigo := em.codigo;
-    act.comision := 0;
-    while(em.codigo = act.codigo) do begin
-      act.nombre := em.nombre;
-      act.comision := act.comision + em.comision;
-
-      leer(empleados,em);
-
-    end;
-
-    write(compacto,act);
-
-  end;
-  close(empleados);
-  close(compacto);
-
-  writeln;
-  writeln('Todos los empleados campactados');
-  reset(compacto);
-  while(not eof(compacto)) do begin
-    read(compacto, regC);
-    writeln('Codigo ',regC.codigo,' nombre ',regC.nombre,' comision ',regC.comision:2:2);
-  end;
-  close(compacto);
+  compactar(arch);
 
   readln;
 end.
