@@ -6,9 +6,9 @@ type
   rango = 0..1;
 
   alumno = record
-    codigo : String;
-    apellido : String;
-    nombre : String;
+    codigo : String[4];
+    apellido : String[50];
+    nombre : String[50];
     cantCursadas : integer;
     cantFinales : integer;
   end;
