@@ -6,228 +6,207 @@ type
   rango = 0..1;
 
   alumno = record
-    codigo : String[4];
-    apellido : String[20];
-    nombre : String[20];
+    codigo : String;
+    apellido : String;
+    nombre : String;
     cantCursadas : integer;
     cantFinales : integer;
   end;
 
-  detAlum = record
-    codigo : String[4];
+  info = record
+    codigo : String;
     fin : rango;
   end;
 
   maestro = file of alumno;
-  detalle = file of detAlum;
+  detalle = file of info;
 
-procedure cargoMaestro(var mae : maestro);
+procedure crearMaestro(var mae : maestro);
 var
-  cargaM : Text;
-  alum : alumno;
+  reg : alumno;
+  alum : text;
 begin
 
-  writeln('A Cargo el archivo maestro');
-  assign(cargaM, 'alumnos.txt');
-  reset(cargaM);
+  assign(alum, 'alumnos.txt');
+
+  reset(alum);
   rewrite(mae);
-
-  while(not eof(cargaM)) do begin
-
-    readln(cargaM, alum.codigo);
-    readln(cargaM, alum.apellido);
-    readln(cargaM, alum.nombre);
-    readln(cargaM, alum.cantCursadas, alum.cantFinales);
-
-    write(mae, alum);
+  while(not eof(alum)) do begin
+    readln(alum, reg.codigo);
+    readln(alum, reg.apellido);
+    readln(alum, reg.nombre);
+    readln(alum, reg.cantCursadas, reg.cantFinales);
+    write(mae, reg);
   end;
-
   close(mae);
-  close(cargaM);
+  close(alum);
 
 end;
 
-procedure cargoDetalle(var det : detalle);
+procedure crearDetalle(var det : detalle);
 var
-  cargaD : Text;
-  detA : detAlum;
+  reg : info;
+  inf : text;
 begin
 
-  writeln('B Cargo el archivo detalle');
-  assign(cargaD, 'detalle.txt');
-  reset(cargaD);
+  assign(inf, 'detalle.txt');
+
+  reset(inf);
   rewrite(det);
-
-  while(not eof(cargaD)) do begin
-
-    readln(cargaD, detA.codigo, detA.fin);
-
-    write(det, detA);
-  end;
-
-  close(det);
-  close(cargaD);
-
-end;
-
-procedure creoReporteAlumnos(var mae : maestro);
-var
-  alum : alumno;
-  reporteMae : Text;
-begin
-
-  writeln('C Creo reporte txt de alumnos');
-  assign(reporteMae, 'reporteAlumnos.txt');
-  reset(mae);
-  rewrite(reporteMae);
-  while(not eof(mae)) do begin
-    read(mae,alum);
-    write(reporteMae, alum.codigo,' ',alum.apellido,' ',alum.nombre,' ',alum.cantCursadas,' ',alum.cantFinales);
-    write(reporteMae,' ');
-  end;
-  close(mae);
-  close(reporteMae);
-
-end;
-
-procedure creoReporteDetalle(var det : detalle);
-var
-  reporteDet : Text;
-  detA : detAlum;
-begin
-
-  writeln('D Creo reporte txt de detalles');
-  assign(reporteDet, 'reporteDetalle.txt');
-  reset(det);
-  rewrite(reporteDet);
-  while(not eof(det)) do begin
-    read(det,detA);
-    write(reporteDet, detA.codigo,' ', detA.fin);
-    write(reporteDet,' ');
+  while(not eof(inf)) do begin
+    readln(inf, reg.codigo);
+    readln(inf, reg.fin);
+    write(det, reg);
   end;
   close(det);
-  close(reporteDet);
+  close(inf);
 
 end;
 
-procedure leer(var det : detalle; var detA : detAlum);
+procedure leer(var arch : maestro; var reg : alumno);
 begin
-  if(not(eof(det))) then
-    read(det, detA)
+  if(not eof(arch)) then
+    read(arch, reg)
   else
-    detA.codigo := valorAlto;
+    reg.codigo := valorAlto;
 end;
 
-procedure actualizoMaestro(var mae : maestro; var det : detalle);
+procedure reporteMaestro(var mae : maestro);
 var
-  detA : detAlum;
-  alum : alumno;
-  totalC : integer;
-  totalF : integer;
-  aux : String[4];
+  reg : alumno;
+  repo : text;
 begin
 
-  writeln('E Actualizo el archivo maestro');
+  assign(repo, 'reporteAlumnos.txt');
+
+  reset(mae);
+  rewrite(repo);
+  leer(mae,reg);
+  while(reg.codigo <> valorAlto) do begin
+    write(repo, reg.codigo,' ',reg.apellido,' ',reg.nombre,' ',reg.cantCursadas,' ',reg.cantFinales);
+    writeln(repo,' ');
+    leer(mae,reg);
+  end;
+  close(repo);
+  close(mae);
+
+end;
+
+procedure reporteDetalle(var det : detalle);
+var
+  reg : info;
+  repo : text;
+begin
+
+  assign(repo, 'reporteDetalle.txt');
+
+  reset(det);
+  rewrite(repo);
+  while(not eof(det)) do begin
+    read(det, reg);
+    write(repo, reg.codigo,' ',reg.fin);
+    writeln(repo,' ');
+  end;
+  close(repo);
+  close(det);
+
+end;
+
+procedure leeer(var det : detalle; var reg : info);
+begin
+  if(not eof(det)) then
+    read(det, reg)
+  else
+    reg.codigo := valorAlto;
+end;
+
+procedure actualizarMaestro(var mae : maestro; var det : detalle);
+var
+  reg : info;
+  alum : alumno;
+begin
+
   reset(mae);
   reset(det);
+
+  leeer(det,reg);
   read(mae, alum);
-  leer(det, detA);
-  while(detA.codigo <> valorAlto) do begin
-    aux := detA.codigo;
-    totalC := 0;
-    totalF := 0;
+  while(reg.codigo <> valorAlto) do begin
 
-    while(aux = detA.codigo) do begin
-      if(detA.fin = 0) then
-        totalC := totalC + 1
-      else
-        totalF := totalF + 1;
-
-      leer(det, detA);
-    end;
-
-    alum.cantCursadas := alum.cantCursadas + totalC;
-    alum.cantFinales := alum.cantFinales + totalF;
-
-    seek(mae, filepos(mae) - 1);
-
-    write(mae, alum);
-
-    if(not(eof(mae))) then
+    while(alum.codigo <> reg.codigo) do
       read(mae, alum);
-
+    while(alum.codigo = reg.codigo) do begin
+      if(reg.fin = 0) then
+        alum.cantCursadas := alum.cantCursadas + 1
+      else
+        alum.cantFinales := alum.cantFinales + 1;
+      leeer(det,reg);
+    end;
+    seek(mae, filepos(mae)-1);
+    write(mae, alum);
   end;
-  close(det);
+
   close(mae);
+  close(det);
 
 end;
 
-procedure creoReporteCuatroSinFinal(var mae : maestro);
+procedure reporteCuatroSinFinal(var arch : maestro);
 var
-  regA : alumno;
-  reporteCuatro : Text;
+  reg : alumno;
+  repo : text;
 begin
 
-  writeln('F Creo reporte txt de alumnos con 4 aprobadas sin final');
-  assign(reporteCuatro, 'reporteCuatro.txt');
-  reset(mae);
-  rewrite(reporteCuatro);
-  while(not eof(mae)) do begin
-    read(mae,regA);
-    if(regA.cantCursadas >= 4) then begin
-      write(reporteCuatro, regA.codigo,' ',regA.apellido,' ',regA.nombre,' ',regA.cantCursadas,' ',regA.cantFinales);
-      write(reporteCuatro,' ');
+  assign(repo, 'reporteCuatroSinFinal.txt');
+
+  reset(arch);
+  rewrite(repo);
+  leer(arch,reg);
+  while(reg.codigo <> valorAlto) do begin
+    if(reg.cantCursadas >= 4) then begin
+      write(repo, reg.codigo,' ',reg.apellido,' ',reg.nombre,' ',reg.cantCursadas,' ',reg.cantFinales);
+      writeln(repo,' ');
     end;
+    leer(arch,reg);
   end;
-  close(mae);
-  close(reporteCuatro);
+  close(arch);
+  close(repo);
 
 end;
 
-
 var
-  mae : maestro;
+  mae : maestro;    reg : alumno;
   det : detalle;
-  nombreMaestro : String[20];
-  nombreDetalle : String[20];
-  regA : alumno;
+  op : char;
 begin
   clrscr;
 
-  write('Ingrese nombre del archivo maestro ');
-  readln(nombreMaestro);
+  assign(mae, 'alumnos');
+  assign(det, 'informacion');
 
-  write('Ingrese nombre del archivo detalle ');
-  readln(nombreDetalle);
+  writeln('a : Crear archivo maestro');
+  writeln('b : Crear archivo detalle');
+  writeln('c : Crear reporte maestro');
+  writeln('d : crear reporte detalle');
+  writeln('e : Actualizar archivo maestro');
+  writeln('f : Reporte de alumnos con 4 aprobadas sin final');
+  readln(op);
 
-  assign(mae, nombreMaestro);
-  assign(det, nombreDetalle);
+  case op of
+    'a' : crearMaestro(mae);
+    'b' : crearDetalle(det);
+    'c' : reporteMaestro(mae);
+    'd' : reporteDetalle(det);
+    'e' : actualizarMaestro(mae,det);
+    'f' : reporteCuatroSinFinal(mae);
+  end;
 
-  writeln;
-
-  cargoMaestro(mae);
-
-  cargoDetalle(det);
-
-  creoReporteAlumnos(mae);
-
-  creoReporteDetalle(det);
-
-  actualizoMaestro(mae,det);
-
-
-  writeln;
-  writeln('Archivo maestro actualizado');
   reset(mae);
   while(not eof(mae)) do begin
-    read(mae, regA);
-    writeln('Codigo ',regA.codigo,' nombre ',regA.nombre, ' cantidad cursadas ',regA.cantCursadas,' cantidad finales ',regA.cantFinales);
+    read(mae, reg);
+    writeln(reg.codigo,' ',reg.apellido,' ',reg.cantCursadas,' ',reg.cantFinales);
   end;
   close(mae);
-
-  writeln;
-  creoReporteCuatroSinFinal(mae);
-
 
   readln;
 end.
