@@ -2,7 +2,7 @@ program Ej3P2;
 Uses crt;
 const
   valorAlto = 9999;
-  dimf = 5;
+  dimf = 30;
 type
 
   producto = record
