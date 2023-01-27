@@ -1,138 +1,212 @@
-program Eje3;
+program Ej3P2;
 Uses crt;
 const
-  df = 5;
-  suc = 30;
+  valorAlto = 9999;
+  dimf = 5;
 type
 
-   producto = record
-     codigo : String[5];
-     nombre : String[12];
-     stock : integer;
-     stockMin : integer;
-     precio : real;
-   end;
+  producto = record
+    codigo : integer;
+    nombre : String[50];
+    descrip : String[50];
+    stockDisp : integer;
+    stockMin : integer;
+    precio : real;
+  end;
 
-   venta = record
-     codigo : String[5];
-     cantVen : Integer;
-   end;
+  venta = record
+    codigo : integer;
+    cantVen : integer;
+  end;
 
-   maestro = file of producto;
+  maestro = file of producto;
+  detalle = file of venta;
 
-   detalle = file Of venta;
+  vector = array[1..dimf] of detalle;
+  vectorVentas = array[1..dimf] of venta;
 
-
-procedure leer(var reg : producto);
-begin
-  write('Ingrese codigo ');
-  readln(reg.codigo);
-  write('Ingrese nombre ');
-  readln(reg.nombre);
-  write('Ingrese stock ');
-  readln(reg.stock);
-  write('Ingrese stock minimo ');
-  readln(reg.stockMin);
-  write('Ingrese precio ');
-  readln(reg.precio);
-end;
-
-procedure cargarArchivo(var mae : maestro);
+procedure crearArchivoMaestro(var mae : maestro);
 var
   reg : producto;
-  i : integer;
+  prod : text;
 begin
+
+  assign(prod, 'productos.txt');
+
+  reset(prod);
   rewrite(mae);
-  for i := 1 to df do begin
-    leer(reg);
+  while(not eof(prod)) do begin
+    readln(prod, reg.codigo);
+    readln(prod, reg.nombre);
+    readln(prod, reg.descrip);
+    readln(prod, reg.stockDisp, reg.stockMin, reg.precio);
     write(mae, reg);
   end;
+  close(prod);
   close(mae);
+
 end;
 
-procedure leerventa(var reg : venta);
+procedure leerVenta(var reg : venta);
 begin
   write('Ingrese codigo ');
   readln(reg.codigo);
-  if(reg.codigo <> '0') then begin
+  if(reg.codigo <> -1) then begin
     write('Ingrese cantidad vendida ');
     readln(reg.cantVen);
   end;
 end;
 
-procedure cargarVentas(var det : detalle);
+procedure cargarDetalle(var arch : detalle);
 var
   reg : venta;
 begin
-  rewrite(det);
-  leerventa(reg);
-  while(reg.codigo <> '0') do begin
-
-    write(det, reg);
-
-    leerventa(reg);
+  rewrite(arch);
+  leerVenta(reg);
+  while(reg.codigo <> -1) do begin
+    write(arch,reg);
+    leerVenta(reg);
   end;
-  reset(det);
+  close(arch);
 end;
 
-procedure actualizoMaestro(var mae : maestro; var det : detalle);
+procedure crearDetalles(var vd : vector);
 var
-  regM : producto;
-  regD : venta;
-begin
-  reset(mae);
-  reset(det);
-
-  while(not eof(det)) do begin
-    read(det, regD);
-
-    read(mae, regM);
-    while(regM.codigo <> regD.codigo) do
-      read(mae, regM);
-
-    seek(mae, filepos(mae)-1);
-
-    regM.stock := regM.stock - regD.cantVen;
-
-    write(mae, regM);
-  end;
-
-  close(det);
-  close(mae);
-end;
-
-procedure actualizarArchivo(var mae : maestro);
-var
-  det : detalle;
   i : integer;
+  det : detalle;
+  a : String;
 begin
-  assign(det, 'ventas');
-
-  for i := 1 to suc do begin
-    writeln('--- Sucursal ',i,' ---');
-    cargarVentas(det);
-    actualizoMaestro(mae,det);
+  for i := 1 to dimf do begin
+    writeln('Cargo detalle sucursal ',i);
+    Str(i,a);
+    assign(vd[i], 'sucursal '+a);
+    cargarDetalle(vd[i]);
   end;
-
 end;
 
+procedure leer(var arch : detalle; var reg : venta);
+begin
+  if(not eof(arch)) then
+    read(arch,reg)
+  else
+    reg.codigo := valorAlto;
+end;
+
+procedure minimo(var vd : vector; var act : vectorVentas; var min : venta);
+var
+  i, pos : integer;
+begin
+  min.codigo := valorAlto;
+  for i := 1 to dimf do begin
+    if(act[i].codigo < min.codigo) then begin
+      min := act[i];
+      pos := i;
+    end;
+  end;
+  if(min.codigo <> valorAlto) then
+    leer(vd[pos],act[pos]);
+end;
+
+procedure actualizarMaestro(var mae : maestro; vd : vector);
+var
+  i : integer;
+  reg : producto;
+  act : vectorVentas;
+  min : venta;
+  a : String;
+  cant, aux : integer;
+begin
+   reset(mae);
+   for i := 1 to dimf do begin
+     Str(i,a);
+     assign(vd[i], 'sucursal '+a);
+     reset(vd[i]);
+     leer(vd[i],act[i]);
+   end;
+
+   minimo(vd,act,min);
+   while(min.codigo <> valorAlto) do begin
+     aux := min.codigo;
+     cant := 0;
+
+     while(reg.codigo = min.codigo) do begin
+       cant := cant + min.cantVen;
+       minimo(vd,act,min);
+     end;
+     while(reg.codigo <> aux) do
+       read(mae, reg);
+     reg.stockDisp := reg.stockDisp - cant;
+     seek(mae, filepos(mae)-1);
+     write(mae,reg);
+
+   end;
+
+   for i := 1 to dimf do begin
+     close(vd[i]);
+   end;
+   close(mae);
+end;
+
+procedure leeer(var arch : maestro; var reg : producto);
+begin
+  if(not eof(arch)) then
+    read(arch,reg)
+  else
+    reg.codigo := valorAlto;
+end;
+
+procedure reporteStockMenor(var mae : maestro);
+var
+  reg : producto;
+  repo : text;
+begin
+
+  assign(repo, 'reporteStockMenor.txt');
+
+  reset(mae);
+  rewrite(repo);
+
+  leeer(mae,reg);
+  while(reg.codigo <> valorAlto) do begin
+    if(reg.stockDisp < reg.stockMin) then begin
+      write(repo, reg.nombre, ' ',reg.descrip,' ',reg.stockDisp,' ',reg.precio:2:2);
+      writeln(repo,' ');
+    end;
+    leeer(mae,reg);
+  end;
+
+  close(mae);
+  close(repo);
+
+end;
 
 var
   mae : maestro;
-  i : integer;
+  vd : vector;
+  op : char;
   reg : producto;
 begin
   clrscr;
 
   assign(mae, 'productos');
-  //cargarArchivo(mae);
-  actualizarArchivo(mae);
+
+  writeln('a : Crear archivo maestro');
+  writeln('b : Crear archivos detalle');
+  writeln('c : Actualizar archivo maestro');
+  writeln('d : Reporte con stock menor al minimo');
+  readln(op);
+
+  case op of
+    'a' : crearArchivoMaestro(mae);
+    'b' : crearDetalles(vd);
+    'c' : actualizarMaestro(mae,vd);
+    'd' : reporteStockMenor(mae);
+  end;
 
   reset(mae);
-  writeln('----- Stock -----');
   while(not eof(mae)) do begin
     read(mae, reg);
-    writeln(reg.codigo,' ',reg.nombre,' ',reg.stock);
+    writeln(reg.codigo,' ',reg.nombre,' ',reg.descrip,' ',reg.stockDisp,' ',reg.stockMin);
   end;
   close(mae);
 
