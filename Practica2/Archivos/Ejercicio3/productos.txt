@@ -1,0 +1,12 @@
+1142
+teclado
+verbatim
+100 25 10
+1145
+mouse
+verbatim
+100 25 15
+1148
+parlantes
+genius
+100 25 20
