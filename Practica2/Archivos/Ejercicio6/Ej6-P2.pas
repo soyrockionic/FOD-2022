@@ -1,0 +1,205 @@
+program Ej6P2;
+Uses crt;
+const
+  dimf = 15;
+  valorAlto = 9999;
+type
+
+  articulo = record
+    codigo : integer;
+    nombre : String[50];
+    descrip : String[50];
+    talle : String[4];
+    color : String[50];
+    stock : integer;
+    stockMin : integer;
+    precio : real;
+  end;
+
+  venta = record
+    codigo : integer;
+    cantVen : integer;
+  end;
+
+  maestro = file of articulo;
+  detalle = file of venta;
+
+  vector = array[1..dimf] of detalle;
+  vectorVen = array[1..dimf] of venta;
+
+procedure crearMaestro(var mae : maestro);
+var
+  reg : articulo;
+  art : text;
+begin
+
+  assign(art, 'articulos.txt');
+
+  reset(art);
+  rewrite(mae);
+  while(not eof(art)) do begin
+    readln(art, reg.codigo);
+    readln(art, reg.nombre);
+    readln(art, reg.descrip);
+    readln(art, reg.talle);
+    readln(art, reg.color);
+    readln(art, reg.stock, reg.stockMin, reg.precio);
+    write(mae,reg);
+  end;
+  close(art);
+  close(mae);
+
+end;
+
+procedure leerVenta(var reg : venta);
+begin
+  write('Ingrese codigo ');
+  readln(reg.codigo);
+  if(reg.codigo <> -1) then begin
+    write('Ingrese cantidad vendida ');
+    readln(reg.cantVen);
+  end;
+end;
+
+procedure cargarDetalle(var arch : detalle);
+var
+  reg : venta;
+begin
+  rewrite(arch);
+  leerVenta(reg);
+  while(reg.codigo <> -1) do begin
+    write(arch,reg);
+    leerVenta(reg);
+  end;
+  close(arch);
+end;
+
+procedure crearDetalles(var vd : vector);
+var
+  reg : venta;
+  i : integer;
+  a : String[4];
+begin
+  for i := 1 to dimf do begin
+    writeln('Detalle tienda ',i);
+    Str(i,a);
+    assign(vd[i], 'tienda'+a);
+    cargarDetalle(vd[i]);
+  end;
+end;
+
+procedure leer(var arch : detalle; var reg : venta);
+begin
+  if(not eof(arch)) then
+    read(arch,reg)
+  else
+    reg.codigo := valorAlto;
+end;
+
+procedure minimo(var min : venta; var vd : vector; var arty : vectorVen);
+var
+  i, pos : integer;
+begin
+  min.codigo := valorAlto;
+  for i := 1 to dimf do begin
+    if(arty[i].codigo < min.codigo) then begin
+      min := arty[i];
+      pos := i;
+    end;
+  end;
+  if(min.codigo <> valorAlto) then
+    leer(vd[pos],arty[pos]);
+end;
+
+procedure actualizarMaestro(var mae : maestro; var vd : vector);
+var
+  min : venta;
+  arty : vectorVen;
+  i : integer;
+  reg : articulo;  a : String[4];
+begin
+
+  for i := 1 to dimf do begin
+    Str(i,a);
+    assign(vd[i], 'tienda'+a);
+    reset(vd[i]);
+    leer(vd[i],arty[i]);
+  end;
+  reset(mae);
+
+  minimo(min,vd,arty);
+  while(min.codigo <> valorAlto) do begin
+    read(mae,reg);
+    while(reg.codigo <> min.codigo) do
+      read(mae,reg);
+    while(reg.codigo = min.codigo) do begin
+      reg.stock := reg.stock - min.cantVen;
+      minimo(min,vd,arty);
+    end;
+    seek(mae, filepos(mae)-1);
+    write(mae,reg);
+  end;
+
+  close(mae);
+  for i := 1 to dimf do begin
+    close(vd[i]);
+  end;
+
+end;
+
+procedure crearReporte(var mae : maestro);
+var
+  reg : articulo;
+  repo : text;
+begin
+
+  assign(repo, 'reporteStockMenor.txt');
+
+  reset(mae);
+  rewrite(repo);
+  while(not eof(mae)) do begin
+    read(mae,reg);
+    if(reg.stock < reg.stockMin) then begin
+      write(repo, reg.nombre,' ',reg.descrip,' ',reg.stock,' ',reg.precio:2:2);
+      writeln(repo,' ');
+    end;
+  end;
+  close(mae);
+  close(repo);
+
+end;
+
+var
+  mae : maestro;
+  vd : vector;
+  op : char;
+  reg : articulo;
+begin
+  clrscr;
+
+  assign(mae, 'articulos');
+
+  writeln('a : crear archivo maestro');
+  writeln('b : crear archivos detalle');
+  writeln('c : actualizar archivo maestro');
+  writeln('d : crear reporte');
+  readln(op);
+
+  case op of
+    'a' : crearMaestro(mae);
+    'b' : crearDetalles(vd);
+    'c' : actualizarMaestro(mae,vd);
+    'd' : crearReporte(mae);
+    else
+      writeln('Opcion incorrecta');
+  end;
+
+  reset(mae);
+  while(not eof(mae)) do begin
+    read(mae,reg);
+    writeln(reg.nombre,' ',reg.talle,' ',reg.color,' ',reg.stock,' ',reg.precio:2:2);
+  end;
+  close(mae);
+
+  readln;
+end.

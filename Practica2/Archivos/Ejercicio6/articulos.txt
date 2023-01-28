@@ -1,0 +1,12 @@
+1145
+remera
+estampada
+38
+blanco
+50 25 10
+1146
+gorra
+visera
+58
+negro
+50 25 15
