@@ -1,0 +1,190 @@
+program Ej7P2;
+Uses crt;
+const
+  valorAlto = '9999';
+type
+
+  producto = record
+    codigo : String[4];
+    nombre : String[50];
+    precio : real;
+    stock : integer;
+    stockMin : integer;
+  end;
+
+  venta = record
+    codigo : String[4];
+    cantVen : integer;
+  end;
+
+  maestro = file of producto;
+  detalle = file of venta;
+
+procedure crearMaestro(var mae : maestro);
+var
+  reg : producto;
+  prod : text;
+begin
+
+  assign(prod, 'productos.txt');
+
+  reset(prod);
+  rewrite(mae);
+  while(not eof(prod)) do begin
+    readln(prod, reg.codigo);
+    readln(prod, reg.nombre);
+    readln(prod, reg.precio, reg.stock, reg.stockMin);
+    write(mae,reg);
+  end;
+  close(prod);
+  close(mae);
+
+end;
+
+procedure crearReporte(var mae : maestro);
+var
+  reg : producto;
+  repo : text;
+begin
+
+  assign(repo, 'reporte.txt');
+
+  reset(mae);
+  rewrite(repo);
+  while(not eof(mae)) do begin
+    read(mae,reg);
+    write(repo, reg.codigo,' ',reg.nombre,' ',reg.precio:2:2,' ',reg.stock,' ',reg.stockMin);
+    writeln(repo,' ');
+  end;
+  close(mae);
+  close(repo);
+
+end;
+
+procedure crearDetalle(var det : detalle);
+var
+  reg : venta;
+  sale : text;
+begin
+
+   assign(sale, 'ventas.txt');
+
+   reset(sale);
+   rewrite(det);
+   while(not eof(sale)) do begin
+     readln(sale, reg.codigo);
+     readln(sale, reg.cantVen);
+     write(det,reg);
+   end;
+   close(sale);
+   close(det);
+
+end;
+
+procedure mostrarVentas(var det : detalle);
+var
+  reg : venta;
+begin
+  reset(det);
+  while(not eof(det)) do begin
+    read(det,reg);
+    writeln(reg.codigo,' ',reg.cantVen);
+  end;
+  close(det);
+end;
+
+procedure leer(var arch : detalle; var reg : venta);
+begin
+  if(not eof(arch)) then
+    read(arch,reg)
+  else
+    reg.codigo := valorAlto;
+end;
+
+procedure actualizarMaestro(var mae : maestro; var det : detalle);
+var
+  reg : venta;
+  pro : producto;
+begin
+
+  reset(mae);
+  reset(det);
+  leer(det,reg);
+  while(reg.codigo <> valorAlto) do begin
+
+    read(mae,pro);
+    while(pro.codigo <> reg.codigo) do
+      read(mae,pro);
+    while(pro.codigo = reg.codigo) do begin
+      pro.stock := pro.stock - reg.cantVen;
+      leer(det,reg);
+    end;
+
+    seek(mae, filepos(mae)-1);
+    write(mae,pro);
+
+  end;
+  close(mae);
+  close(det);
+
+end;
+
+procedure reporteMinimo(var mae : maestro);
+var
+  reg : producto;
+  repo : text;
+begin
+
+  assign(repo, 'stockMinimo.txt');
+
+  reset(mae);
+  rewrite(repo);
+  while(not eof(mae)) do begin
+    read(mae,reg);
+    if(reg.stock < reg.stockMin) then begin
+      write(repo, reg.codigo,' ',reg.nombre,' ',reg.precio:2:2,' ',reg.stock);
+      writeln(repo,' ');
+    end;
+  end;
+  close(mae);
+  close(repo);
+
+end;
+
+var
+  mae : maestro;
+  det : detalle;
+  op : char;
+  reg : producto;
+begin
+  clrscr;
+
+  assign(mae, 'productos');
+  assign(det, 'ventas');
+
+  writeln('a : Crear archivo maestro');
+  writeln('b : Crear reporte');
+  writeln('c : Crear archivo detalle');
+  writeln('d : Mostrar ventas');
+  writeln('e : Actualizar archivo maestro');
+  writeln('f : Crear reporte de minimos');
+  readln(op);
+
+  case op of
+    'a' : crearMaestro(mae);
+    'b' : crearReporte(mae);
+    'c' : crearDetalle(det);
+    'd' : mostrarVentas(det);
+    'e' : actualizarMaestro(mae,det);
+    'f' : reporteMinimo(mae);
+  end;
+
+  reset(mae);
+  while(not eof(mae)) do begin
+    read(mae,reg);
+    writeln(reg.codigo,' ',reg.nombre,' ',reg.precio:2:2,' ',reg.stock);
+  end;
+  close(mae);
+
+  readln;
+end.
