@@ -3,7 +3,7 @@ remera
 estampada
 38
 blanco
-50 25 10
+50 25 15
 1146
 gorra
 visera
