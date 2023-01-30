@@ -9,4 +9,4 @@ verbatim
 1148
 parlantes
 genius
-100 25 20
+100 25 15
