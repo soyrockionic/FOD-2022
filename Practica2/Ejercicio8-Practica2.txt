@@ -4,114 +4,94 @@ const
   valorAlto = '9999';
 type
 
-  venta = record
-    codCliente : String[4];
-    nombre : String[20];
-    apellido : String[20];
+  cliente = record
+    codigo : String[4];
+    nombre : String[50];
+    apellido : String[50];
     anio : String[4];
     mes : String[4];
     dia : String[4];
     monto : real;
   end;
 
-  maestro = file of venta;
+  maestro = file of cliente;
 
-
-procedure cargoMaestro(var mae : maestro);
+procedure crearMaestro(var mae : maestro); //Se dispone
 var
-  cargaM : Text;
-  regV : venta;
+  reg : cliente;
+  kupac : text;
 begin
-
-  writeln('Cargo el archivo maestro');
-  assign(cargaM, 'clientes.txt');
-  reset(cargaM);
+  assign(kupac, 'clientes.txt');
+  reset(kupac);
   rewrite(mae);
-
-  while(not eof(cargaM)) do begin
-
-    readln(cargaM, regV.codCliente);
-    readln(cargaM, regV.anio);
-    readln(cargaM, regV.mes);
-    readln(cargaM, regV.dia);
-    readln(cargaM, regV.nombre);
-    readln(cargaM, regV.apellido);
-    readln(cargaM, regV.monto);
-
-    write(mae, regV);
+  while(not eof(kupac)) do begin
+    readln(kupac,reg.codigo);
+    readln(kupac,reg.nombre);
+    readln(kupac,reg.apellido);
+    readln(kupac,reg.anio);
+    readln(kupac,reg.mes);
+    readln(kupac,reg.dia);
+    readln(kupac,reg.monto);
+    write(mae,reg);
   end;
-
+  close(kupac);
   close(mae);
-  close(cargaM);
-
 end;
 
-
-procedure leer(var mae : maestro; var regV : venta);
+procedure leer(var arch : maestro; var reg : cliente);
 begin
-  if(not(eof(mae))) then
-    read(mae, regV)
+  if(not eof(arch)) then
+    read(arch,reg)
   else
-    regV.codCliente := valorAlto;
+    reg.codigo := valorAlto;
 end;
 
-procedure imprimirReporte(var mae : maestro);
+procedure mostrarReporte(var mae : maestro);
 var
-  regV : venta;
-  act : venta;
-  totalMes, totalAnio, total : real;
+  reg : cliente;
+  act : cliente;
+  totalMes, totalAnio, totalEmpresa : real;
 begin
-  total := 0;
+  totalEmpresa := 0;
   reset(mae);
-  leer(mae,regV);
-
-  while(regV.codCliente <> valorAlto) do begin
-    act := regV;
-    writeln;
-    writeln('Cliente ',act.codCliente,' ',act.nombre,' ',act.apellido);
-
-    while(regV.codCliente <> valorAlto) and (act.codCliente = regV.codCliente) do begin
-      act.anio := regV.anio;
-      totalAnio := 0;
-
-      while(regV.codCliente <> valorAlto) and (act.codCliente = regV.codCliente) and (act.anio = regV.anio) do begin
-         act.mes := regV.mes;
-         totalMes := 0;
-
-         while(regV.codCliente <> valorAlto) and (act.codCliente = regV.codCliente) and (act.anio = regV.anio)  and (act.mes = regV.mes) do begin
-           totalMes := totalMes + regV.monto;
-
-           leer(mae,regV);
-         end;
-
-         writeln('Mes ',act.mes,' ',totalMes:2:2);
-         totalAnio := totalAnio + totalMes;
-
-       end;
-
-       writeln('Anio ',act.anio,' ',totalAnio:2:2);
-       total := total + totalAnio;
-
+  leer(mae,reg);
+  while(reg.codigo <> valorAlto) do begin
+    writeln('** ',reg.codigo,' ',reg.nombre,' ',reg.apellido,' **');
+    act.codigo := reg.codigo;
+    while(reg.codigo <> valorAlto) and (act.codigo = reg.codigo) do begin
+      act.anio := reg.anio;
+      totalAnio:= 0;
+      writeln('Anio ',act.anio);
+      while(reg.codigo <> valorAlto) and (act.codigo = reg.codigo) and (act.anio = reg.anio) do begin
+        act.mes := reg.mes;
+        totalMes := 0;
+        writeln('-Mes ',reg.mes);
+        while(reg.codigo <> valorAlto) and (act.codigo = reg.codigo) and (act.anio = reg.anio) and (act.mes = reg.mes) do begin
+          totalMes := totalMes + reg.monto;
+          leer(mae,reg);
+        end;
+        writeln('Total ',totalMes:2:2);
+        totalAnio := totalAnio + totalMes;
+      end;
+      writeln('*Total ',totalAnio:2:2);
+      totalEmpresa := totalEmpresa + totalAnio;
     end;
-
   end;
-  writeln;
-  writeln('Total ',total:2:2);
   close(mae);
+  writeln('---------------------');
+  writeln('Total empresa ',totalEmpresa:2:2);
 end;
-
 
 var
   mae : maestro;
-  regV : venta;
 begin
   clrscr;
 
-  assign(mae, 'Clientes');
+  assign(mae, 'clientes');
 
-  cargoMaestro(mae);
+  crearMaestro(mae); //Se dispone
 
-  imprimirReporte(mae);
+  mostrarReporte(mae);
 
   readln;
 end.
