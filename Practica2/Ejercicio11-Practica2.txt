@@ -1,0 +1,108 @@
+program Ej11P2;
+Uses crt;
+const
+  valorAlto = '9999';
+  df = 2;
+type
+
+  provincia = record
+    codProv : String[50];
+    alfabetizados : integer;
+    encuestados : integer;
+  end;
+
+  censo = record
+    codProv : String[50];
+    codLoc : String[4];
+    alfabetizados : integer;
+    encuestados : integer;
+  end;
+
+  maestro = file of provincia;
+  detalle = file of censo;
+
+  vector = array[1..df] of detalle;
+  vecCen = array[1..df] of censo;
+
+procedure leer(var arch : detalle; var reg : censo);
+begin
+  if(not eof(arch)) then
+    read(arch,reg)
+  else
+    reg.codProv := valorAlto;
+end;
+
+procedure minimo(var vd : vector; var cen : vecCen; var min : censo);
+var
+  i, pos : integer;
+begin
+  min.codProv := valorAlto;
+  for i := 1 to df do begin
+    if(cen[i].codProv < min.codProv) then begin
+      min := cen[i];
+      pos := i;
+    end;
+  end;
+  if(min.codProv <> valorAlto) then
+    leer(vd[pos],cen[pos]);
+end;
+
+procedure actualizarMaestro(var mae : maestro; var vd : vector);
+var
+  reg : provincia;
+  cen : vecCen;
+  min : censo;
+  i : integer;
+begin
+  for i := 1 to df do begin
+    reset(vd[i]);
+    leer(vd[i],cen[i]);
+  end;
+  reset(mae);
+
+  min.codProv := valorAlto;
+  minimo(vd,cen,min);
+  while(min.codProv <> valorAlto) do begin
+    read(mae,reg);
+    while(not eof(mae)) and (reg.codProv <> min.codProv) do
+      read(mae,reg);
+    while(reg.codProv = min.codProv) do begin
+      reg.alfabetizados := reg.alfabetizados + min.alfabetizados;
+      reg.encuestados := reg.encuestados + min.encuestados;
+      minimo(vd,cen,min);
+    end;
+    seek(mae, filepos(mae)-1);
+    write(mae,reg);
+  end;
+
+  for i := 1 to df do
+    close(vd[i]);
+  close(mae);
+end;
+
+var
+  mae : maestro;
+  vd : vector;
+  i : integer;
+  a : String[4];
+  reg : provincia;
+begin
+  clrscr;
+
+  assign(mae, 'provincias');
+  for i := 1 to df do begin
+    Str(i,a);
+    assign(vd[i], 'censo'+a);
+  end;
+
+  actualizarMaestro(mae,vd);
+
+  reset(mae);
+  while(not eof(mae)) do begin
+    read(mae,reg);
+    writeln(reg.codProv,' ',reg.alfabetizados,' ',reg.encuestados);
+  end;
+  close(mae);
+
+  readln;
+end.
