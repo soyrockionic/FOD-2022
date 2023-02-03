@@ -50,7 +50,7 @@ end;
 var
    empleados : archivo_Empleados;
    nombreArchivo : String[12];
-   regE, e : empleado;
+   regE, aux : empleado;
    op, cant, i, nro : integer;
 begin
   clrscr;
@@ -101,42 +101,42 @@ begin
         end;
 
      4: begin
-           write('ingrese cuantos empleados quiere agregar ');
-           readln(cant);
-           reset(empleados);
-           seek(empleados, filesize(empleados));
-           for i := 1 to cant do begin
-             leer(e);
-             write(empleados, e);
-           end;
-           close(empleados);
-       end;
+          write('ingrese cuantos empleados quiere agregar ');
+          readln(cant);
+          reset(empleados);
+          seek(empleados, filesize(empleados));
+          for i := 1 to cant do begin
+            leer(e);
+            write(empleados, e);
+          end;
+          close(empleados);
+        end;
 
-       5:  begin
-             write('Ingrese la cantidad de empleados que desea eliminar ');
-             readln(cant);
-             reset(arch);
-             for i := 1 to cant do begin
-               write('Ingrese codigo del empleado que desea eliminar ');
-               readln(cod);
-               seek(arch, filesize(arch)-1);
-               read(arch,aux);
-               seek(arch,0);
-               while(not eof(arch)) and (reg.nro <> cod) do
-                 read(arch,reg);
-               if(reg.nro = cod) then begin
-                 seek(arch, filepos(arch)-1);
-                 write(arch,aux);
-                 seek(arch, filesize(arch)-1);
-                 truncate(arch);
-               end;
-             end;
-             close(arch);
-             todosLosEmpleados(arch);
-           end
-       else
-           writeln('Opcion incorrecta');
-     end;
+     5: begin
+          write('Ingrese la cantidad de empleados que desea eliminar ');
+          readln(cant);
+          reset(arch);
+          for i := 1 to cant do begin
+            write('Ingrese codigo del empleado que desea eliminar ');
+            readln(cod);
+            seek(arch, filesize(arch)-1);
+            read(arch,aux);
+            seek(arch,0);
+            while(not eof(arch)) and (reg.nro <> cod) do
+              read(arch,reg);
+            if(reg.nro = cod) then begin
+              seek(arch, filepos(arch)-1);
+              write(arch,aux);
+              seek(arch, filesize(arch)-1);
+              truncate(arch);
+            end;
+          end;
+          close(arch);
+          todosLosEmpleados(arch);
+        end
+    else
+      writeln('Opcion incorrecta');
+  end;
 
   readln;
 end.
