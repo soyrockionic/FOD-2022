@@ -94,7 +94,7 @@ begin
     leer(mae, reg);
   end;
   if(reg.codigo = cod) then begin
-    reg.codigo := ind.codigo;
+    reg.codigo := ind.codigo * 0;
     seek(mae, filepos(mae)-1);
     ind.codigo := filepos(mae) * -1;
     write(mae, reg);
