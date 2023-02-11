@@ -88,16 +88,15 @@ begin
   reset(mae);
   write('ingrese codigo de novela ha eliminar ');
   readln(cod);
-  leer(mae, ind);
   leer(mae, reg);
-  while(reg.codigo <> 9999) and (reg.codigo <> cod) do begin
+  ind.codigo := reg.codigo;
+  while(reg.codigo <> 9999) and (reg.codigo <> cod) do
     leer(mae, reg);
-  end;
   if(reg.codigo = cod) then begin
-    reg.codigo := ind.codigo * 0;
+    reg.codigo := ind.codigo;
     seek(mae, filepos(mae)-1);
-    ind.codigo := filepos(mae) * -1;
     write(mae, reg);
+    ind.codigo := (filepos(mae)-1) * -1;
     seek(mae, 0);
     write(mae, ind);
   end
@@ -140,8 +139,8 @@ var
 begin
   clrscr;
 
-  writeln('1 para cargar el archivo');
-  writeln('2 para dar el alta a una novela');
+  writeln('1 cargar el archivo');
+  writeln('2 dar el alta a una novela');
   writeln('3 dar de baja una novela');
   writeln('4 ver registros del archivo');
   readln(op);
