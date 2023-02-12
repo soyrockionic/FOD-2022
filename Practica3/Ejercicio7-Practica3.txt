@@ -1,0 +1,131 @@
+program Ej7P3;
+Uses crt;
+const
+  valorAlto = '999999';
+type
+
+  ave = record
+    codigo : String[6];
+    especie : String[50];
+    familia : String[50];
+    descrip : String[50];
+    zonaGeo : String[50];
+  end;
+
+  maestro = file of ave;
+
+procedure leerAve(var reg : ave);
+begin
+  write('Ingrese codigo de ave ');
+  readln(reg.codigo);
+  if(reg.codigo <> '500000') then begin
+    write('Ingrese especie ');
+    readln(reg.especie);
+    write('Ingrese familia ');
+    readln(reg.familia);
+    write('Ingrese descripcion ');
+    readln(reg.descrip);
+    write('Ingrese zona geografica ');
+    readln(reg.zonaGeo);
+  end;
+end;
+
+procedure crearArchivo(var mae : maestro);
+var
+  reg : ave;
+begin
+  rewrite(mae);
+  leerAve(reg);
+  while(reg.codigo <> '500000') do begin
+    write(mae,reg);
+    leerAve(reg);
+  end;
+  close(mae);
+end;
+
+procedure leer(var arch : maestro; var reg : ave);
+begin
+  if(not eof(arch)) then
+    read(arch,reg)
+  else
+    reg.codigo := valorAlto;
+end;
+
+procedure borrarEspecies(var mae : maestro);
+var
+  reg : ave;
+  cod : String[6];
+begin
+  reset(mae);
+  write('Ingrese codigo de la especie que desea eliminar ');
+  readln(cod);
+  while(cod <> '500000') do begin
+
+    leer(mae,reg);
+    while(reg.codigo <> valorAlto) and (reg.codigo <> cod) do
+      leer(mae,reg);
+    if(reg.codigo = cod) then begin
+      reg.codigo := '*'+reg.codigo;
+      seek(mae,filepos(mae)-1);
+      write(mae,reg);
+    end;
+
+    write('Ingrese codigo de la especie que desea eliminar ');
+    readln(cod);
+  end;
+  close(mae);
+end;
+
+procedure compactar(var mae : maestro);
+var
+  reg, aux : ave;
+  pos : integer;
+begin
+  reset(mae);
+  leer(mae,reg);
+  while(reg.codigo <> valorAlto) do begin
+    if(reg.codigo[1] = '*') then begin
+      pos := filepos(mae)-1;
+      seek(mae,filesize(mae)-1);
+      read(mae,aux);
+      seek(mae,pos);
+      write(mae,aux);
+      seek(mae,filesize(mae)-1);
+      truncate(mae);
+      seek(mae,pos);
+    end;
+    leer(mae,reg);
+  end;
+  close(mae);
+end;
+
+procedure mostrar(var arch : maestro);
+var
+  reg : ave;
+begin
+  reset(arch);
+  leer(arch,reg);
+  while(reg.codigo <> valorAlto) do begin
+    writeln(reg.codigo,' ',reg.especie,' ',reg.familia,' ',reg.zonaGeo);
+    leer(arch,reg);
+  end;
+  close(arch);
+end;
+
+var
+  mae : maestro;
+begin
+  clrscr;
+
+  assign(mae,'aves');
+
+  crearArchivo(mae);
+
+  borrarEspecies(mae);
+  mostrar(mae);
+
+  compactar(mae);
+  mostrar(mae);
+
+  readln;
+end.
