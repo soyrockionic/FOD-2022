@@ -1,0 +1,144 @@
+Dado el archivo dispersado a continuación, grafique los estados sucesivos para las
+siguientes operaciones: +23, +56, +90, +61, -49, -67
+
+Técnica de resolución de colisiones: Saturación progresiva encadenada.
+
+NOTA: Indicar Lecturas y Escrituras
+
+f(x) = x MOD 11
+
+--------------------------------------------------------------------------------------------------
+
++23 --> f(23) = 1
+
+    0: (-1) ()
+    1: (2)  (67)
+    2: (-1) (23)
+    3: (-1) (80)
+    4: (-1) ()
+    5: (8)  (71)
+    6: (-1) (60)
+    7: (-1) (18)
+    8: (6)  (49)
+    9: (-1) (20)
+   10: (-1) ()
+
+L1, L2, E2, E1
+
+- Se intenta agregar la clave 23 en la direccion 1, se produce overflow, se busca la proxima
+  direccion con espacio disponible, se agrega en la direccion 2, y se actualiza el enlace
+  de la direccion base, ahora apunta a la direccion donde se agrego la clave 23
+
+--------------------------------------------------------------------------------------------------
+
++56 --> f(56) = 1
+
+    0: (-1) ()
+    1: (4)  (67)
+    2: (-1) (23)
+    3: (-1) (80)
+    4: (2)  (56)
+    5: (8)  (71)
+    6: (-1) (60)
+    7: (-1) (18)
+    8: (6)  (49)
+    9: (-1) (20)
+   10: (-1) ()
+
+L1, L2, L3, L4, E4, E1
+
+- Se intenta agregar la clave 56 en la direccion 1, se produce overflow, se busca la proxima
+  direccion disponible, se agrega en la direccion 4, y esta pasa apuntar a la direccion 2
+  asi no se pierden la referencia, se actualiza el enlace de la direccion base ahora apunta
+  a la direcccion donde se agrego la clave 56
+
+--------------------------------------------------------------------------------------------------
+
++90 --> f(90) = 2
+
+    0: (-1) ()
+    1: (4)  (67)
+    2: (-1) (90)
+    3: (-1) (80)
+    4: (10) (56)
+    5: (8)  (71)
+    6: (-1) (60)
+    7: (-1) (18)
+    8: (6)  (49)
+    9: (-1) (20)
+   10: (-1) (23)
+
+L2, L3, L4, L5, L6, L7, L8, L9, L10, E2, E10, E4
+
+- Se agrega la clave 90 en su direcion base (2), la clave 23 es intrusa entonces se busca una
+  nueva direccion con espacio disponible, se agrega en la direccion 10 y se actualiza su enlace
+  de referencia
+
+--------------------------------------------------------------------------------------------------
+
++61 --> f(61) = 6
+
+    0: (-1) (60)
+    1: (4)  (67)
+    2: (-1) (90)
+    3: (-1) (80)
+    4: (10) (56)
+    5: (8)  (71)
+    6: (-1) (61)
+    7: (-1) (18)
+    8: (0)  (49)
+    9: (-1) (20)
+   10: (-1) (23)
+
+L6, L7, L8, L9, L10, L0, E0, E6, E8
+
+- Se agrega la clave 61 en la direccion 6, la clave 60 es intrusa entonces se busca una nueva
+  direccion con espacio disponible, se agrega en la direccion 0 y se actualiza su enlace de
+  referencia de la clave 60
+
+--------------------------------------------------------------------------------------------------
+
+-49 --> f(49) = 5
+
+    0: (-1) (60)
+    1: (4)  (67)
+    2: (-1) (90)
+    3: (-1) (80)
+    4: (10) (56)
+    5: (0)  (71)
+    6: (-1) (61)
+    7: (-1) (18)
+    8: (-1)  ()
+    9: (-1) (20)
+   10: (-1) (23)
+
+L5, L8, E8, E5
+
+- Se da de baja la clave 49 de la direccion 8, se escribe su enlace de referencia en la
+  direccion 5
+
+--------------------------------------------------------------------------------------------------
+
+-67 --> f(67) = 1
+
+    0: (-1) (60)
+    1: (10) (56)
+    2: (-1) (90)
+    3: (-1) (80)
+    4: (-1) ()
+    5: (0)  (71)
+    6: (-1) (61)
+    7: (-1) (18)
+    8: (-1)  ()
+    9: (-1) (20)
+   10: (-1) (23)
+
+L1, L4, E4, E1
+
+- Se da de baja la clave 67 de la direccion 1, se escribe en la direccion 1 el siguiente
+  enlace de referencia
+
+--------------------------------------------------------------------------------------------------
+
+9 / 11 = 0.81
+DE = 0.81 * 100 = 81%

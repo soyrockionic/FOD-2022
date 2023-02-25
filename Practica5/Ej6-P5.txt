@@ -1,0 +1,90 @@
+Dado el archivo dispersado a continuación, grafique los estados sucesivos, indique
+lecturas y escrituras y calcule la densidad de empaquetamiento para las siguientes
+operaciones: +31, +82, -15, -52
+
+Técnica de resolución de colisiones: Saturación progresiva.
+
+f(x) = x MOD 10
+
+--------------------------------------------------------------------------------------------------
+
++31 --> f(31) = 1
+
+    0:  ()   ()
+    1:  (11) (21)
+    2:  (52) (31)
+    3:  (13) (93)
+    4:  ()   ()
+    5:  (15) ()
+    6:  ()   ()
+    7:  (17) (97)
+    8:  ()   ()
+    9:  ()   ()
+
+L1, L2, E2
+
+- Se intenta agregar la clave 31 en la direccion 1, se produce overflow, se busca la proxima
+  direccion con espacio disponible, se agrega en la direccion 2
+
+--------------------------------------------------------------------------------------------------
+
++82 --> f(82) = 2
+
+    0:  ()   ()
+    1:  (11) (21)
+    2:  (52) (31)
+    3:  (13) (93)
+    4:  (82) ()
+    5:  (15) ()
+    6:  ()   ()
+    7:  (17) (97)
+    8:  ()   ()
+    9:  ()   ()
+
+L2, L3, L4, E4
+
+- Se agrega la clave 82 en la direccion 4
+
+--------------------------------------------------------------------------------------------------
+
+-15 --> f(15) = 5
+
+    0:  ()   ()
+    1:  (11) (21)
+    2:  (52) (31)
+    3:  (13) (93)
+    4:  (82) ()
+    5:  ()   ()
+    6:  ()   ()
+    7:  (17) (97)
+    8:  ()   ()
+    9:  ()   ()
+
+L5, E5
+
+- Se da de baja la clave 15 de la direccion 5, y no se deja marca porque esta vacia
+
+--------------------------------------------------------------------------------------------------
+
+-52 --> f(52) = 2
+
+    0:  ()   ()
+    1:  (11) (21)
+    2:  (##) (31)
+    3:  (13) (93)
+    4:  (82) ()
+    5:  ()   ()
+    6:  ()   ()
+    7:  (17) (97)
+    8:  ()   ()
+    9:  ()   ()
+
+L2, E2
+
+- Se da de baja la clave 52 de la direccion 2, se deja marca porque el siguiente
+  espacio esta cargado
+
+--------------------------------------------------------------------------------------------------
+
+8 / 20 = 0.4
+DE = 0.4 * 100 = 40%

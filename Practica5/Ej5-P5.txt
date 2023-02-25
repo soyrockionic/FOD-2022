@@ -1,0 +1,96 @@
+Dado el archivo dispersado a continuación, grafique los estados sucesivos para las siguientes 
+operaciones: +12, +45, -70, -56.
+
+Técnica de resolución de colisiones: Saturación progresiva.
+
+f(x) = x MOD 11
+
+--------------------------------------------------------------------------------------------------
+
++12 --> f(12) = 1
+
+    0:  (44) ()
+    1:  (23) (56)
+    2:  (24) (12)
+    3:  ()   ()
+    4:  (70) ()
+    5:  (60) ()
+    6:  (50) ()
+    7:  (84) ()
+    8:  ()   ()
+    9:  (42) ()
+    10: (21) (65)
+
+L1, L2, E2
+
+- Se intenta agregar la clave 12 en la direccion 1, se produce overflow, se busca la proxima
+  direccion con espacio disponible, en la direccion 2 hay una clave, pero tiene un espacio
+  disponible y se agrega la clave 12
+
+--------------------------------------------------------------------------------------------------
+
++45 --> f(45) = 1
+
+    0:  (44) ()
+    1:  (23) (56)
+    2:  (24) (12)
+    3:  (45) ()
+    4:  (70) ()
+    5:  (60) ()
+    6:  (50) ()
+    7:  (84) ()
+    8:  ()   ()
+    9:  (42) ()
+    10: (21) (65)
+
+L1, L2, L3, E3
+
+- Se intenta agregar la clave 45 en la direccion 1, se produce overflow, se busca la proxima
+  direccion con espacio disponible, en la direccion 3 hay espacio disponible y se agrega ahi
+
+--------------------------------------------------------------------------------------------------
+
+-70 --> f(70) = 4
+
+    0:  (44) ()
+    1:  (23) (56)
+    2:  (24) (12)
+    3:  (45) ()
+    4:  ()   ()
+    5:  (60) ()
+    6:  (50) ()
+    7:  (84) ()
+    8:  ()   ()
+    9:  (42) ()
+    10: (21) (65)
+
+L4, E4
+
+- Se da de baja de la clave 70 de la direccion 4, y no se deja marca porque la direccion
+  esta vacia
+
+--------------------------------------------------------------------------------------------------
+
+-56 --> f(56) = 1
+
+    0:  (44) ()
+    1:  (23) (##)
+    2:  (24) (12)
+    3:  (45) ()
+    4:  ()   ()
+    5:  (60) ()
+    6:  (50) ()
+    7:  (84) ()
+    8:  ()   ()
+    9:  (42) ()
+    10: (21) (65)
+
+L1, E1
+
+- Se da de baja la clave 56 de la direccion 1, y se deja marca porque la siguiente
+  direccion tiene claves
+
+--------------------------------------------------------------------------------------------------
+
+11 / (11*2) = 0.5
+DE = 0.59 * 100 = 50%
