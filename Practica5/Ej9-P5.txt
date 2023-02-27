@@ -1,0 +1,143 @@
+Dado el archivo dispersado a continuación, grafique los estados sucesivos para las
+siguientes operaciones: +78, +34, +23, +48, +37, -34
+
+Técnica de resolución de colisiones: Saturación progresiva encadenada.
+
+NOTA: Indicar Lecturas y Escrituras necesarias para cada operación.
+
+f(x) = x MOD 11
+
+--------------------------------------------------------------------------------------------------
+
++78 --> f(78) = 1
+
+    0: (-1) ()
+    1: (2)  (12)
+    2: (-1) (78)
+    3: (-1) (47)
+    4: (-1) ()
+    5: (-1) (16)
+    6: (-1) ()
+    7: (-1) (18)
+    8: (-1) ()
+    9: (-1) (20)
+   10: (-1) ()
+
+L1, L2, E2, E1
+
+- Se intenta agregar en la direccion 1, se produce overflow, se busca la proxima
+  direccion con espacio disponible, se agrega en la direccion 2 y se actualiza
+  su direccion base(ahora apunta a la direccion 2)
+
+--------------------------------------------------------------------------------------------------
+
++34 --> f(34) = 1
+
+    0: (-1) ()
+    1: (4)  (12)
+    2: (-1) (78)
+    3: (-1) (47)
+    4: (2)  (34)
+    5: (-1) (16)
+    6: (-1) ()
+    7: (-1) (18)
+    8: (-1) ()
+    9: (-1) (20)
+   10: (-1) ()
+
+L1, L2, L3, L4, E4, E1
+
+- Se intenta agregar en la direccion 1, se produce overflow, se busca la proxima
+  direccion con espacio disponible, se agrega en la direccion 4, se actualiza
+  su direccion base y ahora apunta a la direccion 4
+
+--------------------------------------------------------------------------------------------------
+
++23 --> f(23) = 1
+
+    0: (-1) ()
+    1: (6)  (12)
+    2: (-1) (78)
+    3: (-1) (47)
+    4: (2)  (34)
+    5: (-1) (16)
+    6: (4)  (23)
+    7: (-1) (18)
+    8: (-1) ()
+    9: (-1) (20)
+   10: (-1) ()
+
+L1, L2, L3, L4, L5, L6, E6, E1
+
+- Se intenta agregar en la direccion 1, se produce overfloow, se busca la proxima direccion
+  con espacio disponible, se agrega en la direccion 6, se actualiza su direccion base y
+  ahora apunta a la direccion 6
+
+--------------------------------------------------------------------------------------------------
+
++48 --> f(48) = 4
+
+    0: (-1) ()
+    1: (6)  (12)
+    2: (-1) (78)
+    3: (-1) (47)
+    4: (-1) (48)
+    5: (-1) (16)
+    6: (8)  (23)
+    7: (-1) (18)
+    8: (2)  (34)
+    9: (-1) (20)
+   10: (-1) ()
+
+L4, L5, L6, L7, L8, E4, E8, E6
+
+- Se intenta agregar en la direccion 4, se produce overflow, pero la clave que ocupa el
+  espacio es intrusa, se agrega la clave 48 en la direccion 4, y se busca una nueva direccion
+  con espacio disponible para la clave intrusa y se actualiza su direccion base 
+
+--------------------------------------------------------------------------------------------------
+
++37 --> f(37) = 4
+
+    0: (-1) ()
+    1: (6)  (12)
+    2: (-1) (78)
+    3: (-1) (47)
+    4: (10) (48)
+    5: (-1) (16)
+    6: (8)  (23)
+    7: (-1) (18)
+    8: (2)  (34)
+    9: (-1) (20)
+   10: (-1) (37)
+
+L4, L5, L6, L7, L8, L9, L10, E10, E4
+
+- Se intenta agregar en la direccion 4, se produce overflow, se busca la proxima direccion
+  con espacio disponible, se agrega en la direccion 10 y se actualiza su direccion base
+
+--------------------------------------------------------------------------------------------------
+
+-34 --> f(34) = 1
+
+    0: (-1) ()
+    1: (6)  (12)
+    2: (-1) (78)
+    3: (-1) (47)
+    4: (10) (48)
+    5: (-1) (16)
+    6: (2)  (23)
+    7: (-1) (18)
+    8: (-1)  ()
+    9: (-1) (20)
+   10: (-1) (37)
+
+L1, L6, L8, E8, E6
+
+- Se da de baja la clave 34 de la direccion 8, se escribe el enlace que tenia la direccion 8
+  en la direccion que lo apuntaba(direccion 6)
+
+--------------------------------------------------------------------------------------------------
+
+9 / 11 = 0.81
+DE = 0.81 * 100 = 81%
