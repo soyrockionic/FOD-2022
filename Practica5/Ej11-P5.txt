@@ -1,0 +1,143 @@
+Dado el archivo dispersado a continuación, grafique los estados sucesivos para las
+siguientes operaciones: +56, +12, +18,-25, -56.
+
+Técnica de resolución: Saturación progresiva encadenada con área de desborde por
+separado.
+
+f(x) = x MOD 11
+
+--------------------------------------------------------------------------------------------------
+
++56 --> f(56) = 1
+
+    0: (-1) (22) ()
+    1: (0)  (34) (78)
+    2: (-1) (46) ()
+    3: (-1) (25) (58)
+    4: (-1) (15) (59)
+    5: (-1) ()   ()
+    6: (-1) ()   ()
+    7: (-1) (40) ()
+    8: (-1) ()   ()
+    9: (-1) ()   ()
+   10: (-1) ()   ()
+
+    0: (-1) (56)
+    1: (-1) ()
+    2: (-1) ()
+    3: (-1) ()
+
+L1, L0ad, E0ad, E1
+
+- Se intenta agregar en la direccion 1, se produce overflow, se agrega en el area separada
+  y se actualiza el enlace base en la tabla
+
+--------------------------------------------------------------------------------------------------
+
++12 --> f(12) = 1
+
+    0: (-1) (22) ()
+    1: (1)  (34) (78)
+    2: (-1) (46) ()
+    3: (-1) (25) (58)
+    4: (-1) (15) (59)
+    5: (-1) ()   ()
+    6: (-1) ()   ()
+    7: (-1) (40) ()
+    8: (-1) ()   ()
+    9: (-1) ()   ()
+   10: (-1) ()   ()
+
+    0: (-1) (56)
+    1: (0)  (12)
+    2: (-1) ()
+    3: (-1) ()
+
+L1, L0ad, L1ad, E1ad, E1
+
+- Se intenta agregar en la direccion 1, se produce overflow, se sigue el enlace al area
+  separada, se produce overflow en la direccion 0, se busca la proximadireccion con 
+  espacio disponible, se agrega la clave 12 en la direccion 1 del area separada y se
+  actualiza su direcion base en el area separada y en la tabla
+  
+--------------------------------------------------------------------------------------------------
+
++18 --> f(18) = 7
+
+    0: (-1) (22) ()
+    1: (1)  (34) (78)
+    2: (-1) (46) ()
+    3: (-1) (25) (58)
+    4: (-1) (15) (59)
+    5: (-1) ()   ()
+    6: (-1) ()   ()
+    7: (-1) (40) (18)
+    8: (-1) ()   ()
+    9: (-1) ()   ()
+   10: (-1) ()   ()
+
+    0: (-1) (56)
+    1: (0)  (12)
+    2: (-1) ()
+    3: (-1) ()
+
+L7, E7
+
+- Se agrega en la direccion 7
+
+--------------------------------------------------------------------------------------------------
+
+-25 --> f(25) = 3
+
+    0: (-1) (22) ()
+    1: (1)  (34) (78)
+    2: (-1) (46) ()
+    3: (-1) ()   (58)
+    4: (-1) (15) (59)
+    5: (-1) ()   ()
+    6: (-1) ()   ()
+    7: (-1) (40) (18)
+    8: (-1) ()   ()
+    9: (-1) ()   ()
+   10: (-1) ()   ()
+
+    0: (-1) (56)
+    1: (0)  (12)
+    2: (-1) ()
+    3: (-1) ()
+
+L3, E3
+
+- Se da de baja la clave 25 de la direccion 3
+
+--------------------------------------------------------------------------------------------------
+
+-56 --> f(56) = 1
+
+    0: (-1) (22) ()
+    1: (1)  (34) (78)
+    2: (-1) (46) ()
+    3: (-1) ()   (58)
+    4: (-1) (15) (59)
+    5: (-1) ()   ()
+    6: (-1) ()   ()
+    7: (-1) (40) (18)
+    8: (-1) ()   ()
+    9: (-1) ()   ()
+   10: (-1) ()   ()
+
+    0: (-1) ()
+    1: (-1) (12)
+    2: (-1) ()
+    3: (-1) ()
+
+L1, L1ad, L0ad, E0ad, E1ad
+
+- Se busca en la direccion 1, se sigue el enlace al area separada, se busca siguiendo
+  el enlace hasta la direccion 0 del area separada, se da de baja la clave 56 y se
+  actualiza su direccion base
+
+--------------------------------------------------------------------------------------------------
+
+10 / ((11*2)+4) = 0.38
+DE = 0.38 + 100 = 38%
