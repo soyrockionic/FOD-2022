@@ -29,8 +29,8 @@ f(x) = x MOD 11
 
 L1, L0ad, E0ad, E1
 
-- Se intenta agregar en la direccion 1, se produce overflow, se agrega en el area separada
-  y se actualiza el enlace base en la tabla
+- Se intenta agregar en la direccion 1, se produce overflow, se agrega en la direccion 1
+  del area separada y se actualiza el enlace base en la tabla
 
 --------------------------------------------------------------------------------------------------
 
@@ -58,7 +58,7 @@ L1, L0ad, L1ad, E1ad, E1
 - Se intenta agregar en la direccion 1, se produce overflow, se sigue el enlace al area
   separada, se produce overflow en la direccion 0, se busca la proximadireccion con 
   espacio disponible, se agrega la clave 12 en la direccion 1 del area separada y se
-  actualiza su direcion base en el area separada y en la tabla
+  actualiza el enlace en el area separada y la direccion base en la tabla
   
 --------------------------------------------------------------------------------------------------
 
@@ -133,9 +133,9 @@ L3, E3
 
 L1, L1ad, L0ad, E0ad, E1ad
 
-- Se busca en la direccion 1, se sigue el enlace al area separada, se busca siguiendo
-  el enlace hasta la direccion 0 del area separada, se da de baja la clave 56 y se
-  actualiza su direccion base
+- Se busca en la direccion 1 no se encuentra, se sigue el enlace al area separada, se busca 
+  siguiendo el enlace hasta la direccion 0 del area separada, se da de baja la clave 56 y
+  se actualiza su direccion base
 
 --------------------------------------------------------------------------------------------------
 
