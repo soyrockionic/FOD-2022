@@ -1,0 +1,109 @@
+Para las siguientes claves, realice el proceso de dispersión mediante el método de hashing
+extensible, sabiendo que cada nodo tiene capacidad para dos registros. El número natural
+indica el orden de llegada de las claves.
+
+Se debe mostrar el estado del archivo para cada operación. Justifique brevemente ante colisión
+y desborde los pasos que realiza.
+
+1: Darin     00111111  2: Alterio     11110100
+3: Sbaraglia 10100101  4: De la Serna 01010111
+5: Altavista 01101011  6: Grandinetti 10101010
+
+--------------------------------------------------------------------------------------------------
+
+1 Darin     00111111
+
+ (0)   (0)
+ 0:    (Darin)   ( )
+
+- Se agrega la clave Darin en el nodo
+
+--------------------------------------------------------------------------------------------------
+
+2 Alterio   11110100
+
+ (0)   (0)
+ 0:    (Darin)   (Alterio)
+
+- Se agrega la clave Alterio en el nodo
+
+--------------------------------------------------------------------------------------------------
+
+3 Sbaraglia 10100101
+
+ (1)   (1)
+ 0:    (Alterio)  ( )
+
+       (1)
+ 1:    (Darin)    (Sbaraglia)
+
+- Se agrega la clave Sbaraglia, produce overflow, se incrementa en 1 el valor asociado al
+  nodo saturado y se crea un nuevo nodo con valor asociado igual al nodo saturado
+- El valor asociado de la tabla en memoria es menor al del nodo saturado entonces se
+  incrementa en 1 y se duplican las celdas de la tabla, la nueva celda apunta al nodo nuevo
+
+--------------------------------------------------------------------------------------------------
+
+4 De La Serna  01011111
+
+ (2)   (1)
+ 00:   (Alterio)   ( )
+ 10:
+
+       (2)
+ 01:   (Sbaraglia) ( )
+
+       (2)
+ 11:   (Darin)     (De La Serna)
+
+- Se agrega la clave De La Serna, produce overflow, se incrementa en 1 el valor asociado al
+  nodo saturado y se crea un nuevo nodo con valor asociado igual al nodo saturado
+- El valor asociado de la tabla en memoria es menor al del nodo saturado entonces se
+  incrementa en 1 y se duplican las celdas de la tabla, la celda 11 apunta al nodo nuevo
+
+--------------------------------------------------------------------------------------------------
+
+5 Altavista  01101011
+
+ (3)    (1)
+ 000:   (Alterio)    ( )
+ 100:
+ 010:
+ 110:
+
+        (2)
+ 001:   (Sbaraglia)  ( )
+ 101
+
+        (3)
+ 011:   (Altavista)  ( )
+
+        (3)
+ 111:   (Darin)      (De La Serna)
+
+- Se agrega la clave Altavista, produce overflow, se incrementa en 1 el valor asociado al
+  nodo saturado y se crea un nuevo nodo con valor asociado igual al nodo saturado
+- El valor asociado de la tabla en memoria es menor al del nodo saturado entonces se
+  incrementa en 1 y se duplican las celdas de la tabla, la celda 111 apunta al nodo nuevo
+
+--------------------------------------------------------------------------------------------------
+
+6 Grandinetti 10101010
+
+ (3)    (1)
+ 000:   (Alterio)    (Grandinetti)
+ 100:
+ 010:
+ 110:
+
+        (2)
+ 001:   (Sbaraglia)  ( )
+ 101
+
+        (3)
+ 011:   (Altavista)  ( )
+
+        (3)
+ 111:   (Darin)      (De La Serna)
+
+- Se agrega la clave Grandinetti
