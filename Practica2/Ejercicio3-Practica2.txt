@@ -129,7 +129,7 @@ begin
      aux := min.codigo;
      cant := 0;
 
-     while(reg.codigo = min.codigo) do begin
+     while(aux = min.codigo) do begin
        cant := cant + min.cantVen;
        minimo(vd,act,min);
      end;
