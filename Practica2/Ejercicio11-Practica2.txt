@@ -1,106 +1,100 @@
-program Ej11P2;
-Uses crt;
+program Ej11_p2;
+Uses crt, sysutils;
 const
   valorAlto = '9999';
-  df = 2;
 type
 
   provincia = record
-    codProv : String[50];
-    alfabetizados : integer;
-    encuestados : integer;
+    nombre : String[50];
+    cantAlfa : integer;
+    cantEnc : integer;
   end;
 
   censo = record
-    codProv : String[50];
-    codLoc : String[4];
-    alfabetizados : integer;
-    encuestados : integer;
+    nombre : String[50];
+    codloc : String[4];
+    cantAlfa : integer;
+    cantEnc : integer;
   end;
 
   maestro = file of provincia;
   detalle = file of censo;
-
-  vector = array[1..df] of detalle;
-  vecCen = array[1..df] of censo;
 
 procedure leer(var arch : detalle; var reg : censo);
 begin
   if(not eof(arch)) then
     read(arch,reg)
   else
-    reg.codProv := valorAlto;
+    reg.nombre := valorAlto;
 end;
 
-procedure minimo(var vd : vector; var cen : vecCen; var min : censo);
-var
-  i, pos : integer;
+procedure minimo(var c1, c2 : detalle; var regD1, regD2 : censo; var min : censo);
 begin
-  min.codProv := valorAlto;
-  for i := 1 to df do begin
-    if(cen[i].codProv < min.codProv) then begin
-      min := cen[i];
-      pos := i;
-    end;
+  if(regD1.nombre <= regD2.nombre) then begin
+    min := regD1;
+    leer(c1,regD1);
+  end
+  else begin
+    min := regD2;
+    leer(c2,regD2);
   end;
-  if(min.codProv <> valorAlto) then
-    leer(vd[pos],cen[pos]);
 end;
 
-procedure actualizarMaestro(var mae : maestro; var vd : vector);
+procedure actualizarMaestro(var mae : maestro; var censo1, censo2 : detalle);
 var
   reg : provincia;
-  cen : vecCen;
   min : censo;
-  i : integer;
+  regD1, regD2 : censo;
+  totalAlfa, totalEnc : integer;
+  actual : String[50];
 begin
-  for i := 1 to df do begin
-    reset(vd[i]);
-    leer(vd[i],cen[i]);
-  end;
   reset(mae);
-
-  min.codProv := valorAlto;
-  minimo(vd,cen,min);
-  while(min.codProv <> valorAlto) do begin
-    read(mae,reg);
-    while(not eof(mae)) and (reg.codProv <> min.codProv) do
-      read(mae,reg);
-    while(reg.codProv = min.codProv) do begin
-      reg.alfabetizados := reg.alfabetizados + min.alfabetizados;
-      reg.encuestados := reg.encuestados + min.encuestados;
-      minimo(vd,cen,min);
+  reset(censo1);
+  reset(censo2);
+  leer(censo1,regD1);
+  leer(censo2,regD2);
+  minimo(censo1,censo2,regD1,regD2,min);
+  while(min.nombre <> valorAlto) do begin
+    actual := min.nombre;
+    totalAlfa := 0;
+    totalEnc := 0;
+    while(actual = min.nombre) do begin
+       totalAlfa := totalAlfa + min.cantAlfa;
+       totalEnc := totalEnc + min.cantEnc;
+       minimo(censo1,censo2,regD1,regD2,min);
     end;
-    seek(mae, filepos(mae)-1);
+    read(mae,reg);
+    while(reg.nombre <> actual) do
+      read(mae,reg);
+    seek(mae,filepos(mae)-1);
+    reg.cantAlfa := reg.cantAlfa + totalAlfa;
+    reg.cantEnc := reg.cantEnc + totalEnc;
     write(mae,reg);
   end;
-
-  for i := 1 to df do
-    close(vd[i]);
   close(mae);
+  close(censo1);
+  close(censo2);
 end;
 
 var
   mae : maestro;
-  vd : vector;
+  censo1, censo2 : detalle;
   i : integer;
   a : String[4];
   reg : provincia;
 begin
   clrscr;
 
-  assign(mae, 'provincias');
-  for i := 1 to df do begin
-    Str(i,a);
-    assign(vd[i], 'censo'+a);
-  end;
+  assign(mae,'Provincias');
+  assign(censo1,'Censo1');
+  assign(censo2,'Censo2');
 
-  actualizarMaestro(mae,vd);
+  actualizarMaestro(mae,censo1,censo2);
 
   reset(mae);
   while(not eof(mae)) do begin
     read(mae,reg);
-    writeln(reg.codProv,' ',reg.alfabetizados,' ',reg.encuestados);
+    writeln(reg.nombre,' ',reg.cantAlfa,' ',reg.cantEnc);
   end;
   close(mae);
 
