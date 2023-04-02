@@ -1,7 +1,7 @@
 program Ej11_p2;
 Uses crt, sysutils;
 const
-  valorAlto = '9999';
+  valorAlto = 'zzzz';
 type
 
   provincia = record
@@ -79,8 +79,6 @@ end;
 var
   mae : maestro;
   censo1, censo2 : detalle;
-  i : integer;
-  a : String[4];
   reg : provincia;
 begin
   clrscr;
