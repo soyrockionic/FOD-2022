@@ -1,0 +1,88 @@
+program Ej13_p2;
+Uses crt;
+const
+  valorAlto = 32000;
+type
+
+  log = record
+    nroUsu : integer;
+    usuario : String[10];
+    nombreUsu : String[10];
+    apellidoUsu : String[10];
+    cantMailEnviados : integer;
+  end;
+
+  mail = record
+    nroUsu : integer;
+    cuentaDestino : String[10];
+    cuerpoMensaje : String[50];
+  end;
+
+  maestro = file of log;
+  detalle = file of mail;
+
+procedure leer(var arch : detalle; var reg : mail);
+begin
+   if(not eof(arch)) then
+     read(arch,reg)
+   else
+     reg.nroUsu := valorAlto;
+end;
+
+procedure crearInforme(var mae : maestro);
+var
+  reg : log;
+  txt : Text;
+begin
+  assign(txt,'Informe.txt');
+  reset(mae);
+  rewrite(txt);
+  while(not eof(mae)) do begin
+    read(mae,reg);
+    writeln(txt,'Usuario: ',reg.nroUsu,' .......... Cantidad de msjs enviados: ',reg.cantMailEnviados);
+  end;
+  close(mae);
+  close(txt);
+end;
+
+procedure actualizarLog(var mae : maestro; var det : detalle);
+var
+  reg : log;
+  regD : mail;
+  usuAct, cantEnviados : integer;
+begin
+  reset(mae);
+  reset(det);
+  leer(det,regD);
+  while(regD.nroUsu <> valorAlto) do begin
+    usuAct := regD.nroUsu;
+    cantEnviados := 0;
+    while(usuAct = regD.nroUsu) do begin
+      cantEnviados := cantEnviados + 1;
+      leer(det,regD);
+    end;
+    read(mae,reg);
+    while(reg.nroUsu <> usuAct) do
+      read(mae,reg);
+    seek(mae,filepos(mae)-1);
+    reg.cantMailEnviados := reg.cantMailEnviados + cantEnviados;
+    write(mae,reg);
+  end;
+  close(mae);
+  close(det);
+  crearInforme(mae);
+end;
+
+var
+  mae : maestro;
+  det : detalle;
+begin
+  clrscr;
+
+  assign(mae,'C:\FPC\3.0.2\bin\i386-win32\var\log\logmail.dat');
+  assign(det,'Enviados');
+
+  actualizarLog(mae,det);
+
+  readln;
+end.
