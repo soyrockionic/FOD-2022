@@ -1,0 +1,105 @@
+program Ej4_p2;
+Uses crt;
+const
+  valorAlto = 32000;
+  n = 5;
+type
+
+  log = record
+    codUsu : integer;
+    fecha : integer;
+    time : integer;
+  end;
+
+  maestro = file of log;
+  detalle = file of log;
+
+  vector = array[1..n] of detalle;
+  registro = array[1..n] of log;
+
+procedure leer(var arch : detalle; var reg : log);
+begin
+  if(not eof(arch)) then
+    read(arch,reg)
+  else
+    reg.codUsu := valorAlto;
+end;
+
+procedure minimo(var v : vector; var regD : registro; var min : log);
+var
+  i, pos : integer;
+begin
+  min.codUsu := valorAlto;
+  for i := 1 to n do
+    if(regD[i].codUsu < min.codUsu) or ((regD[i].codUsu = min.codUsu) and (regD[i].fecha < min.fecha)) then begin
+      min := regD[i];
+      pos := i;
+    end;
+  if(min.codUsu <> valorAlto) then
+    leer(v[pos],regD[pos]);
+end;
+
+procedure informe(var mae : maestro);
+var
+  reg : log;
+  txt : Text;
+begin
+  assign(txt,'logs.txt');
+  reset(mae);
+  rewrite(txt);
+  while(not eof(mae)) do begin
+    read(mae,reg);
+    writeln(txt,'Usuario ',reg.codUsu,' fecha ',reg.fecha,' tiempo total ',reg.time);
+  end;
+  close(mae);
+  close(txt);
+end;
+
+procedure actualizar(var mae : maestro; var v : vector);
+var
+  reg, min : log;
+  regD : registro;
+  i : integer;
+begin
+  for i := 1 to n do begin
+    reset(v[i]);
+    leer(v[i],regD[i]);
+  end;
+  rewrite(mae);
+  minimo(v,regD,min);
+  while(min.codUsu <> valorAlto) do begin
+    reg.codUsu := min.codUsu;
+    while(reg.codUsu = min.codUsu) do begin
+      reg.fecha := min.fecha;
+      reg.time := 0;
+      while(reg.codUsu = min.codUsu) and (reg.fecha = min.fecha) do begin
+        reg.time := reg.time + min.time;
+        minimo(v,regD,min);
+      end;
+      write(mae,reg);
+    end;
+  end;
+  for i := 1 to n do
+    close(v[i]);
+  close(mae);
+  informe(mae);
+end;
+
+var
+  mae : maestro;
+  v : vector;
+  i : integer;
+  a : String[1];
+begin
+  clrscr;
+
+  assign(mae,'C:\FPC\3.0.2\bin\i386-win32\var\log\Usuarios.dat');
+  for i := 1 to n do begin
+    Str(i,a);
+    assign(v[i],'log'+a);
+  end;
+
+  actualizar(mae,v);
+
+  readln;
+end.
