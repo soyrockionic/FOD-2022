@@ -1,0 +1,9 @@
+Usuario 142 fecha 1 tiempo total 60
+Usuario 142 fecha 3 tiempo total 120
+Usuario 142 fecha 5 tiempo total 60
+Usuario 145 fecha 1 tiempo total 120
+Usuario 145 fecha 3 tiempo total 60
+Usuario 148 fecha 1 tiempo total 90
+Usuario 148 fecha 3 tiempo total 210
+Usuario 150 fecha 1 tiempo total 129
+Usuario 150 fecha 4 tiempo total 60
