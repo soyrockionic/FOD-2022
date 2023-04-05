@@ -1,0 +1,5 @@
+Usuario: 142 .......... Cantidad de msjs enviados: 5
+Usuario: 145 .......... Cantidad de msjs enviados: 4
+Usuario: 148 .......... Cantidad de msjs enviados: 0
+Usuario: 150 .......... Cantidad de msjs enviados: 2
+Usuario: 154 .......... Cantidad de msjs enviados: 2
