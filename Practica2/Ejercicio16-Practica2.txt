@@ -1,0 +1,132 @@
+program Ej16_p2;
+Uses crt, sysUtils;
+const
+  valorAlto = 32000;
+  n = 100;
+type
+
+  emision = record
+    fecha : integer;
+    codSem : integer;
+    semanario : String[10];
+    descrip : String[10];
+    precio : real;
+    totalEjem : integer;
+    totalVen : integer;
+  end;
+
+  venta = record
+    fecha : integer;
+    codSem : integer;
+    cantVen : integer
+  end;
+
+  maestro = file of emision;
+  detalle = file of venta;
+
+  vector = array[1..n] of detalle;
+  registro = array[1..n] of venta;
+
+procedure leer(var arch : detalle; var reg : venta);
+begin
+  if(not eof(arch)) then
+    read(arch,reg)
+  else
+    reg.fecha := valorAlto;
+end;
+
+procedure minimo(var vd : vector; var regD : registro; var min : venta);
+var
+  i , pos : integer;
+begin
+  min.fecha := valorAlto;
+  for i := 1 to n do
+    if(regD[i].fecha < min.fecha) or ((regD[i].fecha = min.fecha) and (regD[i].codSem < min.codSem)) then begin
+      min := regD[i];
+      pos := i;
+    end;
+  if(min.fecha <> valorAlto) then
+    leer(vd[pos],regD[pos]);
+end;
+
+procedure actualizar(var mae : maestro; vd : vector);
+var
+  reg : emision;
+  regD : registro;
+  i, auxS, auxF, cantVen : integer;
+  min : venta;
+begin
+  reset(mae);
+  for i := 1 to n do begin
+    reset(vd[i]);
+    leer(vd[i],regD[i]);
+  end;
+  minimo(vd,regD,min);
+  while(min.fecha <> valorAlto) do begin
+    auxF := min.fecha;
+    while(min.fecha = auxF) do begin
+      auxS := min.codSem;
+      cantVen := 0;
+      while(min.fecha = auxF) and (auxS = min.codSem) do begin
+        cantVen := cantVen + min.cantVen;
+        minimo(vd,regD,min);
+      end;
+      read(mae,reg);
+      while(reg.fecha <> auxF) and (auxS <> reg.codSem)  do
+        read(mae,reg);
+      reg.totalVen := reg.totalVen + cantVen;
+      reg.totalEjem := reg.totalEjem - reg.totalVen;
+      seek(mae,filepos(mae)-1);
+      write(mae,reg);
+    end;
+  end;
+  close(mae);
+  for i := 1 to n do
+    close(vd[i]);
+end;
+
+procedure informar(var mae : maestro);
+var
+  reg, max, min : emision;
+begin
+  min.totalVen := 32000;
+  max.totalVen := -1;
+  reset(mae);
+  while(not eof(mae)) do begin
+    read(mae,reg);
+    writeln(reg.fecha,' ',reg.codSem,' ',reg.semanario,' ',reg.totalEjem,' ',reg.totalVen);
+    if(reg.totalVen > max.totalVen) then
+      max := reg
+     else
+       if(reg.totalVen < min.totalVen) then
+         min := reg;
+  end;
+  close(mae);
+  writeln('Seminario mas vendido: ',max.fecha,' ',max.semanario);
+  writeln('Semanario menos vendido: ',min.fecha,' ',min.semanario);
+end;
+
+var
+  fecha : TDateTime;
+  mae : maestro;
+  vd : vector;
+  i : integer;
+  a : String[1];
+begin
+  clrscr;
+
+  fecha := Date;
+  writeln('Fecha de hoy: ',DateToStr(fecha),' Hora: ',FormatDateTime('HH:NN:SS',Time()));
+
+  assign(mae,'Emisiones');
+  for i := 1 to n do begin
+    Str(i,a);
+    assign(vd[i],'Ventas'+a);
+  end;
+
+  actualizar(mae,vd);
+
+  informar(mae);
+
+  readln;
+end.
