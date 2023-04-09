@@ -2,7 +2,7 @@ program Ej16_p2;
 Uses crt, sysUtils;
 const
   valorAlto = 32000;
-  n = 100;
+  n = 3;
 type
 
   emision = record
@@ -74,8 +74,10 @@ begin
       read(mae,reg);
       while(reg.fecha <> auxF) and (auxS <> reg.codSem)  do
         read(mae,reg);
-      reg.totalVen := reg.totalVen + cantVen;
-      reg.totalEjem := reg.totalEjem - reg.totalVen;
+      if((reg.totalEjem - cantVen) >= 0) then begin
+        reg.totalVen := reg.totalVen + cantVen;
+        reg.totalEjem := reg.totalEjem - cantVen;
+      end;
       seek(mae,filepos(mae)-1);
       write(mae,reg);
     end;
