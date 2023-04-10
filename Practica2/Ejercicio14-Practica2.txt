@@ -1,8 +1,7 @@
-program Eje14;
-Uses crt;
+program Ej14_p2;
+Uses crt, sysUtils;
 const
-  df = 2;
-  valorAlto = '9999';
+  valorAlto = '~~~~~~';
 type
 
   vuelo = record
@@ -22,9 +21,6 @@ type
   maestro = file of vuelo;
 
   detalle = file of venta;
-
-  vector = array[1..df] of detalle;
-  vecVentas = array[1..df] of venta;
 
   reglista = record
     destino : String[12];
@@ -64,7 +60,7 @@ begin
   close(mae);
 end;
 
-procedure leerdet(var reg : venta);
+procedure leerVenta(var reg : venta);
 begin
   write('Ingrese destino ');
   readln(reg.destino);
@@ -78,26 +74,17 @@ begin
   end;
 end;
 
-procedure cargarDetalle(var vec : vector);
+procedure cargarDetalle(var det : detalle);
 var
-  i : integer;
   reg : venta;
 begin
-  for i := 1 to df do begin
-    rewrite(vec[i]);
+  rewrite(det);
+  leerVenta(reg);
+  while(reg.destino <> 'aero') do begin
+    write(det,reg);
+    leerVenta(reg);
   end;
-
-  for i := 1 to df do begin
-    leerdet(reg);
-    while(reg.destino <> valorAlto) do begin
-      write(vec[i], reg);
-      leerdet(reg);
-    end;
-  end;
-
-  for i := 1 to df do begin
-    close(vec[i]);
-  end;
+  close(det);
 end;
 
 procedure leer(var det : detalle; var regD : venta);
@@ -109,55 +96,51 @@ begin
     end;
 end;
 
-procedure minimo(var v : vector; var regD : vecVentas; var min : venta);
-var
-  i , pos : integer;
+procedure minimo(var det1, det2 : detalle; var regD1, regD2 : venta; var min : venta);
 begin
-  min.destino := valorAlto;
-  for i := 1 to df do begin
-
-    if(regD[i].destino < min.destino) then begin
-       min := regD[i];
-       pos := i;
-    end;
-
+  if(regD1.destino <= regD2.destino) then begin
+    min := regD1;
+    leer(det1,regD1);
+  end
+  else begin
+    min := regD2;
+    leer(det2,regD2);
   end;
-   leer(v[pos], regD[pos]);
 end;
 
-procedure actualizarArchivo(var mae : maestro; v : vector);
+procedure actualizarArchivo(var mae : maestro; var det1, det2 : detalle);
 var
   i : integer;
   regM : vuelo;
-  regD : vecVentas;
+  regD1, regD2 : venta;
   min : venta;
 begin
   reset(mae);
-  for i := 1 to df do begin
-    reset(v[i]);
-    leer(v[i],regD[i]);
-  end;
+  reset(det1);
+  reset(det2);
+  leer(det1,regD1);
+  leer(det2,regD2);
 
-  minimo(v,regD,min);
+  minimo(det1,det2,regD1,regD2,min);
   while(min.destino <> valorAlto) do begin
-  
+
     read(mae, regM);
-    
+
     while(regM.destino <> min.destino) do
       read(mae, regM);
-      
+
     while(min.destino = regM.destino) do begin
       regM.cantAsientos := regM.cantAsientos - min.asientosVen;
-      minimo(v,regD,min);
+      minimo(det1,det2,regD1,regD2,min);
     end;
-    
+
     seek(mae, filepos(mae)-1);
     write(mae, regM);
-    
+
   end;
-  
-  for i := 1 to df do
-    close(v[i]);
+
+  close(det1);
+  close(det2);
   close(mae);
 end;
 
@@ -203,25 +186,6 @@ begin
   close(mae);
 end;
 
-procedure imprimirDetalle(var vec : vector);
-var
-  i : integer;
-  reg : venta;
-begin
-   for i := 1 to df do
-     reset(vec[i]);
-     
-     for i := 1 to df do begin
-       while(not eof(vec[i])) do begin
-         read(vec[i], reg);
-         writeln(reg.destino,' ',reg.hora,' ',reg.asientosVen);
-       end;
-     end;
-     
-   for i := 1 to df do  
-     close(vec[i]);
-end;
-
 procedure imprimirlista(l : lista);
 begin
   while(l <> nil) do begin
@@ -231,32 +195,30 @@ begin
 end;
 
 var
+  fecha : TDateTime;
   mae : maestro;
-  vec : vector;
+  det1, det2 : detalle;
   i, cant : integer;
-  nro : String[12];
   l : lista;
 begin
   clrscr;
   l := nil;
 
-  assign(mae,'maestro');
-  for i := 1 to df do begin
-    Str(i,nro);
-    assign(vec[i],'detalle'+nro);
-  end;
+  fecha := Date;
+  writeln('Fecha de hoy: ',DateToStr(fecha),' Hora: ',FormatDateTime('HH:NN:SS',Time()));
+
+  assign(mae,'Vuelos');
+  assign(det1,'Ventas1');
+  assign(det2,'Ventas2');
 
   //cargarArchivo(mae);
- 
+
   writeln('---- Sin actualizar ----');
   imprimirMaestro(mae);
 
-  //cargarDetalle(vec);
-  
-  writeln('---- ventas ---');
-  imprimirDetalle(vec);
-  
-  actualizarArchivo(mae,vec);
+  //cargarDetalle(det2);
+
+  actualizarArchivo(mae,det1,det2);
   writeln('---- Actualizado ---');
   imprimirMaestro(mae);
 
