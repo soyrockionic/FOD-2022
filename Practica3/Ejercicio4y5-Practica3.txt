@@ -1,4 +1,4 @@
-program Ej4_p3;
+program Ej4y5_p3;
 Uses crt, sysUtils;
 const
   valorAlto = 32000;
@@ -33,20 +33,17 @@ begin
   close(mae);
 end;
 
-procedure eliminarFlor(var mae : maestro);
+procedure eliminarFlor(var mae : maestro; f : flor);
 var
   reg, ind : flor;
-  cod : integer;
 begin
   reset(mae);
   writeln;
-  write('Ingrese codigo de la flor que desea eliminar ');
-  readln(cod);
   leer(mae,reg);
   ind.codigo := reg.codigo;
-  while(reg.codigo <> valorAlto) and (reg.codigo <> cod) do
+  while(reg.codigo <> valorAlto) and (reg.codigo <> f.codigo) do
     leer(mae,reg);
-  if(reg.codigo = cod) then begin
+  if(reg.codigo = f.codigo) then begin
     reg.codigo := ind.codigo;
     seek(mae,filepos(mae)-1);
     ind.codigo := (filepos(mae)) * -1;
@@ -94,6 +91,7 @@ var
   fecha : TDateTime;
   nombre : String[45];
   codigo : integer;
+  reg : flor;
 begin
   clrscr;
 
@@ -104,7 +102,10 @@ begin
   writeln('--------------------------------------');
   informe(mae);
 
-  eliminarflor(mae);
+  writeln('-------------Elimino Flor-------------');
+  write('Ingrese codigo de la flor que desea eliminar ');
+  readln(reg.codigo);
+  eliminarflor(mae,reg);
 
   writeln('--------------Agrego Flor-------------');
   write('Ingrese codigo ');
