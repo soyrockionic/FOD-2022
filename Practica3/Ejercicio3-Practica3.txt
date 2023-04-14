@@ -95,8 +95,8 @@ begin
   if(reg.codigo = cod) then begin
     reg.codigo := ind.codigo;
     seek(mae, filepos(mae)-1);
+    ind.codigo := (filepos(mae)) * -1;
     write(mae, reg);
-    ind.codigo := (filepos(mae)-1) * -1;
     seek(mae, 0);
     write(mae, ind);
   end
