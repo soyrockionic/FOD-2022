@@ -68,6 +68,7 @@ begin
       reg.codigo := '*'+reg.codigo;
       seek(mae,filepos(mae)-1);
       write(mae,reg);
+      seek(mae,0);
     end;
 
     write('Ingrese codigo de la especie que desea eliminar ');
