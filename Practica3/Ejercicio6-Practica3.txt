@@ -7,7 +7,7 @@ type
   prenda = record
     cod_prenda : integer;
     descripcion : String[50];
-    //colores : String[30];
+    colores : String[30];
     tipo_prenda : String[50];
     stock : integer;
     precio_unitario : real;
