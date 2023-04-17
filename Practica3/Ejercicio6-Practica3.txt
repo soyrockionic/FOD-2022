@@ -1,156 +1,112 @@
-program Ej6P3;
-Uses crt;
+program Ej6_p3;
+Uses crt, sysUtils;
 const
-  valorAlto = 9999;
+  valorAlto = 32000;
 type
 
   prenda = record
     cod_prenda : integer;
-    descrip : String[50];
-    color : String[10];
-    tipo_prenda : String[4];
+    descripcion : String[50];
+    //colores : String[30];
+    tipo_prenda : String[50];
     stock : integer;
-    precio_unit : real;
+    precio_unitario : real;
   end;
 
   maestro = file of prenda;
-
   detalle = file of integer;
 
-
-procedure leerPrenda(var reg : prenda);
+procedure leer(var arch : maestro; var reg : prenda);
 begin
-  write('Ingrese codigo de prenda ');
-  readln(reg.cod_prenda);
-  if(reg.cod_prenda <> -1) then begin
-    write('Ingrese descripcion ');
-    readln(reg.descrip);
-    write('Ingrese color ');
-    readln(reg.color);
-    write('Ingrese tipo de prenda ');
-    readln(reg.tipo_prenda);
-    write('Ingrese stock ');
-    readln(reg.stock);
-    write('Ingrese precio ');
-    readln(reg.precio_unit);
-  end;
-end;
-
-procedure cargarMaestro(var mae : maestro);
-var
-  reg : prenda;
-begin
-  rewrite(mae);
-
-  leerPrenda(reg);
-  while(reg.cod_prenda <> -1) do begin
-    write(mae, reg);
-    leerPrenda(reg);
-  end;
-
-  close(mae);
-end;
-
-procedure cargarDetalle(var det : detalle);
-var
-  reg : integer;
-begin
-  rewrite(det);
-  write('Ingrese codigo ha actualizar ');
-  readln(reg);
-  while(reg <> 0) do begin
-    write(det, reg);
-    write('Ingrese codigo ha actualizar ');
-    readln(reg);
-  end;
-  close(det);
-end;
-
-procedure leer(var det : detalle; var regD : integer);
-begin
-  if(not eof(det)) then
-    read(det, regD)
+  if(not eof(arch)) then
+    read(arch,reg)
   else
-    regD := valorAlto;
-end;
-
-procedure actualizar(var mae : maestro; var det : detalle);
-var
-  regM : prenda;
-  regD : integer;
-begin
-  reset(mae);
-  reset(det);
-
-  leer(det, regD);
-  while(regD <> valorAlto) do begin
-    read(mae, regM);
-    while(regM.cod_prenda <> regD) do
-      read(mae, regM);
-
-    if(regM.stock > 0) then
-      regM.stock := regM.stock * -1;
-    seek(mae, filepos(mae)-1);
-    write(mae, regM);
-
-    leer(det, regD);
-  end;
-
-  close(det);
-  close(mae);
+    reg.cod_prenda := valorAlto;
 end;
 
 procedure compactar(var mae : maestro; var new_mae : maestro);
 var
   reg : prenda;
 begin
-  reset(mae);
+  assign(new_mae,'New_Prendas.dot');
   rewrite(new_mae);
-
-  while(not eof(mae)) do begin
-    read(mae, reg);
+  reset(mae);
+  leer(mae,reg);
+  while(reg.cod_prenda <> valorAlto) do begin
     if(reg.stock > 0) then
-      write(new_mae, reg);
+      write(new_mae,reg);
+    leer(mae,reg);
   end;
-
   close(new_mae);
   close(mae);
 end;
 
-procedure reporte(var m : maestro);
+procedure informe(var arch : maestro);
 var
   reg : prenda;
 begin
-  reset(m);
-  while(not eof(m)) do begin
-    read(m, reg);
-    writeln(reg.cod_prenda,' ',reg.stock,' ',reg.precio_unit:2:2);
+  writeln('---------------------------------------');
+  assign(arch,'Prendas.dot');
+  reset(arch);
+  leer(arch,reg);
+  while(reg.cod_prenda <> valorAlto) do begin
+    writeln(reg.cod_prenda,' ',reg.stock);
+    leer(arch,reg);
   end;
-  close(m);
+  close(arch);
+end;
+
+procedure eliminar(var mae : maestro; cod : integer);
+var
+  reg : prenda;
+begin
+  reset(mae);
+  leer(mae,reg);
+  while(reg.cod_prenda <> cod) do
+    leer(mae,reg);
+  reg.stock := reg.stock * -1;
+  seek(mae,filepos(mae)-1);
+  write(mae,reg);
+  close(mae);
+end;
+
+procedure actualizar(var mae : maestro; var det : maestro);
+var
+  reg : prenda;
+  regD : prenda;
+  new_mae : maestro;
+begin
+  reset(det);
+  leer(det,regD);
+  while(regD.cod_prenda <> valorAlto) do begin
+    eliminar(mae,regD.cod_prenda);
+    leer(det,regD);
+  end;
+  close(det);
+  compactar(mae, new_mae);
+  informe(mae);
+  Erase(mae);
+  Rename(new_mae,'Prendas.dot');
 end;
 
 var
-  mae, new_mae : maestro;
-  det : detalle;
-  reg : prenda;
+  fecha : TDateTime;
+  mae : maestro;
+  det : maestro; reg : prenda;
 begin
   clrscr;
 
-  assign(mae, 'prendas');
-  assign(det, 'det_prendas');
+  fecha := Date;
+  writeln('Fecha de hoy: ',DateToStr(fecha),' Hora: ',FormatDateTime('HH:NN:SS',Time()));
 
-  //cargarMaestro(mae);
-  //cargarDetalle(det);
+  assign(mae,'Prendas.dot');
+  assign(det,'Obsoletas.dot');
 
-  //actualizar(mae,det);
+  informe(mae);
 
-  assign(new_mae, 'new_prendas');
-  compactar(mae,new_mae);
-  Erase(mae);
-  Rename(new_mae, 'prendas');
+  actualizar(mae,det);
 
-  writeln('Archivo compacto');
-  reporte(new_mae);
+  informe(mae);
 
   readln;
 end.
