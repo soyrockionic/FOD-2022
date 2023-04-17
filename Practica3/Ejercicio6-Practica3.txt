@@ -7,7 +7,7 @@ type
   prenda = record
     cod_prenda : integer;
     descripcion : String[50];
-    colores : String[30];
+    //colores : String[30];
     tipo_prenda : String[50];
     stock : integer;
     precio_unitario : real;
@@ -56,20 +56,6 @@ begin
   close(arch);
 end;
 
-procedure eliminar(var mae : maestro; cod : integer);
-var
-  reg : prenda;
-begin
-  reset(mae);
-  leer(mae,reg);
-  while(reg.cod_prenda <> cod) do
-    leer(mae,reg);
-  reg.stock := reg.stock * -1;
-  seek(mae,filepos(mae)-1);
-  write(mae,reg);
-  close(mae);
-end;
-
 procedure actualizar(var mae : maestro; var det : maestro);
 var
   reg : prenda;
@@ -77,11 +63,19 @@ var
   new_mae : maestro;
 begin
   reset(det);
+  reset(mae);
   leer(det,regD);
   while(regD.cod_prenda <> valorAlto) do begin
-    eliminar(mae,regD.cod_prenda);
+    leer(mae,reg);
+    while(reg.cod_prenda <> regD.cod_prenda) do
+      leer(mae,reg);
+    reg.stock := reg.stock * -1;
+    seek(mae,filepos(mae)-1);
+    write(mae,reg);
+    seek(mae,0);
     leer(det,regD);
   end;
+  close(mae);
   close(det);
   compactar(mae, new_mae);
   informe(mae);
