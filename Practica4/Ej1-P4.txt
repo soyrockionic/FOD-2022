@@ -1,0 +1,49 @@
+1. Definir la estructura de datos correspondiente a un árbol B de orden M, que almacenará información correspondiente a alumnos de la facultad de informática de la UNLP. De los mismos deberá guardarse nombre y apellido, DNI, legajo y año de
+ingreso.
+¿Cuál de estos datos debería seleccionarse como clave de identificación para organizar los elementos en el árbol?
+¿Hay más de una opción? Justifique su elección.
+
+Un arbol B es un arbol multicamino con una construccion especial de arboles que permite mantenerlos balanceados a bajo costo.
+
+const
+  M = ...; {orden de arbol}
+type
+  Alumno = record
+    nombre: String;
+    apellido: String;
+    dni: integer;
+    legajo: integer;
+    anio_ingreso: integer;
+  end;
+
+  NodoB = record
+    elementos: array[1..M-1] of Alumno;
+    hijos: array[0..M] of ^NodoB;
+    cantElementos: integer;
+  end;
+
+  arbol = file of NodoB
+
+var
+  arbolB : arbol;
+
+
+Propiedad de Arboles Orden M:
+
+1) Maximo de descendientes y elementos: Cada nodo en un arbol B de orden M puede tener como máximo "M" descendientes
+   y "M-1" elementos. Esto garantiza que el arbol tenga una estructura multicamino y permite una alta capacidad de    almacenamiento de elementos.
+
+2) Raiz con 0 o al menos dos descendientes: La raiz de un arbol B puede tener 0 o al menos dos descendientes, lo que       garantiza que el arbol tenga una estructura bien definida y balanceada desde la raiz. 
+
+3) Numero de elementos en un nodo con X descendientes: Un nodo con "X" descendientes en un arbol B de orden M contiene       exactamente "X-1" elementos. Esto asegura que la cantidad de elementos en un nodo este relacionada directamente con
+   el numero de descendientes, manteniendo el arbol balanceado.
+
+4) Limites minimos y maximos de elementos en nodos no raiz: Todos los nodos en un arbol B de orden M, excepto la raiz,
+   deben tener como minimo "[M/2] - 1" elementos y como maximo "M-1" elementos. Esta restriccion asegura que los nodos
+   no esten vacios y evita que los nodos se sobrecarguen con demasiados elementos.
+
+5) Nivel uniforme de las hojas: Todas las hojas en un arbol B de orden M estan al mismo nivel, lo que significa que la
+   altura del arbol esta equilibrada y garantiza un rendimiento eficiente en las operaciones de busqueda, insercion y       eliminacion.
+
+
+Como clave de identificacion se deberia seleccionar el dni o legajo, ya que son datos unicos.
