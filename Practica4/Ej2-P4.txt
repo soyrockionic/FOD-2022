@@ -1,0 +1,55 @@
+Responda detalladamente:
+a. ¿Cómo accede a la información para buscar al alumno con DNI 23.333.333?
+b. ¿Cómo accede a la información para buscar al alumno José Perez?
+c. Indique cuáles son las ventajas que ofrece este tipo de árbol para el caso de la
+búsqueda planteada en el inciso b.
+
+La principal diferencia en la definicion es que se ha agregado un campo adicional esHoja en la estructura de datos
+NodoB para indicar si el nodo es una hoja o no. Esto es especifico de los arboles B+ en comparacion con los arboles B.
+Los arboles B+ tienen hojas adicionales que contienen punteros a los nodos hijos, lo que permite una busqueda mas
+eficiente en disco, ya que se evitan accesos innecesarios.
+
+const
+  M = ...; {orden de arbol}
+type
+  Alumno = record
+    nombre: String;
+    apellido: String;
+    dni: integer;
+    legajo: integer;
+    anio_ingreso: integer;
+  end;
+
+  NodoB = record
+    elementos: array[1..M-1] of Alumno;
+    hijos: array[0..M] of ^NodoB;
+    cantElementos: integer;
+    esHoja: boolean;
+  end;
+
+  ArbolBPlus = file of NodoB;
+
+var
+  arbolB: ArbolBPlus;
+
+
+Propiedades:
+
+1) Cada nodo puede tener como maximo M descendientes y M-1 elementos.
+2) La raiz tiene 0 o al menos dos descendientes.
+3) Un nodo con X descendientes contiene X elementos.
+4) Todos los nodos excepto la raiz tienen como minimo [M/2] - 1 elementos y como maximo M - 1 elementos.
+5) Todas las hojas estan al mismo nivel.
+6) Los nodos hojas representan un conjunto de datos y son enlazados juntos.
+
+
+a. Se implementa un procedimiento que toma como parametros el DNI que se desea buscar y el nodo actual en el que se esta realizando la busqueda. El procedimiento realiza una busqueda descendente en el arbol siguiendo las propiedades de un
+arbol B+ y muestra la informacion del alumno si se encuentra, o un mensaje indicando que el alumno no fue encontrado
+en el arbol.
+
+b. Se implementa un procedimiento que toma como parametros el nombre del alumno que se desea buscar y el nodo actual en
+el que se esta realizando la busqueda. El procedimiento realiza una busqueda secuencial en las hojas del arbol siguiendo
+el orden de los nombres de los alumnos y muestra la informacion del alumno si se encuentra, o un mensaje indicando que el alumno no fue encontrado en el arbol.
+
+c. En resumen, el uso de un arbol B+ ofrece eficiencia en la busqueda, manejo eficiente de datos en disco, escalabilidad
+y soporte para busquedas ordenadas y por rangos, lo que lo convierte en una opcion ventajosa para el caso de busqueda de alumnos por nombre en el inciso b.
