@@ -1,0 +1,20 @@
+4. Defina los siguientes conceptos:
+   ● Overflow
+   ● Underflow
+   ● Redistribución
+   ● Fusión o concatenación
+
+En los dos últimos casos, ¿cuándo se aplica cada uno?
+
+● Overflow: cuando un nodo supera el maximo de elementos permitidos por el orden del arbol.
+
+● Underflow: cuando un nodo tiene menos del minimo de elementos permitidos.
+
+● Redistribucion: es una operacion utilizada en la gestion de arboles B para mantener el balance del arbol despues
+  de la eliminacion o insercion de elementos. Cuando un nodo tiene underflow puede trasladarse llaves de un nodo
+  adyacente hermano (en caso que este tenga suficientes elementos).
+
+● Fusion: es una operacion utilizada en la gestion de arboles B para mantener el balance del arbol despues de la
+  eliminacion de elementos. Cuando un nodo tiene underflow si un nodo adyacente hermano esta al mínimo (no le sobra
+  ningun elemento) no se puede redistribuir, se concatena con un nodo adyacente disminuyendo el nro de nodos
+  (y en algunos casos la altura del arbol).
