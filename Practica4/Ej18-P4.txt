@@ -1,0 +1,43 @@
+Dado el siguiente arbol B+ de orden 4, mostrar como quedaria definido el arbol luego
+de realizar las siguientes operaciones: -56, -23, -1.
+
+            2: 0(56)1
+
+    0: (1)(23)1    1: (56)(75)(107)
+
+--------------------------------------------------------------------------------------------------
+
+-56
+
+            2: 0(56)1
+
+    0: (1)(23)1    1: (75)(107)
+
+- Baja de la clave 56 del nodo 1
+
+L0, L1, E1
+
+--------------------------------------------------------------------------------------------------
+
+-23
+
+          2: 0 (56) 1
+
+    0: (1) 1    1: (75)(107)
+
+- Baja de la clave 23 del nodo 0
+
+L0, E0
+
+--------------------------------------------------------------------------------------------------
+
+-1
+
+         2: 0 (107) 1
+
+    0: (75) 1    1: (107)
+
+- Baja de la clave 1 del nodo 0, se genera underflow, se redistribuye con su hermano derecho
+- Se promonociona una copia de la clave 107
+
+L0, E0, L1, E1, E2
