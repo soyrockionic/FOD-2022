@@ -67,3 +67,5 @@ L0, L8, L1, L3, L4, L5
 
 - Baja de la clave 104 del nodo 5, se genera underflow y se redistribuye con su hermano izquierdo --> nodo 4
 - Se promociona una copia de clave 80
+
+L0, L8, L1, L3, L4, L5, E5, E4, E6
