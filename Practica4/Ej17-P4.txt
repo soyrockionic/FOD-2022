@@ -162,12 +162,12 @@ L0, L3, L1, E1
 
 -73
 
-                               2: 0(19)3(52)1(85)4
+                               2: 0(19)3(44)1(85)4
 
-    0: (5)(7)(10)(14)3    3: (19)(23)(41)(44)1    1: (52)(74)4    4:(85)(99)(100)(130)
+    0: (5)(7)(10)(14)3    3: (19)(23)(41)1    1: (44)(52)(74)4    4:(85)(99)(100)(130)
 
 - Baja de la clave 73 del nodo 1, se genera underflow, se redistribuye con el hermano izquierdo
-  y se promociona una copia de la clave 52
+  y se promociona una copia de la clave 44
 
 L0, L3, L1, E1, L3, E3, L2, E2
 
@@ -175,9 +175,9 @@ L0, L3, L1, E1, L3, E3, L2, E2
 
 +15
 
-                              2: 0(19)3(52)1(85)4
+                              2: 0(19)3(44)1(85)4
 
-    0: (5)(7)(10)(14)(15)3    3: (19)(23)(41)(44)1    1: (52)(74)4    4:(85)(99)(100)(130)
+    0: (5)(7)(10)(14)(15)3    3: (19)(23)(41)1    1: (44)(52)(74)4    4:(85)(99)(100)(130)
 
 - Se agrega la clave 15 en el nodo 0
 
@@ -188,9 +188,9 @@ L0, E0
 +16
 
                               
-                                   2: 0(14)(19)3(52)1(85)4
+                                   2: 0(14)(19)3(44)1(85)4
 
-    0: (5)(7)(10)5    5: (14)(15)(16)3    3: (19)(23)(41)(44)1    1: (52)(74)4    4:(85)(99)(100)(130)
+    0: (5)(7)(10)5    5: (14)(15)(16)3    3: (19)(23)(41)1    1: (44)(52)(74)4    4:(85)(99)(100)(130)
 
 - Se agrega la clave 16 en el nodo 0, se genera overflow, se divide creando el nodo 5
 - Se promociona una copia de la clave 14
@@ -205,9 +205,7 @@ L0, E0, E5, L2, E2
 
     0: (5)(7)(10)5    5: (14)(15)(16)3    3: (19)(23)(41)1    1: (44)(52)4    4:(85)(99)(100)(130)
 
-- Baja de la clave 74 del nodo 1, se genera underflow, se redistribuye con el hermano izquierdo
-  y se promociona una copia de la clave 44
-
+- Baja de la clave 74 del nodo 1
 L0, L5, L3, L1, E1, E5, L2, E2
 
 --------------------------------------------------------------------------------------------------
