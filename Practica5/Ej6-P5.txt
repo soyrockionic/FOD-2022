@@ -23,7 +23,7 @@ f(x) = x MOD 10
 
 L1, L2, E2
 
-- Se intenta agregar la clave 31 en la direccion 1, se produce overflow, se busca la proxima
+- Se intenta agregar la clave 31 en la direccion 1, se genera overflow, se busca la proxima
   direccion con espacio disponible, se agrega en la direccion 2
 
 --------------------------------------------------------------------------------------------------
@@ -43,7 +43,8 @@ L1, L2, E2
 
 L2, L3, L4, E4
 
-- Se agrega la clave 82 en la direccion 4
+- Se intenta agregar la clave 82 en la direccion 2, se genera overflow, se busca la proxima
+  direccion con espacio disponible, se agrega en la direccion 4 que esta vacia
 
 --------------------------------------------------------------------------------------------------
 
