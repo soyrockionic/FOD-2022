@@ -1,0 +1,103 @@
+Para las siguientes claves, realice el proceso de dispersion mediante el metodo de
+hashing extensible, sabiendo que cada nodo tiene capacidad para dos registros.
+El numero natural indica el orden de llegada de las claves. 
+
+Se debe mostrar el estado del archivo para cada operación. Justifique brevemente ante
+colision y desborde los pasos que realiza
+
+1 Borges   11110100  2 Sabato  00111111
+3 Cortazar 01010111  4 Lugones 10100101
+5 Casares  10101010  6 Walsh   01101011
+
+--------------------------------------------------------------------------------------------------
+
+1 Borges 11110100
+2 Sabado 00111111
+
+     0     0
+     0:    (Borges) (Sabato) 
+
+- No se toma ningun bit de la funcion hash asociada a la clave
+
+--------------------------------------------------------------------------------------------------
+
+3 Cortazar 01010111
+
+     1     1
+     0:    (Borges)
+
+           1
+     1:    (Sabato)  (Cortazar)
+
+- Se toma 1 bit de la funcion hash asociada a la clave
+
+- Se agrega la clave Cortazar, se genera overflow, se incrementa en 1 el valor asociado al
+  nodo saturado y se crea un nuevo nodo con valor asociado igual al nodo saturado
+- El valor asociado de la tabla en memoria es menor al del nodo saturado entonces se
+  increnenta en 1 y se duolican las celdas de la tabla, la nueva celda apunda al nodo nuevo 
+
+--------------------------------------------------------------------------------------------------
+
+4 Lugones 10100101
+
+     2     1
+     00:   (Borges)
+     10:
+
+           2
+     01:   (Lugones)
+
+           2
+     11:   (Sabato)  (Cortazar)
+
+- Se toma 2 bit de la funcion hash asociada a la clave
+
+- Se intenta agregar la clave Lugones en la direccion 1, se genera overflow, se incrementa en 1 el
+  valor asociado al nodo saturado y se crea un nuevo nodo cn valor igual al nodo saturado
+- El valor asociado de la tabla en memoria es menor al del nodo saturado entonces se incrementa
+  en 1 y se duplican las celdas de la tabla, la celda 11 apunta al nodo nuevo 
+
+--------------------------------------------------------------------------------------------------
+
+5 Casares  10101010
+
+     2     1
+     00:   (Borges)  (Casares)          
+     10:   
+
+           2
+     01:   (Lugones)
+
+           2
+     11:   (Sabato)  (Cortazar)
+
+- Se toma 2 bit de la funcion hash asociada a la clave
+
+- Se agrega la clave Casares en la direccion 10
+
+--------------------------------------------------------------------------------------------------
+
+6 Walsh   01101011
+
+     3     1
+     000:  (Borges)  (Casares)
+     010:
+     100:
+     110:
+
+           2
+     001:  (Lugones)
+     101:
+
+           3
+     011:  (Walsh)
+
+           3
+     111:  (Sabato)  (Cortazar)
+
+- Se toma 3 bit de la funcion hash asociada a la clave
+
+- Se intenta agregar la clave Walsh en la direcion 11, se genera overflow, se incrementa en 1 el valor
+  asociado al nodo saturado y se crea un nuevo nodo con el valor asociado igual al nodo saturado
+- El valor asociado de la tabla en memoria es menor al del nodoo saturado entonces se incrementa en 1
+  y se duplican las celdas de la tabla, la celda 111 apunta al nodo nuevo
