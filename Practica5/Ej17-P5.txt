@@ -1,0 +1,113 @@
+Realice el proceso de dispersión mediante el método de hashing extensible, sabiendo
+que cada registro tiene capacidad para dos claves. El número natural indica el orden de
+llegada de las mismas.
+
+Se debe mostrar el estado del archivo para cada operación. Justifique brevemente ante
+colisión y desborde los pasos que realiza.
+
+1 Buenos Aires ....1001  2 San Juan   ....0100
+3 Entre Ríos   ....1110  4 Corrientes ....0010
+5 San Luis     ....0101  6 Tucumán    ....0111
+7 Rio Negro    ....0011  8 Jujuy      ....1111
+
+--------------------------------------------------------------------------------------------------
+
+1 Buenos Aires 1001
+2 San Juan     0100
+ 
+ (0)   (0)
+ 0:    (Buenos Aires)  (San Juan)
+
+--------------------------------------------------------------------------------------------------
+
+3 Entre Ríos   1110
+
+ (1)   (1)
+ 0:    (Entre Rios)    (San Juan)
+
+       (1)
+ 1:    (Buenos Aires)  ( )
+
+--------------------------------------------------------------------------------------------------
+
+4 Corrientes 0010
+
+ (2)   (2)
+ 00:   (San Juan)      ( )
+
+       (2)
+ 10:   (Corrientes)    (Entre Rios)
+
+       (1)
+ 01:   (Buenos Aires)  ( )
+ 11:
+
+--------------------------------------------------------------------------------------------------
+
+5 San Luis     0101
+
+ (2)   (2)
+ 00:   (San Juan)      ( )
+
+       (2)
+ 10:   (Corrientes)    (Entre Rios)
+
+       (1)
+ 01:   (Buenos Aires)  (San Luis)
+ 11:
+
+--------------------------------------------------------------------------------------------------
+
+6 Tucumán    0111
+
+ (2)   (2)
+ 00:   (San Juan)      ( )
+
+       (2)
+ 10:   (Corrientes)    (Entre Rios)
+
+       (2)
+ 01:   (Buenos Aires)  (San Luis)
+
+       (2)
+ 11:   (Tucuman)        ( )
+
+--------------------------------------------------------------------------------------------------
+
+7 Rio Negro    0011
+
+ (2)   (2)
+ 00:   (San Juan)      ( )
+
+       (2)
+ 10:   (Corrientes)    (Entre Rios)
+
+       (2)
+ 01:   (Buenos Aires)  (San Luis)
+
+       (2)
+ 11:   (Rio negro)     (Tucuman)
+
+--------------------------------------------------------------------------------------------------
+
+8 Jujuy      1111
+
+ (2)   (2)
+ 000:  (San Juan)      ( )
+ 100:
+
+       (2)
+ 010:  (Corrientes)    (Entre Rios)
+ 110:
+
+       (2)
+ 001:  (Buenos Aires)  (San Luis)
+ 101:
+
+       (3)
+ 011:  (Rio negro)     ()
+
+       (3)
+ 111:  (Jujuy)         (Tucuman)
+
+--------------------------------------------------------------------------------------------------
