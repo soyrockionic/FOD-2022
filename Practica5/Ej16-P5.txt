@@ -16,6 +16,8 @@ y desborde los pasos que realiza.
  (0)   (0)
  0:    (Darin)   ( )
 
+- No se toma ningun bit de la funcion hash asociada a la clave
+
 - Se agrega la clave Darin en el nodo
 
 --------------------------------------------------------------------------------------------------
@@ -24,6 +26,8 @@ y desborde los pasos que realiza.
 
  (0)   (0)
  0:    (Darin)   (Alterio)
+
+- No se toma ningun bit de la funcion hash asociada a la clave
 
 - Se agrega la clave Alterio en el nodo
 
@@ -36,6 +40,8 @@ y desborde los pasos que realiza.
 
        (1)
  1:    (Darin)    (Sbaraglia)
+
+- Se toma 1 bit de la funcion hash asociada a la clave
 
 - Se agrega la clave Sbaraglia, produce overflow, se incrementa en 1 el valor asociado al
   nodo saturado y se crea un nuevo nodo con valor asociado igual al nodo saturado
@@ -55,6 +61,8 @@ y desborde los pasos que realiza.
 
        (2)
  11:   (Darin)     (De La Serna)
+
+- Se toma 2 bit de la funcion hash asociada a la clave
 
 - Se agrega la clave De La Serna, produce overflow, se incrementa en 1 el valor asociado al
   nodo saturado y se crea un nuevo nodo con valor asociado igual al nodo saturado
@@ -81,6 +89,8 @@ y desborde los pasos que realiza.
         (3)
  111:   (Darin)      (De La Serna)
 
+- Se toma 3 bit de la funcion hash asociada a la clave
+
 - Se agrega la clave Altavista, produce overflow, se incrementa en 1 el valor asociado al
   nodo saturado y se crea un nuevo nodo con valor asociado igual al nodo saturado
 - El valor asociado de la tabla en memoria es menor al del nodo saturado entonces se
@@ -105,5 +115,7 @@ y desborde los pasos que realiza.
 
         (3)
  111:   (Darin)      (De La Serna)
+
+- Se toma 3 bit de la funcion hash asociada a la clave
 
 - Se agrega la clave Grandinetti
