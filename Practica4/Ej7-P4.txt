@@ -1,66 +1,80 @@
-Dado el siguiente árbol B de orden 6, mostrar como quedaría el mismo luego de realizar
-las siguientes operaciones: +15, +71, +3, +48, -56, -71.
+Dado el siguiente Ã¡rbol B de orden 6, mostrar como quedarÃ­a el mismo luego de realizar las siguientes operaciones:
++15, +71, +3, +48, -56, -71.
+PolÃ­tica de resoluciÃ³n de underflows: derecha o izquierda.
 
-Política de resolución de underflows: derecha o izquierda.
+        0: (34) (56) (78) (100) (176)
 
-
-                                                  0: (34) (56) (78) (100) (176)
-
-------------------------------------------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------------------------------------
 
 +15
 
-                                        
-                                                  2: 0(78)1
+                  2: 0 (78) 1
 
-                       0: (15) (34) (56)                 1: (100) (176)
+     0: (15) (34) (56)     1: (100) (176)
 
-- Overflow en el nodo raiz (nodo 0), lo divido y promociono el 78
-  que va ser la clave de la nueva raiz
+- Se agrega la clave 15 en el nodo 0, se genera overflow, se divide y se crea el nuevo nodo 1
+- Se promociona la clave 78 y se crea el nuevo nodo 2
 
-------------------------------------------------------------------------------------------------------------------------
+L0, E0, E1, E2
 
-+71 y +3
+-------------------------------------------------------------------------------------------------------------------
 
-                                                              2: 0(78)1
++71
 
-                       0: (3) (15) (34) (56) (71)                1: (100) (176)
+                      2: 0 (78) 1
 
-- Agregos las claves 71 y 3 en el nodo 0 , sin problemas
+     0: (15) (34) (56) (71)     1: (100) (176)
 
-------------------------------------------------------------------------------------------------------------------------
+- Se agrega la clave 71 en el nodo 0 sin inconvenientes
+
+L2, L0, E0
+
+-------------------------------------------------------------------------------------------------------------------
+
++3
+
+                          2: 0 (78) 1
+
+     0: (15) (34) (56) (71) (3)     1: (100) (176)
+
+- Se agrega la clave 3 en el nodo 0 sin inconvenientes
+
+L2, L0, E0
+
+-------------------------------------------------------------------------------------------------------------------
 
 +48
 
-                                                        2: 0(48)3(78)1
+                      2: 0 (48) 3 (78) 1
 
-                       0: (3) (15) (34)            3: (56) (71)             1: (100) (176)
+     0: (3) (15) (34)     3: (56) (71)     1: (100) (176)
 
-- Overflow en el nodo 0 , lo divido y promociono el 48
+- Se agrega la clave 48 en el nodo 0, se genera overflow, se divide y se crea el nuevo nodo 3
+- Se promociona la clave 48
 
-------------------------------------------------------------------------------------------------------------------------
+L2, L0, E0, E3, E2
+
+-------------------------------------------------------------------------------------------------------------------
 
 -56
 
-                                                2: 0(34)3(78)1
+                     2: 0 (34) 3 (78) 1
 
-                       0: (3) (15)            3: (48) (71)            1: (100) (176)
+     0: (3) (15)     3: (48) (71)     1: (100) (176)
 
-- La baja del 56 produce underflow en el nodo 3 , como la politica es de derecha o izquierda
-  se intenta redistribuir con el hermano derecho , como este contiene la minima cantidad de
-  claves por nodo, no se puede realizar , por lo que intenta redistribuir con el hermano
-  izquierdo , siendo posible la operacion , por lo que se balancea la carga entre el nodo 0 y
-  el nodo 3
+- Baja de la clave 56 del nodo 3, se genera underflow, se redistribuye con el nodo 0
 
-------------------------------------------------------------------------------------------------------------------------
+L2, L3, L1, L0, E0, E3, E2
+
+-------------------------------------------------------------------------------------------------------------------
 
 -71
 
-                                                2: 0(34)3
+              2: 0 (34) 3
 
-                       0: (3) (15)            3: (48) (78) (100) (176)
+     0: (3) (15)     3: (48) (78) (100) (176)
 
-- La baja de la clave 71 produce underflow en el nodo 3 , como la politica es de derecha o izquierda
-  se intenta redistribuir con el hermano derecho , como no es posible porque tiene la minima cantidad
-  de claves , lo intenta con el hermano izquierdo , como tampoco es posible , se fuciona con el
-  hermano adyacente derecho
+- Baja de la clave 71, se genera underflow, como no se puede redistribuir con los hermanos adyacentes
+  se fuciona con el hermano derecho
+
+L2, L3, L1, L0, E3, E2
