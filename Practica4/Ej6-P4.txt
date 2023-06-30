@@ -1,72 +1,76 @@
-Dado el siguiente árbol B de orden 4, mostrar cómo quedaría el mismo luego de realizar
-las siguientes operaciones: +5, +9, +80, +51, -50, -92.
+Dado el siguiente Ã¡rbol B de orden 4, mostrar cÃ³mo quedarÃ­a el mismo luego de realizarlas siguientes operaciones:
++5, +9, +80, +51, -50, -92.
+PolÃ­tica de resoluciÃ³n de underflows: derecha.
 
-Política de resolución de underflows: derecha.
++5
 
-                                          2: 0(66)1
+            2: 0 (32) 3 (66) 1
 
-             0: (22) (32) (50)                    1: (77) (79) (92)
+0: (5)(22)     3: (50)     1: (77) (79) (92)
 
-------------------------------------------------------------------------------------------------------------------------
+-Se agrega la clave 5 en el nodo 0, se genera overflow, se divide y se promociona la clave 32
+-se crea el nuevo nodo 3
 
-+5                                                                         (5) (22) 32 (50)
-                                                                                            I
-                                          2: 0(32)3(66)1
+L2, L0, E0, E3, E2
 
-             0: (5) (22)       3: (50)        1: (77) (79) (92)
-
-- Overflow en el nodo 0 , lo divido y promociono la clave 32
-
-------------------------------------------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------------------------------------
 
 +9
+         
+            2: 0 (32) 3 (66) 1
 
-                                          2: 0(32)3(66)1
+0: (5)(9)(22)     3: (50)     1: (77) (79) (92)
 
-             0: (5) (9) (22)       3: (50)        1: (77) (79) (92)
+-Se agrega la clave 9 al nodo 0, sin inconvenientes
 
-- Se agrega la clave 9 en el nodo 0
+L2, L0, E0
 
-------------------------------------------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------------------------------------
 
 +80
 
-                                          2: 0(32)3(66)1(80)4
+                2: 0 (32) 3 (66) 1 (80) 4
 
-             0: (5) (9) (22)       3: (50)        1: (77) (79)        4: (92)
+0: (5)(9)(22)     3: (50)     1: (77) (79)     4: (92)
 
-- Overflow del nodo 1 , lo divido y promociono el 80
+- Se agrega la clave 80 en el nodo 1, se genera overflow, se divide y se crea el nuevo nodo 4
+- Se promociona la clave 80
 
-------------------------------------------------------------------------------------------------------------------------
+L2, L1, E1, E4, E2
+
+-------------------------------------------------------------------------------------------------------------------
 
 +51
 
-                                          2: 0(32)3(66)1(80)4
+                2: 0 (32) 3 (66) 1 (80) 4
 
-             0: (5) (9) (22)       3: (50) (51)       1: (77) (79)        4: (92)
+0: (5)(9)(22)     3: (50) (51)    1: (77) (79)     4: (92)
 
-- Agrego la clave 51 en el nodo 3
+- Se agrega la clave 51 en el nodo 3, sin inconvenientes
 
-------------------------------------------------------------------------------------------------------------------------
+L2, L3, E3
+
+-------------------------------------------------------------------------------------------------------------------
 
 -50
 
-                                          2: 0(32)3(66)1(80)4
+                2: 0 (32) 3 (66) 1 (80) 4
 
-             0: (5) (9) (22)       3: (51)        1: (77) (79)        4: (92)
+0: (5)(9)(22)     3: (51)    1: (77) (79)     4: (92)
 
--Baja de la clave 50 del nodo 3 sin problemas
+- Baja de la clave 50 del nodo 3, sin inconvenientes
 
-------------------------------------------------------------------------------------------------------------------------
+L2, L3, E3
+
+-------------------------------------------------------------------------------------------------------------------
 
 -92
 
-                                          2: 0(32)3(66)1(79)4
+                2: 0 (32) 3 (66) 1 (79) 4
 
-             0: (5) (9) (22)       3: (51)        1: (77)        4: (80)
+0: (5)(9)(22)     3: (51)     1: (77)     4: (80)
 
-- La baja de la clave 92 produce underflow en el nodo 4,
-  hay politica de derecha pero como se trata de un nodo
-  extremo se intenta redidtribuir con el unico hermano adyacente
-  que tiene (ndodo 1). Se puede redistribuir porque el hermano
-  no tiene el minimo de claves por nodo
+- Baja de la clave 92 del nodo 4, se genera underflow, y como es un nodo extremo se redistribuye con el unico
+  hermano adyacente
+
+L2, L4, L1, E1, E4, E2
