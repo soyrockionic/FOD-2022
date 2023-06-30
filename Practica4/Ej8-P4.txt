@@ -1,67 +1,68 @@
-Dado el siguiente árbol B de orden 5, mostrar como quedaría el mismo luego de realizar
+Dado el siguiente Ã¡rbol B de orden 5, mostrar como quedarÃ­a el mismo luego de realizar
 las siguientes operaciones: +450, -485, -511, -614.
 
-Política de resolución de underflows: derecha.
+PolÃ­tica de resoluciÃ³n de underflows: derecha.
 
+                                  2: 0 (315) 1 (485) 4 (547) 5 (639) 3
 
-                                                         2: 0(315)1(485)4(547)5(639)3
+     0: (148)(223)     1: (333)(390)(442)(454)     4: (508)(511)     5: (614)(633)     3: (789)(915)
 
-   0: (148) (223)     1: (333) (390) (442) (454)     4: (508) (511)     5: (614) (633)     3: (789) (915)
+-------------------------------------------------------------------------------------------------------------------
 
-------------------------------------------------------------------------------------------------------------------------
++450
 
-+450                                                                                        [5/2] - 1 = 1 min claves x nodo
+                                                  8: 2 (485) 7
+                              
+                                   2: 0 (315) 1 (442) 6     7: 4 (547) 5 (639) 3
 
-                                                                        8: 2(485)7
+     0: (148)(223)     1: (333)(390)     6: (450)(454)     4: (508)(511)     5: (614)(633)     3: (789)(915)
 
-                                2: 0(315)1(442)6                                       7: 4(547)5(639)3
+- Se agrega la clave 450 en el nodo 1, se genera overflow, se divide y se crea el nodo 6
+- Se promociona la clave 442, se genera overflow en el nodo 2, se divide y se crea el nodo 7
+- Se promociona la clave 485 y se crea el nuevo nodo raiz 8
 
-   0: (148) (223)     1: (333) (390)   6: (450) (454)     4: (508) (511)     5: (614) (633)     3: (789) (915)
+L2, L1, E1, E2, E8
 
-- Overflow del nodo 1 , se divide y se promociona la clave 442
-- Se propaga el overflow a la raiz , esta se divide y se promociona la clave 485 a una nueva raiz
-  produciendo el aumento de la altura del arbol
+-------------------------------------------------------------------------------------------------------------------
 
-------------------------------------------------------------------------------------------------------------------------
+-485
+                                           
+                                                 8: 2 (508) 7
+                              
+                                  2: 0 (315) 1 (442) 6     7: 4 (547) 5 (639) 3
 
--485                                                                                         [5/2] - 1 = 1 min claves x nodo
+     0: (148)(223)     1: (333)(390)     6: (450)(454)     4: (511)     5: (614)(633)     3: (789)(915)
 
-                                                                        8: 2(508)7
+- Baja de la clave 485 del nodo 8, se remplaza la menor de su subarbol derecho, no se genera underflow
 
-                                2: 0(315)1(442)6                                       7: 4(547)5(639)3
+L8, L7, L4, E8
 
-   0: (148) (223)     1: (333) (390)   6: (450) (454)     4: (511)     5: (614) (633)     3: (789) (915)
+-------------------------------------------------------------------------------------------------------------------
 
-- baja de la clave 485 , como no es un nodo terminal la reemplazo por la menor clave de
-  su subarbol derecho , esto no genera underflow en la hoja ya que el minimo es 1 clave
-  por nodo y es lo que termina teniendo la hoja
+-511
 
+                                                 8: 2 (508) 7
+                              
+                                  2: 0 (315) 1 (442) 6     7: 4 (614) 5 (639) 3
 
-------------------------------------------------------------------------------------------------------------------------
+     0: (148)(223)     1: (333)(390)     6: (450)(454)     4:(547)     5: (633)     3: (789)(915)
 
--511                                                                                         [5/2] - 1 = 1 min claves x nodo
+- Baja de la clave 511 del nodo 4, se genera underflow, se redistribuye con su hermano derecho
+  y se balancea la carga entre el nodo 4 y el nodo 5
 
-                                                                        8: 2(508)7
+L8, L7, L4, E4, E5, E7
 
-                                2: 0(315)1(442)6                                       7: 4(614)5(639)3
+-------------------------------------------------------------------------------------------------------------------
 
-   0: (148) (223)     1: (333) (390)   6: (450) (454)     4: (547)     5:(633)     3: (789) (915)
+-614
 
-- Baja de la clave 511 produce underflow en el nodo 4 , como la politica es de derecha se
-  intenta redistribuir con el hermano derecho , como este no contiene la cantidad minima 
-  de claves , es posible y se balancea la carga entre los nodos 4 y 5
+                                                  8: 2 (508) 7
+                              
+                                  2: 0 (315) 1 (442) 6     7: 4 (633) 5 (789) 3
 
-------------------------------------------------------------------------------------------------------------------------
+     0: (148)(223)     1: (333)(390)     6: (450)(454)     4: (547)    5: (639)     3: (915)
 
--614                                                                                         [5/2] - 1 = 1 min claves x nodo
+- Baja de la clave 614 del nodo 7, se reemplaza por la menor de su subarbol derecho, se genera underflow
+  en el nodo 5, se redistribuye con su hermano derecho
 
-                                                                        8: 2(508)7
-
-                                2: 0(315)1(442)6                                       7: 4(633)5(789)3
-
-   0: (148) (223)     1: (333) (390)   6: (450) (454)     4: (547)     5:(639)     3: (915)
-
-- Baja de la clave 614 del nodo 7 , como no se trata de un nodo terminal se la reemplaza
-  con la menor clave de su subarbol derecho que es 633 , esto genera underflow en la hoja
-  por lo que como se trata de politica de derecha se intenta redistribuir con su nodo hermano
-  derecho , lo cual es posible
+L8, L7, L5, E7, E5, E3
