@@ -13,6 +13,8 @@ Política de resolución de underflows: izquierda.
 
 - Se agrega la clave 80 en el nodo 0
 
+E0
+
 --------------------------------------------------------------------------------------------------
 
 +50
@@ -20,6 +22,8 @@ Política de resolución de underflows: izquierda.
          0: (50) (80)
 
 - Se agrega la clave 50 en el nodo 0
+
+E0
 
 --------------------------------------------------------------------------------------------------
 
@@ -29,6 +33,8 @@ Política de resolución de underflows: izquierda.
 
 - Se agrega la clave 70 en el nodo 0
 
+E0
+
 --------------------------------------------------------------------------------------------------
 
 +120
@@ -36,6 +42,8 @@ Política de resolución de underflows: izquierda.
          0: (50) (70) (80) (120)
 
 - Se agrega la clave 120 en el nodo 0
+
+E0
 
 --------------------------------------------------------------------------------------------------
 
@@ -48,6 +56,7 @@ Política de resolución de underflows: izquierda.
 
 - Overflow en el nodo 0 , lo divido y promociono la clave 70
 
+E0, E1, E2
 
 --------------------------------------------------------------------------------------------------
 
@@ -59,6 +68,8 @@ Política de resolución de underflows: izquierda.
 
 - Se agrega la clave 52 en el nodo 0
 
+L2, L0, E0
+
 --------------------------------------------------------------------------------------------------
 
 +59
@@ -68,6 +79,8 @@ Política de resolución de underflows: izquierda.
          0: (23) (50) (52) (59)     1: (80) (120)  
 
 - Se agrega la clave 59 en el nodo 0
+
+L2, L0, E0
 
 --------------------------------------------------------------------------------------------------
 
@@ -79,6 +92,8 @@ Política de resolución de underflows: izquierda.
 
 - Overflow en el nodo 0 , lo divido y promociono la clave 52
 
+L2, L0, E0, E3, E2
+
 --------------------------------------------------------------------------------------------------
 
 +30
@@ -88,6 +103,8 @@ Política de resolución de underflows: izquierda.
          0: (23) (30) (50)     3: (59) (65)     1: (80) (120)
 
 - Se agrega la clave 30 en el nodo 0
+
+L2, L0, E0
 
 --------------------------------------------------------------------------------------------------
 
@@ -99,6 +116,8 @@ Política de resolución de underflows: izquierda.
 
 - Se agrega la clave 40 en el nodo 0
 
+L2, L0, E0
+
 --------------------------------------------------------------------------------------------------
 
 +45
@@ -108,6 +127,8 @@ Política de resolución de underflows: izquierda.
          0: (23) (30)     4:(45) (50)     3: (59) (65)     1: (80) (120)
 
 - Overflow en el nodo 0 , lo divido y promociono la clave 40
+
+L2, L0, E0, E4, E2
 
 --------------------------------------------------------------------------------------------------
 
@@ -119,6 +140,8 @@ Política de resolución de underflows: izquierda.
 
 - Se agrega la clave 31 en el nodo 0
 
+L2, L0, E0
+
 --------------------------------------------------------------------------------------------------
 
 +34
@@ -128,6 +151,8 @@ Política de resolución de underflows: izquierda.
          0: (23) (30) (31) (34)    4:(45) (50)     3: (59) (65)     1: (80) (120) 
 
 - Se agrega la clave 34 en el nodo 0
+
+L2, L0, E0
 
 --------------------------------------------------------------------------------------------------
 
@@ -139,6 +164,8 @@ Política de resolución de underflows: izquierda.
 
 - Overflow en el nodo 0 , lo divido y promociono la clave 31
 
+L2, L0, E0, E5, E2
+
 --------------------------------------------------------------------------------------------------
 
 +60
@@ -149,6 +176,8 @@ Política de resolución de underflows: izquierda.
 
 - Se agrega la clave 60 en el nodo 3
 
+L2, L3, E3
+
 --------------------------------------------------------------------------------------------------
 
 +63
@@ -158,6 +187,8 @@ Política de resolución de underflows: izquierda.
        0: (23) (30)    5: (34) (38)    4:(45) (50)     3: (59) (60) (63) (65)     1: (80) (120)
 
 - Se agrega la clave 63 en el nodo 3
+
+L2, L3, E3
 
 --------------------------------------------------------------------------------------------------
 
@@ -172,6 +203,8 @@ Política de resolución de underflows: izquierda.
 - Overflow en el nodo 3 , lo divido y promociono la clave 63
 - Overflow en el nodo 2 , lo divido y promociono la clave 52
 
+L2, L3, E3, E6, E2, E7, E8
+
 --------------------------------------------------------------------------------------------------
 
 -23
@@ -183,6 +216,9 @@ Política de resolución de underflows: izquierda.
     0: (30)    5: (34) (38)    4:(45) (50)     3: (59) (60)    6: (64) (65)     1: (80) (120)
 
 - Baja de la clave 23 del nodo 0
+
+L8, L2, L0, E0
+
 --------------------------------------------------------------------------------------------------
 
 -30
@@ -194,6 +230,8 @@ Política de resolución de underflows: izquierda.
     0: (31)    5: (38)    4:(45) (50)     3: (59) (60)    6: (64) (65)     1: (80) (120)
 
 - Baja de la clave 30 del nodo 0, se produce underflow y se destribuye con el nodo 5
+
+L8, L2, L0, L5, E0, E5, E2
 
 --------------------------------------------------------------------------------------------------
 
@@ -207,6 +245,9 @@ Política de resolución de underflows: izquierda.
 
 - Baja de la clave 31 del nodo 0, se produce underflow
   y se fusiona con el nodo 5 porque no se puede destribuir
+
+L8, L2, L0, L5, E0, E2
+
 --------------------------------------------------------------------------------------------------
 
 -40
@@ -215,10 +256,12 @@ Política de resolución de underflows: izquierda.
 
                            2: 0(45)4              7: 3(63)6(70)1
 
-    0: (34) (38)    4: (50)     3: (59) (60)    6: (64) (65)     1: (80) (120)  
+    0: (34) (38)    4: (50)    3: (59) (60)    6: (64) (65)     1: (80) (120)  
 
 - Se reemplaza la clave 40 por la que esta mas a la izquierda de su derecha
 - Baja de la clave 40
+
+L8, L2, L4, E4, E2
 
 --------------------------------------------------------------------------------------------------
 
@@ -233,6 +276,9 @@ Política de resolución de underflows: izquierda.
 - Se reemplaza la clave 45 por la que esta mas a la izquierda de su derecha
 - Baja de la clave 45, se produce underflow en el nodo 4 y se destribuye con
   el nodo 0
+
+L8, L2, L4, L0, E0, E4, E2
+
 --------------------------------------------------------------------------------------------------
 
 -38
@@ -246,3 +292,5 @@ Política de resolución de underflows: izquierda.
 - Se reemplaza la clave 38 por la que esta mas a la izquierda de su derecha
 - Baja de la clave 38, se produce underflow el nodo 4 y se fusiona con el nodo 0
 - Se produce underflow en el 2 y se destribuuye con el nodo 7
+
+L8, L2, L4, L0, E0, L7, E2, E7, E8
