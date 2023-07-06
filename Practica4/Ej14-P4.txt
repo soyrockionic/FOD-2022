@@ -21,6 +21,8 @@ operación. +80, -400.
 - Overflow en el nodo 0, se divide y se promociona una copia de la clave 77
 - Se produce overflow en el nodo 4
 
+L4, L0, E0, E5, E4, E6, E7
+
 --------------------------------------------------------------------------------------------------
 
 -400
