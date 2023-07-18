@@ -147,7 +147,7 @@ L5, L3, L1, E1
     4: (709)    ()
     5: (347) (113)
 
-L1, L5, L4, E4
+L1, L0, L5, L4, E4
 
 - Se intenta agregar en la direccion 1, se produce overflow, se desplaza hasta encontrar
   una direccion con espacio disponible, se agrega en la direccion 4
