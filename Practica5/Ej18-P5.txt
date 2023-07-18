@@ -27,7 +27,7 @@ colision y desborde los pasos que realiza
      0:    (Borges)
 
            1
-     1:    (Sabato)  (Cortazar)
+     1:    (Cortazar)  (Sabato)
 
 - Se toma 1 bit de la funcion hash asociada a la clave
 
@@ -48,7 +48,7 @@ colision y desborde los pasos que realiza
      01:   (Lugones)
 
            2
-     11:   (Sabato)  (Cortazar)
+     11:   (Cortazar)  (Sabato)
 
 - Se toma 2 bit de la funcion hash asociada a la clave
 
@@ -69,7 +69,7 @@ colision y desborde los pasos que realiza
      01:   (Lugones)
 
            2
-     11:   (Sabato)  (Cortazar)
+     11:   (Cortazar)  (Sabato)
 
 - Se toma 2 bit de la funcion hash asociada a la clave
 
@@ -93,7 +93,7 @@ colision y desborde los pasos que realiza
      011:  (Walsh)
 
            3
-     111:  (Sabato)  (Cortazar)
+     111:  (Cortazar)  (Sabato)
 
 - Se toma 3 bit de la funcion hash asociada a la clave
 
