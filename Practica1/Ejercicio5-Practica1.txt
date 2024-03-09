@@ -19,7 +19,7 @@ var
   reg : celular;
   carga : text;
 begin
-  assign(carga, '001celulares.txt');
+  assign(carga, 'celulares.txt');
   rewrite(arch);
   reset(carga);
   while(not eof(carga)) do begin
@@ -57,7 +57,7 @@ var
   reg : celular;
   phone : text;
 begin
-  assign(phone, '001celulares.txt');
+  assign(phone, 'celulares.txt');
   rewrite(phone);
   reset(arch);
   while(not eof(arch)) do begin
