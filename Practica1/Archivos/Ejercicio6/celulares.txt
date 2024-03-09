@@ -1,0 +1,12 @@
+1042 15000.00 lg
+120 50 usado
+k4
+4096 24000.00 moto
+45 50 usado
+G6
+2048 18000.00 moto
+40 50 usado
+G3
+8192 30000.00 nokia
+100 50 nuevo
+lumit
