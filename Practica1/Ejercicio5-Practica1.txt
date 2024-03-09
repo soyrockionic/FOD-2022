@@ -1,11 +1,11 @@
 program Ej5P1;
-Uses crt;
+Uses crt, SysUtils;
 type
 
   celular = record
     codigo : integer;
     nombre : String[50];
-    descrip : String[50];
+    descripcion : String[50];
     marca : String[50];
     precio : real;
     stockMin : integer;
@@ -19,16 +19,22 @@ var
   reg : celular;
   carga : text;
 begin
-  assign(carga, 'celulares.txt');
+  assign(carga, '001celulares.txt');
   rewrite(arch);
   reset(carga);
   while(not eof(carga)) do begin
-    readln(carga, reg.codigo,reg.precio,reg.nombre,reg.marca);
-    readln(carga, reg.stockMin,reg.stockDisp,reg.descrip);
+    readln(carga,reg.codigo,reg.precio,reg.marca);
+    readln(carga,reg.stockDisp,reg.stockMin,reg.descripcion);
+    readln(carga,reg.nombre);
     write(arch, reg);
   end;
   close(carga);
   close(arch);
+end;
+
+procedure imprimir(reg : celular);
+begin
+  writeln(Format('%-4d | %0.2f | %-6s | %-4d | %-10s ',[reg.codigo,reg.precio,reg.marca,reg.stockDisp,reg.descripcion]));
 end;
 
 procedure stockMenorAlMinimo(var arch : archivo);
@@ -36,13 +42,13 @@ var
   reg : celular;
 begin
   reset(arch);
-  writeln('-------------------------');
+  writeln('--------------------------------------------------');
   while(not eof(arch)) do begin
     read(arch, reg);
     if(reg.stockDisp < reg.stockMin) then
-      writeln(reg.codigo,' ',reg.nombre,' ',reg.marca,' ',reg.precio:2:2,' ',reg.stockDisp);
+      imprimir(reg);
   end;
-  writeln('-------------------------');
+  writeln('--------------------------------------------------');
   close(arch);
 end;
 
@@ -51,13 +57,14 @@ var
   reg : celular;
   phone : text;
 begin
-  assign(phone, 'celular.txt');
+  assign(phone, '001celulares.txt');
   rewrite(phone);
   reset(arch);
   while(not eof(arch)) do begin
     read(arch, reg);
-    write(phone, reg.codigo,' ',reg.nombre,' ',reg.marca,' ',reg.precio:2:2,' ',reg.stockDisp);
-    writeln(phone, ' ');
+    writeln(phone,reg.codigo,' ',reg.precio:2:2,reg.marca);
+    writeln(phone,reg.stockDisp,' ',reg.stockMin,reg.descripcion);
+    writeln(phone,reg.nombre);
   end;
   close(phone);
   close(arch);
@@ -71,10 +78,11 @@ begin
   reset(arch);
   write('Ingrese la cadena de caracteres para verificar ');
   readln(cadena);
+  writeln('--------------------------------------------------');
   while(not eof(arch)) do begin
     read(arch, reg);
-    if(pos(cadena, reg.descrip) > 0) then
-      writeln(reg.codigo,' ',reg.nombre,' ',reg.marca,' ',reg.descrip);
+    if(pos(cadena, reg.descripcion) > 0) then
+      imprimir(reg);
   end;
   close(arch);
 end;
@@ -90,17 +98,17 @@ begin
   readln(n);
 
   assign(arch, n);
-  writeln('-------------------------');
+  writeln('--------------------------------------------------');
   writeln('a : Cargar archivo');
   writeln('b : Celulares con stock menor al minimo');
-  writeln('c : crear archivo de txt');
-  writeln('d : celulares cuya descrip contiene los char ingresados');
+  writeln('c : celulares cuya descrip contiene los char ingresados');
+  writeln('d : crear archivo de txt');
   readln(car);
   case car of
     'a' : cargarArchivo(arch);
     'b' : stockMenorAlMinimo(arch);
-    'c' : crearArchivoText(arch);
-    'd' : contienenLosCharIngresados(arch);
+    'c' : contienenLosCharIngresados(arch);
+    'd' : crearArchivoText(arch);
   end;
 
   readln;
