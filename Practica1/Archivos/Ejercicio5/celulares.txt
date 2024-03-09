@@ -1,6 +1,9 @@
-1042 15000 lg k4
-50 120 usado
-4096 24000 moto G6
-50 45 usado
-2048 18000 moto G3
-50 40 usado
+1042 15000.00 lg
+120 50 usado
+k4
+4096 24000.00 moto
+45 50 usado
+G6
+2048 18000.00 moto
+40 50 usado
+G3
