@@ -1,13 +1,13 @@
 program Ej4P1;
-Uses crt;
+Uses crt, SysUtils;
 type
 
   empleado = record
     nro : integer;
-    apellido : String[25];
-    nombre : String[25];
+    apellido : String[20];
+    nombre : String[20];
     edad : integer;
-    dni : integer;
+    dni : String[8];
   end;
 
   archivo = file of empleado;
@@ -41,18 +41,25 @@ begin
   close(arch);
 end;
 
-procedure listaConElIngresado(var arch : archivo);
+procedure imprimir(reg : empleado);
+begin
+  writeln(Format('%-4d | %-10s | %-10s | %4d | %4s', [reg.nro,reg.nombre,reg.apellido,reg.edad,reg.dni]));
+end;
+
+procedure empleadosConDatoIngresado(var arch : archivo);
 var
   reg : empleado;
-  n : String;
+  dato : String[20];
 begin
-  write('Ingrese nombre para mostrar en pantalla ');
-  readln(n);
+  clrscr;
+  write('Ingrese nombre o apellido para filtrar ');
+  readln(dato);
+  writeln('------------------------------------------------');
   reset(arch);
   while(not eof(arch)) do begin
     read(arch, reg);
-    if(reg.nombre = n) then
-      writeln(reg.apellido,' ',reg.dni);
+    if(reg.nombre = dato) then
+      imprimir(reg);
   end;
   close(arch);
 end;
@@ -61,10 +68,12 @@ procedure todosLosEmpleados(var arch : archivo);
 var
   reg : empleado;
 begin
+  clrscr;
+  writeln('------------------------------------------------');
   reset(arch);
   while(not eof(arch)) do begin
     read(arch, reg);
-    writeln(reg.nro,' ',reg.apellido,' ',reg.edad,' ',reg.dni);
+    imprimir(reg);
   end;
   close(arch);
 end;
@@ -73,11 +82,13 @@ procedure ProntoAJubilarse(var arch : archivo);
 var
   reg : empleado;
 begin
+  clrscr;
+  writeln('------------------------------------------------');
   reset(arch);
   while(not eof(arch)) do begin
     read(arch, reg);
     if(reg.edad > 70) then
-      write(reg.nro,' ',reg.apellido);
+      imprimir(reg);
   end;
   close(arch);
 end;
@@ -85,31 +96,26 @@ end;
 procedure agregarNuevosEmpleados(var arch : archivo);
 var
   reg : empleado;
-  cant, i : integer;
 begin
-  write('Ingrese la cant de empleados que desea agregar ');
-  readln(cant);
   reset(arch);
-  seek(arch, filesize(arch));
-  for i := 1 to cant do begin
+  leer(reg);
+  seek(arch,filesize(arch));
+  while(reg.apellido <> 'fin') do begin
+    write(arch,reg);
     leer(reg);
-    write(arch, reg);
   end;
   close(arch);
-  todosLosEmpleados(arch);
 end;
 
 procedure modificarEdad(var arch : archivo);
 var
   reg : empleado;
-  cant, i, cod : integer;
+  cod : integer;
 begin
   reset(arch);
-  write('Ingrese la cantidad de empledados que desea modificar la edad ');
-  read(cant);
-  for i := 1 to cant do begin
-    write('Ingrese el codigo del empleado ');
-    read(cod);
+  write('Ingrese el codigo del empleado ');
+  readln(cod);
+  while(cod <> -1) do begin
     while(not eof(arch)) and (reg.nro <> cod) do
       read(arch, reg);
     if(reg.nro = cod) then begin
@@ -119,9 +125,10 @@ begin
       write(arch, reg);
     end;
     seek(arch, 0);
+    write('Ingrese el codigo del empleado ');
+    readln(cod);
   end;
   close(arch);
-  todosLosEmpleados(arch);
 end;
 
 procedure exportarArchivo(var arch : archivo);
@@ -129,13 +136,12 @@ var
   reg : empleado;
   carga : text;
 begin
-  assign(carga, 'todos_empleados.txt');
+  assign(carga, '001todos_empleados.txt');
   rewrite(carga);
   reset(arch);
   while(not eof(arch)) do begin
     read(arch, reg);
-    write(carga, reg.nro, ' ', reg.apellido, ' ', reg.edad, ' ', reg.dni);
-    writeln(carga, ' ');
+    writeln(carga, reg.nro,' ',reg.nombre,' ',reg.apellido,' ', reg.edad,' ', reg.dni);
   end;
   close(carga);
   close(arch);
@@ -146,29 +152,25 @@ var
   carga : text;
   reg : empleado;
 begin
-
   assign(carga, 'faltaDniEmpleado.txt');
-
   reset(arch);
   rewrite(carga);
   while(not eof(arch)) do begin
     read(arch, reg);
-    if(reg.dni = 00) then begin
-      write(carga, reg.nro,' ',reg.apellido,' ',reg.edad,' ',reg.dni);
-      writeln(carga,' ');
+    if(reg.dni = '00') then begin
+      write(carga, reg.nro,' ',reg.nombre,' ',reg.apellido,' ',reg.edad,' ',reg.dni);
     end;
   end;
   close(carga);
   close(arch);
-
 end;
 
-procedure recorrerArchivo(var arch : archivo);
+procedure procesarArchivo(var arch : archivo);
 var
-  op : integer;
+  op : char;
 begin
   writeln();
-  writeln('1 : lista de empleados con el nombre ingresado');
+  writeln('1 : lista de empleados con el dato ingresado');
   writeln('2 : lista de todos los empleados');
   writeln('3 : lista de los empleados pronto a jubilarse');
   writeln('4 : agregar nuevos empleados');
@@ -179,19 +181,20 @@ begin
   write('Ingrese que eperacion desea ');
   readln(op);
   case op of
-    1 : listaConElIngresado(arch);
-    2 : todosLosEmpleados(arch);
-    3 : ProntoAJubilarse(arch);
-    4 : agregarNuevosEmpleados(arch);
-    5 : modificarEdad(arch);
-    6 : exportarArchivo(arch);
-    7 : empleadosSinDni(arch);
+    '1' : empleadosConDatoIngresado(arch);
+    '2' : todosLosEmpleados(arch);
+    '3' : ProntoAJubilarse(arch);
+    '4' : agregarNuevosEmpleados(arch);
+    '5' : modificarEdad(arch);
+    '6' : exportarArchivo(arch);
+    '7' : empleadosSinDni(arch);
   end;
 end;
 
 var
   arch : archivo;
-  n : String;
+  n : String[20];
+  op : char;
 begin
   clrscr;
 
@@ -200,9 +203,13 @@ begin
 
   assign(arch, n);
 
-  cargarArchivo(arch);
-
-  recorrerArchivo(arch);
+  writeln('a cargar el archivo');
+  writeln('b procesar el archivo');
+  readln(op);
+  case op of
+    'a' : cargarArchivo(arch);
+    'b' : procesarArchivo(arch);
+  end;
 
   readln;
 end.
