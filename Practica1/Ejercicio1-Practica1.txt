@@ -19,7 +19,7 @@ var
 begin
 
   leer(num);
-  while(num <> 3000) do begin
+  while(num <> 30000) do begin
 
     write(nros , num);
 
