@@ -116,6 +116,7 @@ begin
   write('Ingrese el codigo del empleado ');
   readln(cod);
   while(cod <> -1) do begin
+    read(arch, reg);
     while(not eof(arch)) and (reg.nro <> cod) do
       read(arch, reg);
     if(reg.nro = cod) then begin
