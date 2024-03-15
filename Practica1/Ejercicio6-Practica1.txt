@@ -129,6 +129,7 @@ begin
   write('Ingrese nombre de celular que desea modificar el stock ');
   readln(n);
   reset(arch);
+  read(arch,reg);
   while(not eof(arch)) and (reg.nombre <> n) do
     read(arch,reg);
   if(reg.nombre = n) then begin
