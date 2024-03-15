@@ -97,6 +97,7 @@ begin
   write('ingrese codigo de la novela que desea modificar ');
   readln(cod);
   reset(arch);
+  read(arch, reg);
   while(not eof(arch)) and (reg.codigo <> cod) do
     read(arch, reg);
   if(reg.codigo = cod) then begin
