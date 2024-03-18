@@ -113,15 +113,14 @@ begin
         end;
 
      5: begin
-          write('Ingrese la cantidad de empleados que desea eliminar ');
-          readln(cant);
           reset(arch);
-          for i := 1 to cant do begin
-            write('Ingrese codigo del empleado que desea eliminar ');
-            readln(cod);
+          write('Ingrese codigo del empleado que desea eliminar ');
+          readln(cod);
+          while(cod <> -1) do begin
             seek(arch, filesize(arch)-1);
             read(arch,aux);
             seek(arch,0);
+            read(arch,reg);
             while(not eof(arch)) and (reg.nro <> cod) do
               read(arch,reg);
             if(reg.nro = cod) then begin
@@ -129,7 +128,11 @@ begin
               write(arch,aux);
               seek(arch, filesize(arch)-1);
               truncate(arch);
-            end;
+            end
+            else
+              writeln('El codigo ingresado no existe');
+            write('Ingrese codigo del empleado que desea eliminar ');
+            readln(cod);
           end;
           close(arch);
           todosLosEmpleados(arch);
