@@ -48,7 +48,7 @@ begin
   reset(mae);
   while(not eof(mae)) do begin
     read(mae, reg);
-    if(reg.codigo < 143) then begin
+    if(reg.codigo < 1000) then begin
       reg.apellido := '@' + reg.apellido;
       seek(mae, filepos(mae)-1);
       write(mae, reg);
