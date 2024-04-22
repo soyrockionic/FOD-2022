@@ -99,9 +99,7 @@ procedure BajaDistribucion(var mae : maestro);
 var
   n : String[10];
   reg, ind : distribucion;
-  fin : boolean;
 begin
-  fin := false;
   write('Ingrese distro que desea eliminar ');
   readln(n);
   if(ExisteDistribucion(mae,n)) then begin
@@ -120,7 +118,6 @@ begin
       seek(mae, 0);
       write(mae, ind); //el indice que esta en e registro de cabecera lo reemplazo
                        //con el del reg que acabo de eliminar
-      fin := true;
       writeln('Distribucion eliminada');
     end;
 
