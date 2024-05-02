@@ -1,5 +1,5 @@
 Cursada FOD primer semestre 2022
 
-<a href="https://drive.google.com/drive/folders/1-148UkGPg3zj1VS5GeqgM4ff_HSAslrM?usp=sharing" target="_black" style="text-decoration: none !important;">                 
+<a href="https://drive.google.com/drive/folders/1-148UkGPg3zj1VS5GeqgM4ff_HSAslrM?usp=sharing" target="_blank" style="text-decoration: none !important;">                 
     Videos de explicaciones practicas
 </a>
