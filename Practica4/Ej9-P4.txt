@@ -19,7 +19,7 @@ nodo 3: 2 h(700)(800)
 
      0: 4 h(21)(45)(46)(70)     4: 2 h(200)     1: 1 h(400)     3: 2 h(700)(800)
 
-- Baja de la clave 76 del nodo 2, se reemplaza por la mayor de su subarbol izquierdo
+- Baja de la clave 76 del nodo 2, se reemplaza por la menor clave de su subarbol derecho
 
 L2, L4, E4, E2
 
