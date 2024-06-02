@@ -92,7 +92,7 @@ colisión y desborde los pasos que realiza.
 
 8 Jujuy      1111
 
- (2)   (2)
+ (3)   (2)
  000:  (San Juan)      ( )
  100:
 
