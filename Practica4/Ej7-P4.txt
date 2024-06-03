@@ -35,7 +35,7 @@ L2, L0, E0
 
                           2: 0 (78) 1
 
-     0: (15) (34) (56) (71) (3)     1: (100) (176)
+     0: (3) (15) (34) (56) (71)     1: (100) (176)
 
 - Se agrega la clave 3 en el nodo 0 sin inconvenientes
 
