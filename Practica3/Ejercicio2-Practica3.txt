@@ -1,99 +1,117 @@
 program Ej2P3;
-Uses crt;
+Uses crt, SysUtils;
 const
-  df = 5;
+  valorAlto = 9999;
 type
 
   asistente = record
-    codigo : integer;
-    apellido : String[12];
-    email : String[12];
+    nro : integer;
+    apellido : String[25];
+    nombre : String[25];
+    email : String[25];
     telefono : String[12];
-    dni : String[12];
+    dni : String[8];
   end;
 
-  maestro = file of asistente;
+  archivo = file of asistente;
 
-procedure leerAs(var reg : asistente);
+procedure leerAsistente(var reg : asistente);
 begin
   write('Ingrese nro de asistente ');
-  readln(reg.codigo);
-  write('Ingrese apellido ');
-  readln(reg.apellido);
-  write('Ingrese email ');
-  readln(reg.email);
-  write('Ingrese nro de telefono ');
-  readln(reg.telefono);
-  write('Ingrese dni ');
-  readln(reg.dni);
-end;
-
-procedure cargarArchivo(var mae : maestro);
-var
-  reg : asistente;
-  i : integer;
-begin
-  rewrite(mae);
-  for i := 1 to df do begin
-    leerAs(reg);
-    write(mae, reg);
+  readln(reg.nro);
+  if(reg.nro <> -1) then begin
+    write('Ingrese apellido ');
+    readln(reg.apellido);
+    write('Ingrese nombre ');
+    readln(reg.nombre);
+    write('Ingrese email ');
+    readln(reg.email);
+    write('Ingrese telefono ');
+    readln(reg.telefono);
+    write('Ingrese dni ');
+    readln(reg.dni);
   end;
-  close(mae);
 end;
 
-procedure eliminar(var mae : maestro);
+procedure cargarArchivo(var arch : archivo);
 var
   reg : asistente;
 begin
-  reset(mae);
-  while(not eof(mae)) do begin
-    read(mae, reg);
-    if(reg.codigo < 1000) then begin
-      reg.apellido := '@' + reg.apellido;
-      seek(mae, filepos(mae)-1);
-      write(mae, reg);
+  rewrite(arch);
+  leerAsistente(reg);
+  while(reg.nro <> -1) do begin
+    write(arch,reg);
+    leerAsistente(reg);
+  end;
+  close(arch);
+end;
+
+procedure leer(var arch : archivo; var reg : asistente);
+begin
+  if(not eof(arch)) then
+    read(arch,reg)
+  else
+    reg.nro := valorAlto;
+end;
+
+procedure eliminarAsistentes(var arch : archivo);
+var
+  reg : asistente;
+begin
+  reset(arch);
+  leer(arch,reg);
+  while(reg.nro <> valorAlto) do begin
+    if(reg.nro < 1000) then begin
+      reg.apellido := '@'+reg.apellido;
+      seek(arch,filepos(arch)-1);
+      write(arch,reg);
     end;
+    leer(arch,reg);
   end;
-  close(mae);
+  close(arch);
 end;
 
-procedure reporte(var mae : maestro);
+procedure imprimirArchivo(var arch : archivo);
 var
   reg : asistente;
 begin
-  reset(mae);
-  while(not eof(mae)) do begin
-    read(mae, reg);
-    writeln(reg.codigo,' ',reg.apellido,' ',reg.telefono);
+  reset(arch);
+  leer(arch,reg);
+  while(reg.nro <> 9999) do begin
+    writeln(reg.nro,' ',reg.apellido,' ',reg.nombre,' ',reg.email,' ',reg.telefono,' ',reg.dni);
+    leer(arch,reg);
   end;
-  close(mae);
+  close(arch);
 end;
 
 var
-  mae : maestro;
-  op : integer;
+  arch : archivo;
+  n : String[25];
+  op : String[2];
 begin
   clrscr;
 
-  assign(mae, 'asistentes');
+  write('Ingrese nombre del archivo ');
+  readln(n);
+  assign(arch,n);
 
-  writeln('1 para cargar el archivo');
-  writeln('2 para eliminacion logica');
-  writeln('3 para ver los asistentes');
+  writeln('1 : cargar el archivo');
+  writeln('2 : eliminacion logica');
+  writeln('3 : informe en pantalla');
   readln(op);
 
-  Case op of
-  1 : begin
-        cargarArchivo(mae);
-  end;
-  2 : begin
-        eliminar(mae);
-      end;
-  3 : begin
-        writeln;
-        reporte(mae);
-      end;
-  end;
+  case op of
+    '1' : begin
+            cargarArchivo(arch);
+          end;
+    '2' : begin
+            eliminarAsistentes(arch);
+          end;
+    '3' : begin
+            writeln;
+            imprimirArchivo(arch);
+          end;
+    end;
 
   readln;
 end.
