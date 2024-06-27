@@ -1,161 +1,149 @@
 program Ej8P3;
-Uses crt;
+Uses crt, sysutils;
 const
-  valorAlto = 'zzz';
+  valorAlto = '9999';
 type
 
-  distribucion = record
-    nombre : String[10];
-    anio : String[4];
-    kernel : String[10];
-    cantDes : integer;
-    descrip : String[30];
+  distro = record
+    nombre : String[50];
+    anio : String[10];
+    version : String[5];
+    CantDes : integer;
+    descripcion : String[50];
   end;
 
-  maestro = file of distribucion;
+  archivo = file of distro;
 
-
-procedure leerDistro(var reg : distribucion);
+procedure leerDistro(var reg : distro);
 begin
-  write('Ingrese nombre ');
+  write('Ingrese nombre de la distribucion ');
   readln(reg.nombre);
-  if(reg.nombre <> 'f') then begin
-    write('Ingrese anio de salida ');
-    readln(reg.anio);
-    write('Ingrese kernel ');
-    readln(reg.kernel);
-    write('Ingrese cantidad de desarrolladores ');
-    readln(reg.cantDes);
-    write('Ingrese descripcion ');
-    readln(reg.descrip);
-  end;
+  write('Ingrese anio de lanzamiento ');
+  readln(reg.anio);
+  write('Ingrese version del kernel ');
+  readln(reg.version);
+  write('Ingrese cantidad de desarrolladores ');
+  readln(reg.cantDes);
+  write('Ingrese descripcion ');
+  readln(reg.descripcion);
 end;
 
-procedure cargoMaestro(var mae : maestro);
-var
-  reg : distribucion;
+procedure leer(var arch : archivo; var reg : distro);
 begin
-  rewrite(mae);
-  reg.cantDes := 0;
-  write(mae, reg);
-  leerDistro(reg);
-  while(reg.nombre <> 'f') do begin
-    write(mae, reg);
-    leerDistro(reg);
-  end;
-  close(mae);
-end;
-
-procedure leer(var mae : maestro; var reg : distribucion);
-begin
-  if(not eof(mae)) then
-    read(mae, reg)
+  if(not eof(arch)) then
+    read(arch,reg)
   else
     reg.nombre := valorAlto;
 end;
 
-function ExisteDistribucion(var mae : maestro; n : String) : boolean;
+function ExisteDistribucion(var arch : archivo; reg : distro) : boolean;
 var
-  reg : distribucion;
+  aux : distro;
 begin
-  reset(mae);
-  leer(mae, reg);
-  while(reg.nombre <> valorAlto) and (reg.nombre <> n) do
-    leer(mae, reg);
-
-  if(reg.nombre = n) then
-    existeDistribucion := true
+  leer(arch,aux);
+  while(aux.nombre <> valorAlto) and (aux.nombre <> reg.nombre) do
+    leer(arch,aux);
+  if(aux.nombre = reg.nombre) then
+    ExisteDistribucion := true
   else
-    existeDistribucion := false;
-
-  close(mae);
+    ExisteDistribucion := false;
 end;
 
-procedure AltaDistribucion(var mae : maestro);
+procedure AltaDistribucion(var arch : archivo);
 var
- reg, ind, lin : distribucion;
+  reg, aux : distro;
+  pos : integer;
 begin
+  reset(arch);
   leerDistro(reg);
-  if(not ExisteDistribucion(mae, reg.nombre)) then begin
-    reset(mae);
-    leer(mae, lin);
-    if(lin.cantDes < 0) then begin
-      seek(mae,abs(lin.cantDes)); //voy a la posicion con espacio libre
-      read(mae,ind); //leo el indice que esta en esa posicion y lo guardo en ind
-      seek(mae,filepos(mae)-1); //ubico el puntero
-      write(mae,reg); //escribo en la posicion donde habia espacio libre
-      seek(mae,0); //vuelvo al registro cabecera
-      write(mae,ind); //escribo el indice que tenia en la posicion que acabo de dar de alta
+  if(ExisteDistribucion(arch,reg)) then
+    writeln('Ya existe la distribucion')
+  else begin
+    seek(arch,0);
+    leer(arch,aux);
+    if(aux.cantDes < 0) then begin
+      pos := aux.cantDes*-1;
+      seek(arch,pos);
+      leer(arch,aux);
+      seek(arch,pos);
+      write(arch,reg);
+      seek(arch,0);
+      write(arch,aux);
     end
-    else
-      writeln('No hay espacio libre');
-    close(mae);
-  end
-  else
-    writeln('Ya existe la distribucion');
-end;
-
-procedure BajaDistribucion(var mae : maestro);
-var
-  n : String[10];
-  reg, ind : distribucion;
-begin
-  write('Ingrese distro que desea eliminar ');
-  readln(n);
-  if(ExisteDistribucion(mae,n)) then begin
-    reset(mae);
-    leer(mae, ind); //leo el indice que esta en cabecera
-    leer(mae, reg);
-    while(reg.nombre <> valorAlto) and (reg.nombre <> n) do
-      leer(mae, reg);
-
-    if(reg.nombre = n) then begin
-      reg.cantDes := ind.cantDes; //copio el indice que estaba en el reg 0 en el que elimino
-                                  //para tener la lista invertida
-      seek(mae, filepos(mae)-1);
-      ind.cantDes := filepos(mae) * -1; //paso e l indice a negativo
-      write(mae, reg);
-      seek(mae, 0);
-      write(mae, ind); //el indice que esta en e registro de cabecera lo reemplazo
-                       //con el del reg que acabo de eliminar
-      writeln('Distribucion eliminada');
+    else begin
+      seek(arch,filesize(arch));
+      write(arch,reg);
     end;
+  end;
+  close(arch);
+end;
 
-    close(mae);
+procedure imprimir(var arch : archivo);
+var
+  reg : distro;
+begin
+  reset(arch);
+  leer(arch,reg);
+  while(reg.nombre <> valorAlto) do begin
+    writeln(reg.nombre,' ',reg.anio,' ',reg.version,' ',reg.cantDes,' ',reg.descripcion);
+    leer(arch,reg);
+  end;
+  close(arch);
+end;
+
+procedure BajaDistribucion(var arch : archivo);
+var
+  reg, aux : distro;
+  pos : integer;
+begin
+  reset(arch);
+  write('Ingrese la distribucion que desea eliminar ');
+  readln(aux.nombre);
+  if(ExisteDistribucion(arch,aux)) then begin
+    pos := filepos(arch)-1;
+    seek(arch,pos);
+    leer(arch,reg);
+    seek(arch,0);
+    leer(arch,aux);
+    seek(arch,0);
+    reg.cantDes := pos*-1;
+    write(arch,reg);
+    seek(arch,pos);
+    write(arch,aux);
   end
   else
-    writeln('Destribucion no existente');
-end;
-
-procedure reporte(var mae : maestro);
-var
-  reg : distribucion;
-begin
-  reset(mae);
-  while(not eof(mae)) do begin
-    read(mae, reg);
-    writeln(reg.nombre,' ',reg.cantDes);
-  end;
-  close(mae);
+    writeln('Distribucion no existente');
+  close(arch);
 end;
 
 var
-  mae : maestro;
+  arch : archivo;
+  n : String[25];
+  op : String[2];
 begin
   clrscr;
 
-  assign(mae, 'distribuciones');
+  write('Ingrese nombre del archivo ');
+  readln(n);
 
-  //cargoMaestro(mae);
+  assign(arch,n);
 
-  AltaDistribucion(mae);
+  writeln('a : agregar una distribucion nueva');
+  writeln('b : dar de baja una distribucion existente');
+  readln(op);
 
-  reporte(mae);
-
-  BajaDistribucion(mae);
-
-  writeln;
-  reporte(mae);
+  case op of
+    'a' : begin
+            AltaDistribucion(arch);
+            writeln;
+            imprimir(arch);
+          end;
+    'b' : begin
+            BajaDistribucion(arch);
+            writeln;
+            imprimir(arch);
+          end;
+  end;
 
   readln;
 end.
