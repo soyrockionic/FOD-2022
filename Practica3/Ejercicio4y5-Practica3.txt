@@ -1,118 +1,129 @@
-program Ej4y5_p3;
-Uses crt, sysUtils;
+program Ej4y5P3;
+Uses crt, SysUtils;
 const
-  valorAlto = 32000;
+   valorAlto = '9999';
 type
 
-  flor = record
+  reg_flor = record
     nombre : String[45];
     codigo : integer;
   end;
 
-  maestro = file of flor;
+  archFlores = file of reg_flor;
 
-procedure leer(var arch : maestro; var reg : flor);
+procedure leer(var arch : archFlores; var reg : reg_flor);
 begin
   if(not eof(arch)) then
     read(arch,reg)
   else
-    reg.codigo := valorAlto;
+    reg.nombre := valorAlto;
 end;
 
-procedure informe(var mae : maestro);
+procedure agregarFlor(var arch : archFlores; nombre : String; codigo : integer);
 var
-  reg : flor;
+  reg, aux : reg_flor;
+  pos : integer;
 begin
-  reset(mae);
-  leer(mae,reg);
-  while(reg.codigo <> valorAlto) do begin
-    if(reg.codigo > 0) then
-      writeln(reg.nombre,' ',reg.codigo);
-    leer(mae,reg);
-  end;
-  close(mae);
-end;
-
-procedure eliminarFlor(var mae : maestro; f : flor);
-var
-  reg, ind : flor;
-begin
-  reset(mae);
-  writeln;
-  leer(mae,reg);
-  ind.codigo := reg.codigo;
-  while(reg.codigo <> valorAlto) and (reg.codigo <> f.codigo) do
-    leer(mae,reg);
-  if(reg.codigo = f.codigo) then begin
-    reg.codigo := ind.codigo;
-    seek(mae,filepos(mae)-1);
-    ind.codigo := (filepos(mae)) * -1;
-    write(mae,reg);
-    seek(mae,0);
-    write(mae,ind);
-  end
-  else
-    writeln('Flor no encontrada');
-  close(mae);
-  writeln('--------------Actualizado-------------');
-  informe(mae);
-end;
-
-procedure agregarFlor(var mae : maestro; nombre : String; codigo : integer);
-var
-  reg, ind : flor;
-begin
-  reset(mae);
-  leer(mae,reg);
+  reset(arch);
+  leer(arch,reg);
   if(reg.codigo < 0) then begin
-    seek(mae,abs(reg.codigo));
-    read(mae,ind);
-    reg.nombre := nombre;
-    reg.codigo := codigo;
-    seek(mae,filepos(mae)-1);
-    write(mae,reg);
-    seek(mae,0);
-    write(mae,ind);
+    pos := reg.codigo*-1;
+    seek(arch,pos);
+    leer(arch,reg);
+    seek(arch,pos);
+    aux.nombre := nombre;
+    aux.codigo := codigo;
+    write(arch,aux);
+    seek(arch,0);
+    write(arch,reg);
   end
   else begin
+    seek(arch,filesize(arch));
     reg.nombre := nombre;
     reg.codigo := codigo;
-    seek(mae,filesize(mae));
-    write(mae,reg);
+    write(arch,reg);
   end;
-  close(mae);
-  writeln;
-  informe(mae);
+  close(arch);
+end;
+
+procedure verContenido(var arch : archFlores);
+var
+  reg : reg_flor;
+begin
+  reset(arch);
+  leer(arch,reg);
+  while(reg.nombre <> valorAlto) do begin
+    if(reg.codigo > 0) then
+      writeln(reg.nombre,' ',reg.codigo);
+    leer(arch,reg);
+  end;
+  close(arch);
+end;
+
+procedure eliminarFlor(var arch : archFlores; flor : reg_flor);
+var
+  reg, aux : reg_flor;
+  pos : integer;
+begin
+  reset(arch);
+  leer(arch,reg);
+  while(reg.nombre <> valorAlto) and (reg.codigo <> flor.codigo) do
+    leer(arch,reg);
+  if(reg.codigo = flor.codigo) then begin
+    pos := filepos(arch)-1;
+    seek(arch,0);
+    leer(arch,aux);
+    seek(arch,0);
+    reg.codigo := pos*-1;
+    write(arch,reg);
+    seek(arch,pos);
+    write(arch,aux);
+  end
+  else
+    writeln('Flor inexistente');
+  close(arch);
 end;
 
 var
-  mae : maestro;
-var
-  fecha : TDateTime;
+  arch : archFlores;
   nombre : String[45];
   codigo : integer;
-  reg : flor;
+  n : String[25];
+  op : String[2];
+  flor : reg_flor;
 begin
   clrscr;
 
-  fecha := Date;
-  writeln('Fecha de hoy: ',DateToStr(fecha),' Hora: ',FormatDateTime('HH:NN:SS',Time()));
+  write('Ingrese nombre del archivo de flores ');
+  readln(n);
 
-  assign(mae,'Flores.dot');
-  writeln('--------------------------------------');
-  informe(mae);
+  assign(arch,n);
 
-  writeln('-------------Elimino Flor-------------');
-  write('Ingrese codigo de la flor que desea eliminar ');
-  readln(reg.codigo);
-  eliminarflor(mae,reg);
+  writeln('1 : agregar una flor');
+  writeln('2 : ver contenido del archivo');
+  writeln('3 : eliminar una flor');
+  readln(op);
 
-  writeln('--------------Agrego Flor-------------');
-  write('Ingrese codigo ');
-  readln(codigo);
-  write('Ingrese nombre ');
-  readln(nombre);
-  agregarFlor(mae,nombre,codigo);
+  case op of
+    '1' : begin
+            write('Ingrese nombre de la flor ');
+            readln(nombre);
+            write('Ingrese codigo ');
+            readln(codigo);
+            agregarFlor(arch,nombre,codigo);
+          end;
+    '2' : begin
+            writeln;
+            verContenido(arch);
+          end;
+    '3' : begin
+            write('Ingrese flor que desea eliminar ');
+            readln(flor.codigo);
+            writeln;
+            eliminarFlor(arch,flor);
+            verContenido(arch);
+          end;
+  end;
 
   readln;
 end.
