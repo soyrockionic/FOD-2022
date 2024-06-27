@@ -1,100 +1,96 @@
-program Ej11_p2;
-Uses crt, sysutils;
+program Ej11P2;
+Uses crt, SysUtils;
 const
   valorAlto = 'zzzz';
 type
 
-  provincia = record
-    nombre : String[50];
-    cantAlfa : integer;
-    cantEnc : integer;
-  end;
+ provincia = record
+   nombre : string[50];
+   cantAlf : integer;
+   cantEnc : integer;
+ end;
 
-  censo = record
-    nombre : String[50];
-    codloc : String[4];
-    cantAlfa : integer;
-    cantEnc : integer;
-  end;
+ maestro = file of provincia;
 
-  maestro = file of provincia;
-  detalle = file of censo;
+ encuesta = record
+   nombre : String[25];
+   localidad : integer;
+   cantAlf : integer;
+   cantEnc : integer;
+ end;
 
-procedure leer(var arch : detalle; var reg : censo);
+procedure leer(var arch : Text; var reg : encuesta);
 begin
-  if(not eof(arch)) then
-    read(arch,reg)
+  if(not eof(arch)) then begin
+    readln(arch,reg.nombre);
+    readln(arch,reg.localidad,reg.cantAlf,reg.cantEnc);
+  end
   else
     reg.nombre := valorAlto;
 end;
 
-procedure minimo(var c1, c2 : detalle; var regD1, regD2 : censo; var min : censo);
+procedure minimo(var archEnc1,archEnc2 : Text; var regEnc1,regEnc2,min : encuesta);
 begin
-  if(regD1.nombre <= regD2.nombre) then begin
-    min := regD1;
-    leer(c1,regD1);
+  min.nombre := valorAlto;
+  if(regEnc1.nombre < regEnc2.nombre) then begin
+    min := regEnc1;
+    leer(archEnc1,regEnc1);
   end
-  else begin
-    min := regD2;
-    leer(c2,regD2);
-  end;
-end;
-
-procedure actualizarMaestro(var mae : maestro; var censo1, censo2 : detalle);
-var
-  reg : provincia;
-  min : censo;
-  regD1, regD2 : censo;
-  totalAlfa, totalEnc : integer;
-  actual : String[50];
-begin
-  reset(mae);
-  reset(censo1);
-  reset(censo2);
-  leer(censo1,regD1);
-  leer(censo2,regD2);
-  minimo(censo1,censo2,regD1,regD2,min);
-  while(min.nombre <> valorAlto) do begin
-    actual := min.nombre;
-    totalAlfa := 0;
-    totalEnc := 0;
-    while(actual = min.nombre) do begin
-       totalAlfa := totalAlfa + min.cantAlfa;
-       totalEnc := totalEnc + min.cantEnc;
-       minimo(censo1,censo2,regD1,regD2,min);
+  else
+    if(regEnc1.nombre > regEnc2.nombre) then begin
+      min := regEnc2;
+      leer(archEnc2,regEnc2);
     end;
-    read(mae,reg);
-    while(reg.nombre <> actual) do
-      read(mae,reg);
-    seek(mae,filepos(mae)-1);
-    reg.cantAlfa := reg.cantAlfa + totalAlfa;
-    reg.cantEnc := reg.cantEnc + totalEnc;
-    write(mae,reg);
+end;
+
+procedure actualizar(var arch : maestro);
+var
+  reg : provincia;
+  archEnc1, archEnc2 : Text;
+  regEnc1, regEnc2, min : encuesta;
+  cantEnc, cantAlf : integer;
+  act : String[25];
+begin
+  assign(archEnc1,'Enc1.txt');
+  assign(archEnc2,'Enc2.txt');
+  reset(arch);
+  reset(archEnc1);
+  reset(archEnc2);
+  leer(archEnc1,regEnc1);
+  leer(archEnc2,regEnc2);
+  minimo(archEnc1,archEnc2,regEnc1,regEnc2,min);
+  while(min.nombre <> valorAlto) do begin
+    act := min.nombre;
+    cantEnc := 0;
+    cantAlf := 0;
+    while(min.nombre <> valorAlto) and (act = min.nombre) do begin
+      cantEnc := cantEnc + min.cantEnc;
+      cantAlf := cantAlf + min.cantAlf;
+      minimo(archEnc1,archEnc2,regEnc1,regEnc2,min);
+    end;
+    read(arch,reg);
+    while(not eof(arch)) and (reg.nombre <> act) do
+      read(arch,reg);
+    if(reg.nombre = act) then begin
+      reg.cantEnc := cantEnc;
+      reg.cantAlf := cantAlf;
+      seek(arch,filepos(arch)-1);
+      write(arch,reg);
+    end;
   end;
-  close(mae);
-  close(censo1);
-  close(censo2);
+  close(arch);
+  close(archEnc1);
+  close(archEnc2);
 end;
 
 var
-  mae : maestro;
-  censo1, censo2 : detalle;
-  reg : provincia;
+  arch : maestro;
 begin
   clrscr;
 
-  assign(mae,'Provincias');
-  assign(censo1,'Censo1');
-  assign(censo2,'Censo2');
+  assign(arch,'Provincias');
 
-  actualizarMaestro(mae,censo1,censo2);
-
-  reset(mae);
-  while(not eof(mae)) do begin
-    read(mae,reg);
-    writeln(reg.nombre,' ',reg.cantAlfa,' ',reg.cantEnc);
-  end;
-  close(mae);
+  actualizar(arch);
 
   readln;
 end.
