@@ -1,24 +1,23 @@
 program Ej3P3;
-Uses crt;
+Uses crt, SysUtils;
 const
   valorAlto = 9999;
 type
 
   novela = record
     codigo : integer;
-    genero : String[12];
-    nombre : String[12];
-    duracion : real;
-    director : String[12];
-    precio : Real;
+    genero : string[25];
+    nombre : String[25];
+    duracion : String[25];
+    director : String[25];
+    precio : real;
   end;
 
-  maestro = file of novela;
-
+  archivo = file of novela;
 
 procedure leerNov(var reg : novela);
 begin
-  write('Ingrese codigo ');
+  write('Ingrese codigo de novela ');
   readln(reg.codigo);
   if(reg.codigo <> -1) then begin
     write('Ingrese genero ');
@@ -34,134 +33,197 @@ begin
   end;
 end;
 
-procedure cargarArchivo(var mae : maestro);
-var
-  reg : novela;
+procedure leer(var arch : archivo; var reg : novela);
 begin
-  rewrite(mae);
-  reg.codigo := 0;
-  write(mae, reg);
-  leerNov(reg);
-  while(reg.codigo <> -1) do begin
-    write(mae, reg);
-    leerNov(reg);
-  end;
-  close(mae);
-end;
-
-procedure leer(var mae : maestro; var reg : novela);
-begin
-  if(not eof(mae)) then
-    read(mae, reg)
+  if(not eof(arch)) then
+    read(arch,reg)
   else
     reg.codigo := valorAlto;
 end;
 
-procedure darAlta(var mae : maestro);
+procedure cargarArchivo(var arch : archivo);
 var
-  reg, ind : novela;
+  reg : novela;
 begin
-  reset(mae);
-  leer(mae, reg);
-  if(reg.codigo < 0) then begin
-    seek(mae, abs(reg.codigo));
-    read(mae, ind);
-    seek(mae, filepos(mae)-1);
+  rewrite(arch);
+  reg.codigo := 0;
+  write(arch,reg);
+  leerNov(reg);
+  while(reg.codigo <> -1) do begin
+    write(arch,reg);
     leerNov(reg);
-    write(mae, reg);
-    seek(mae, 0);
-    write(mae, ind);
+  end;
+  close(arch);
+end;
+
+procedure darAlta(var arch : archivo);
+var
+  reg, aux : novela;
+  pos : integer;
+begin
+  reset(arch);
+  leerNov(reg);
+  leer(arch,aux);
+  if(aux.codigo < 0) then begin
+    pos := aux.codigo*-1;
+    seek(arch,pos);
+    read(arch,aux);
+    seek(arch,filepos(arch)-1);
+    write(arch,reg);
+    seek(arch,0);
+    write(arch,aux);
   end
   else begin
-    seek(mae, filesize(mae));
-    leerNov(reg);
-    write(mae, reg);
+    seek(arch,filesize(arch));
+    write(arch,reg);
   end;
-  close(mae);
+  close(arch);
 end;
 
-procedure eliminar(var mae : maestro);
+procedure actualizarNovela(var arch : archivo);
 var
+  reg : novela;
   cod : integer;
-  reg, ind : novela;
+  op : String[2];
 begin
-  reset(mae);
-  write('ingrese codigo de novela ha eliminar ');
+  write('Ingrese codigo de novela ha modificar ');
   readln(cod);
-  leer(mae, reg);
-  ind.codigo := reg.codigo;
-  while(reg.codigo <> 9999) and (reg.codigo <> cod) do
-    leer(mae, reg);
+  reset(arch);
+  leer(arch,reg);
+  while(reg.codigo <> valorAlto) and (reg.codigo <> cod) do
+    leer(arch,reg);
   if(reg.codigo = cod) then begin
-    reg.codigo := ind.codigo;
-    seek(mae, filepos(mae)-1);
-    ind.codigo := (filepos(mae)) * -1;
-    write(mae, reg);
-    seek(mae, 0);
-    write(mae, ind);
+    clrscr;
+    seek(arch,filepos(arch)-1);
+    writeln('1 : modificar genero');
+    writeln('2 : modificar nombre');
+    writeln('3 : modificar duracion');
+    writeln('4 : modificar director');
+    writeln('5 : modificar precio');
+    readln(op);
+    case op of
+      '1' : begin
+              write('Ingrese nuevo genero ');
+              readln(reg.genero);
+            end;
+      '2' : begin
+              write('Ingrese nuevo nombre ');
+              readln(reg.nombre);
+            end;
+      '3' : begin
+              write('Ingrese nueva duracion ');
+              readln(reg.duracion);
+            end;
+      '4' : begin
+              write('Ingrese nuevo director ');
+              readln(reg.director);
+            end;
+      '5' : begin
+              write('Ingrese nuevo precio ');
+              readln(reg.precio);
+            end;
+    end;
+    write(arch,reg);
+  end;
+  close(arch);
+end;
+
+procedure darBaja(var arch : archivo);
+var
+  reg, aux : novela;
+  cod, pos : integer;
+begin
+  write('Ingrese codigo de novela ha eliminar ');
+  readln(cod);
+  reset(arch);
+  leer(arch,aux);
+  leer(arch,reg);
+  while(reg.codigo <> valorAlto) and (reg.codigo <> cod) do
+    leer(arch,reg);
+  if(reg.codigo = cod) then begin
+    pos := (filepos(arch)-1) *-1;
+    seek(arch,filepos(arch)-1);
+    write(arch,aux);
+    reg.codigo := pos;
+    seek(arch,0);
+    write(arch,reg);
   end
   else
-    writeln('El codigo ingresado no se encuentra en el archivo');
-  close(mae);
+    writeln('El codigo ingresado no existe');
+  close(arch);
 end;
 
-procedure reporte(var mae : maestro);
+procedure mantenimiento(var arch : archivo);
+var
+  reg : novela;
+  op : String[2];
+begin
+  clrscr;
+  writeln('1 : dar alta');
+  writeln('2 : actualizar novela');
+  writeln('3 : dar baja');
+  readln(op);
+  case op of
+    '1' : darAlta(arch);
+    '2' : actualizarNovela(arch);
+    '3' : darBaja(arch);
+  end;
+end;
+
+procedure reporteTxt(var arch : archivo);
+var
+  reg : novela;
+  txt : Text;
+begin
+  assign(txt,'novelas.txt');
+  reset(arch);
+  rewrite(txt);
+  leer(arch,reg);
+  while(reg.codigo <> valorAlto) do begin
+    writeln(txt,reg.codigo,' ',reg.genero,' ',reg.nombre,' ',reg.duracion,' ',reg.director,' ',reg.precio:2:2);
+    leer(arch,reg);
+  end;
+  close(arch);
+  close(txt);
+end;
+
+procedure imprimir(var arch : archivo);
 var
   reg : novela;
 begin
-  reset(mae);
-  while(not eof(mae)) do begin
-    read(mae, reg);
-    writeln(reg.codigo,' ',reg.nombre,' ',reg.precio:2:2);
+  reset(arch);
+  leer(arch,reg);
+  while(reg.codigo <> valorAlto) do begin
+    if(reg.codigo > 0) then
+      writeln(reg.codigo,' ',reg.genero,' ',reg.nombre,' ',reg.duracion,' ',reg.director,' ',reg.precio:2:2);
+    leer(arch,reg);
   end;
-  close(mae);
-end;
-
-procedure crearTxt(var mae : maestro);
-var
-  reg : novela;
-  carga : Text;
-begin
-  assign(carga, 'novelas.txt');
-  reset(mae);
-  rewrite(carga);
-  while(not eof(mae)) do begin
-    read(mae, reg);
-    writeln(carga, reg.codigo,' ',reg.nombre,' ',reg.director,' ',reg.precio:2:2);
-  end;
-  close(carga);
-  close(mae);
+  close(arch);
 end;
 
 var
-  mae : maestro;
-  op : integer;
+  arch : archivo;
+  opcion : String[2];
+  n : String[25];
 begin
   clrscr;
 
-  writeln('1 cargar el archivo');
-  writeln('2 dar el alta a una novela');
-  writeln('3 dar de baja una novela');
-  writeln('4 ver registros del archivo');
-  readln(op);
+  write('Ingrese nombre del archivo ');
+  readln(n);
+  assign(arch,n);
 
-  assign(mae, 'novelas');
-  Case op of
-  1 : begin
-        cargarArchivo(mae);
-      end;
-  2 : begin
-        darAlta(mae);
-      end;
-  3 : begin
-        eliminar(mae);
-      end;
-  4 : begin
-        reporte(mae);
-      end;
+  writeln('a : cargar el archivo');
+  writeln('b : procesar el archivo');
+  readln(opcion);
+
+  case opcion of
+    'a' : cargarArchivo(arch);
+    'b' : mantenimiento(arch);
+    'c' : reporteTxt(arch);
   end;
 
-  crearTxt(mae);
+  writeln;
+  imprimir(arch);
 
   readln;
 end.
