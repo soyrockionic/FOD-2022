@@ -1,75 +1,57 @@
 program Ej1P2;
-Uses crt;
+Uses crt, SysUtils;
 const
-  valorAlto = '9999';
+  valorAlto = 9999;
 type
 
   empleado = record
-    codigo : String[4];
-    nombre : String[50];
+    codigo : integer;
+    nombre : String[25];
     monto : real;
   end;
 
   archivo = file of empleado;
 
-procedure leer(var arch : archivo; var reg : empleado);
+procedure leer(var arch : Text; var reg : empleado);
 begin
-  if(not eof(arch)) then
-    read(arch, reg)
+  if(not eof(arch)) then begin
+    readln(arch,reg.codigo,reg.nombre);
+    readln(arch,reg.monto);
+  end
   else
     reg.codigo := valorAlto;
 end;
 
-procedure mostrarEnPantalla(var arch : archivo);
+procedure compactar(var arch : Text);
 var
-  reg : empleado;
+  reg, aux : empleado;
+  archEmp : archivo;
 begin
+  assign(archEmp,'compacto');
+  rewrite(archEmp);
   reset(arch);
-  while(not eof(arch)) do begin
-    read(arch, reg);
-    writeln(reg.codigo,' ',reg.nombre,' ',reg.monto:2:2);
-  end;
-  close(arch);
-end;
-
-procedure compactar(var arch : archivo);
-var
-  reg, act : empleado;
-  compacto : archivo;
-begin
-
-  assign(compacto,'compacto');
-
-  reset(arch);
-  rewrite(compacto);
-  leer(arch, reg);
+  leer(arch,reg);
   while(reg.codigo <> valorAlto) do begin
-    act.codigo := reg.codigo;
-    act.nombre := reg.nombre;
-    act.monto := 0;
-    while(reg.codigo = act.codigo) do begin
-      act.monto := act.monto + reg.monto;
-      leer(arch, reg);
+    aux.codigo := reg.codigo;
+    aux.monto := 0;
+    aux.nombre := reg.nombre;
+    while(reg.codigo <> valorAlto) and (reg.codigo = aux.codigo) do begin
+      aux.monto := aux.monto + reg.monto;
+      leer(arch,reg);
     end;
-    write(compacto, act);
+    write(archEmp,aux);
   end;
-  close(compacto);
+  close(archEmp);
   close(arch);
-
-  mostrarEnPantalla(compacto);
-
 end;
 
 var
-  arch : archivo;
+  arch : Text;
 begin
   clrscr;
 
-  assign(arch, 'comisiones');
+  assign(arch,'comisiones.txt');
 
-  mostrarEnPantalla(arch);
-
-  writeln;
   compactar(arch);
 
   readln;
