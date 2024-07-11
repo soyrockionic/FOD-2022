@@ -1,0 +1,195 @@
+Realice el proceso de dispersión mediante el método de hashing extensible, sabiendo que
+cada registro tiene capacida para dos claves. El numero natural indica el orden de llegada
+de las mismas.
+Deberá explicar los pasos que realiza en cada operación y dibujar los estados sucesivos
+correspondientes.
+
+1 JavaScript   10100111    2 C#        10101010
+3 HTML           00111110    4 NoSQL  01101111
+5 Python         0110101     6 Rust      11110000
+7 SQL             01011101    8 Perl      01011011
+9 Java            00110100   10 PHP     11100011
+
+-------------------------------------------------------------------------------------------------------------------------------------------------
+
+1 JavaScript 10100111
+
+(0)    (0)
+ 0:     (JavaScript)  ()
+
+- No se toma ningun bit de la funcion hash asociada a la clave
+- Se agrega la clave JavaScript a la cubeta
+
+-------------------------------------------------------------------------------------------------------------------------------------------------
+
+2 C# 10101010
+
+(0)    (0)
+ 0:    (C#)  (JavaScript)
+
+- No se toma ningun bit de la funcion hash asocidada a la clave
+- Se agrega la clave C# a la cubeta
+
+-------------------------------------------------------------------------------------------------------------------------------------------------
+
+3 HTML 00111110
+
+(1)    (1)
+ 0:    (C#)               (HTML)
+
+        (1)
+ 1:    (JavaScript)  ()
+
+- Se toma 1 bit de la funcion hash asociada a la clave
+- Se agrega la clave HTML, se produce desborde, se incrementa en 1 el valor asociado
+  a la cubeta saturada y se crea una nueva cubeta con el mismo valor asociado
+
+-------------------------------------------------------------------------------------------------------------------------------------------------
+
+4 NoSQL 01101111
+
+ (1)   (1)
+ 0:    (C#)        (HTML)
+
+        (1)
+ 1:    (NoSQL) (JavaScript)
+
+- Se toma 1 bit de la funcion hash asociada a la clave
+- Se agrega la clave NoSQL, no hay desborde
+
+-------------------------------------------------------------------------------------------------------------------------------------------------
+
+5 Python 0110101
+
+ (2)     (1)
+ 00:    (C#)        (HTML)
+ 10:
+
+          (2)
+ 01:    (Python) ()
+
+          (2)
+ 11:    (NoSQL)  (JavaScript)
+
+- Se toma 2 bit de la funcion hash asociada a la clave
+- Se agrega la clave Python, se produce desborde, se incrementa en 1 el valor asociado
+  a la cubeta saturada y se crea una nueva cubeta con el mismo valor asociado
+- Como el valor asociado de la tabla de direcciones es menor al de la cubeta saturada
+  se incrementa en 1 y se duplican las celdas
+
+-------------------------------------------------------------------------------------------------------------------------------------------------
+
+6 Rust 11110000
+
+ (2)     (2)
+ 00:    (Rust)     ()
+
+          (2)
+ 10:     (C#)        (HTML)
+
+          (2)
+ 01:    (Python) ()
+
+          (2)
+ 11:    (NoSQL)  (JavaScript)
+
+- Se toman 2 bit de la funcion hash asociada a la clave
+- Se agrega la clave Rust, se produce desborde, se incrementa en 1 el valor asociado
+  a la cubeta saturada y se crea una nueva cubeta con el mismo valor asociado
+
+-------------------------------------------------------------------------------------------------------------------------------------------------
+
+7 SQL 01011101
+
+ (2)     (2)
+ 00:    (Rust)     ()
+
+          (2)
+ 10:     (C#)        (HTML)
+
+          (2)
+ 01:    (Python) (SQL)
+
+          (2)
+ 11:    (NoSQL)  (JavaScript)
+
+- Se toman 2 bit de la funcion hash asociada a la clave
+- Se agrega la clave SQL, no hay desborde
+
+-------------------------------------------------------------------------------------------------------------------------------------------------
+
+8 Perl 01011011
+
+ (3)      (2)
+ 000:    (Rust)     ()
+ 100:
+
+           (2)
+ 010:   (C#)        (HTML)
+ 110:
+
+           (2)
+ 001:    (Python) (SQL)
+ 101:
+
+          (3)
+ 011:   (Perl)     ()
+
+          (3)
+ 111:    (NoSQL)  (JavaScript)
+
+- Se toman 3 bit de la funcion hash asociada a la clave
+- Se agrega la clave Perl, se produce desborde, se incrementa en 1 el valor asociado
+  a la cubeta saturada y se crea una nueva cubeta con el mismo valor asociado
+- Como el valor asociado de la tabla de direcciones es menor al de la cubeta saturada
+  se incrementa en 1 y se dupican las celdas
+
+-------------------------------------------------------------------------------------------------------------------------------------------------
+
+9 Java 00110100
+
+ (3)      (2)
+ 000:    (Java)     (Rust)
+ 100:
+
+           (2)
+ 010:   (C#)        (HTML)
+ 110:
+
+           (2)
+ 001:    (Python) (SQL)
+ 101:
+
+          (3)
+ 011:   (Perl)     ()
+
+          (3)
+ 111:    (NoSQL)  (JavaScript)
+
+- Se toman 2 bit de la funcion hash asociada a la clave
+- Se agrega la clave Java, no hay desborde
+
+-------------------------------------------------------------------------------------------------------------------------------------------------
+
+10 PHP 11100011
+
+ (2)      (2)
+ 000:    (Java)     (Rust)
+ 100:
+
+           (2)
+ 010:   (C#)        (HTML)
+ 110:
+
+           (2)
+ 001:    (Python) (SQL)
+ 101:
+
+          (3)
+ 011:   (Perl)     (PHP)
+
+          (3)
+ 111:    (NoSQL)  (JavaScript)
+
+- Se toman 3 bit de la funcion hash asociada a la clave
+- Se agrega la clave PHP, no hay desborde

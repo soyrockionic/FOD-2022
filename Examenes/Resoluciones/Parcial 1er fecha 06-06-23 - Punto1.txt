@@ -1,0 +1,129 @@
+program Parcial1eraFecha2023;
+Uses crt, sysutils;
+const
+  valorAlto = 9999;
+type
+
+  empleado = record
+    dni : integer;
+    nombre : String[25];
+    apellido : String[25];
+    edad : String[3];
+    domicilio : String[25];
+    nacimiento : String[25];
+  end;
+
+  archivo = file of empleado;
+
+procedure leer(var arch : archivo; var aux : empleado);
+begin
+  if(not eof(arch)) then
+    read(arch,aux)
+  else
+    aux.dni := valorAlto;
+end;
+
+procedure leerEmp(var reg : empleado);
+begin
+  write('Ingrese dni ');
+  readln(reg.dni);
+  if(reg.dni <> -1) then begin
+    write('Ingrese nombre ');
+    readln(reg.nombre);
+    write('Ingrese apellido ');
+    readln(reg.apellido);
+    write('Ingrese edad ');
+    readln(reg.edad);
+    write('Ingrese domicilio ');
+    readln(reg.domicilio);
+    write('Ingrese fecha de nacimiento ');
+    readln(reg.nacimiento);
+  end;
+end;
+
+function existeEmpleado(dni : integer; var arch : archivo) : boolean;
+var
+  reg : empleado;
+begin
+  leer(arch,reg);
+  while(reg.dni <> valorAlto) and (reg.dni <> dni) do
+    leer(arch,reg);
+  if(reg.dni = dni) then
+    existeEmpleado := true
+  else
+    existeEmpleado := false;
+end;
+
+procedure AgregarEmpleado(var arch : archivo);
+var
+  reg, aux : empleado;
+begin
+  reset(arch);
+  leerEmp(reg);
+  if(reg.dni > 0) then
+    if(existeEmpleado(reg.dni,arch)) then
+      writeln('El dni ingresado ya existe en el archivo')
+    else begin
+      seek(arch,0);
+      leer(arch,aux);
+      if(aux.dni < 0) then begin
+        aux.dni := aux.dni * -1;
+        seek(arch,aux.dni);
+        leer(arch,aux);
+        seek(arch,filepos(arch)-1);
+        write(arch,reg);
+        seek(arch,0);
+        write(arch,aux);
+      end
+      else begin
+        seek(arch,filesize(arch));
+        write(arch,reg);
+      end;
+    end;
+  close(arch);
+end;
+
+procedure QuitarEmpleado(var arch : archivo);
+var
+  reg, aux : empleado;
+  dni, pos : integer;
+begin
+  reset(arch);
+  write('Ingrese el dni del empleado que va eliminar ');
+  readln(dni);
+  if(dni > 0) then
+    if(existeEmpleado(dni,arch)) then begin
+      seek(arch,0);
+      leer(arch,reg);
+      while(reg.dni <> dni) do
+        leer(arch,reg);
+      pos := filepos(arch)-1;
+      reg.dni := pos*-1;
+      seek(arch,0);
+      leer(arch,aux);
+      seek(arch,0);
+      write(arch,reg);
+      seek(arch,pos);
+      write(arch,aux);
+    end
+    else
+      writeln('El dni ingresado nose encuentra en el archivo');
+  close(arch);
+end;
+
+var
+  arch : archivo;
+  n : String[25];
+begin
+  clrscr;
+  write('Ingrese nombre del archivo ');
+  readln(n);
+
+  assign(arch,n);
+
+  AgregarEmpleado(arch);
+
+  QuitarEmpleado(arch);
+
+  readln;
+end.

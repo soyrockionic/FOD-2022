@@ -1,0 +1,127 @@
+program Parcial1eraFecha2019;
+Uses crt, sysutils;
+const
+  valorAlto = 3200;
+  df = 10;
+type
+
+  farmaco = record
+    cod_farmaco : integer;
+    nombre : string[30];
+    fecha : string[10];
+    cant_vendida : integer;
+    forma_pago : string[7];
+  end;
+
+  archivo = file of farmaco;
+
+  vector = array[1..df] of archivo;
+
+  vector_far = array[1..df] of farmaco;
+
+procedure leer(var arch : archivo; var reg : farmaco);
+begin
+  if(not eof(arch)) then
+    read(arch,reg)
+  else
+    reg.cod_farmaco := valorAlto;
+end;
+
+procedure minimo(var v : vector; var vr : vector_far; var min : farmaco);
+var
+  i, pos : integer;
+begin
+  min.cod_farmaco := valorAlto;
+  min.fecha := '~~~~';
+  for i := 1 to df do
+    if(vr[i].cod_farmaco < min.cod_farmaco) or ((vr[i].cod_farmaco = min.cod_farmaco) and (vr[i].fecha < min.fecha)) then begin
+      min := vr[i];
+      pos := i;
+    end;
+  if(min.cod_farmaco <> valorAlto) then
+    leer(v[pos],vr[pos]);
+end;
+
+procedure farmaco_mas_vendido(var v : vector);
+var
+  min, aux, maxfar : farmaco;
+  i, cod, cant, max : integer;
+  vr : vector_far;
+begin
+  max := -1;
+  for i := 1 to df do begin
+    reset(v[i]);
+    leer(v[i],vr[i]);
+  end;
+  minimo(v,vr,min);
+  while(min.cod_farmaco <> valorAlto) do begin
+    aux := min;
+    cant := 0;
+    while(aux.cod_farmaco = min.cod_farmaco) do begin
+      cant := cant + min.cant_vendida;
+      minimo(v,vr,min);
+    end;
+    if(cant > max) then begin
+      max := cant;
+      maxfar := aux;
+    end;
+  end;
+  for i := 1 to df do
+    close(v[i]);
+  writeln('Farmaco con mayor cantidad vendida ',maxfar.cod_farmaco,' ',maxfar.nombre,' ',max);
+end;
+
+procedure crearResumen(var v : vector);
+var
+  min : farmaco;
+  i, cod, total_fecha : integer;
+  vr : vector_far;
+  txt : Text;
+  fecha : string[10];
+  nombre : string[30];
+begin
+  assign(txt,'001resumen.txt');
+  rewrite(txt);
+  for i := 1 to df do begin
+    reset(v[i]);
+    leer(v[i],vr[i]);
+  end;
+  minimo(v,vr,min);
+  while(min.cod_farmaco <> valorAlto) do begin
+    cod := min.cod_farmaco;
+    nombre := min.nombre;
+    while(cod = min.cod_farmaco) do begin
+      fecha := min.fecha;
+      total_fecha := 0;
+      while(cod = min.cod_farmaco) and (fecha = min.fecha) do begin
+        total_fecha := total_fecha + min.cant_vendida;
+        minimo(v,vr,min);
+      end;
+      writeln(txt,cod,' ',nombre,' ',fecha,' ',total_fecha);
+    end;
+  end;
+  close(txt);
+  for i := 1 to df do
+    close(v[i]);
+end;
+
+var
+  v : vector;
+  i : integer;
+  a : String[2];
+begin
+  clrscr;
+
+  for i := 1 to df do begin
+    Str(i,a);
+    assign(v[i],'001sucursal'+a);
+  end;
+
+  //Inciso A
+  farmaco_mas_vendido(v);
+
+  //Inciso C
+  crearResumen(v);
+
+  readln;
+end.

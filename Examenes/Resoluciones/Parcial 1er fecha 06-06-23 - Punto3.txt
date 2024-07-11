@@ -1,0 +1,96 @@
+Dado el archivo dispersado a continuacion, grafique los estados sucesivos para las
+siguientes operaciones: +45, +89, -70, -34
+Indique las lecturas y escrituras en cada operacion, y calcule la densidad de
+empaquetamiento despues de la ultima operacion.
+
+Tecnica de  resolucion de colisiones: Saturacion progresiva.
+
+f(x) = x MOD 11
+
+-------------------------------------------------------------------------------------------------------------------------------------------------
+
++45 --> f(45) = 1
+
+ 0:    (55) ()
+ 1:    (23) (34)
+ 2:    (46) (45)
+ 3:    ()     ()
+ 4:    (70) ()
+ 5:    (60) ()
+ 6:    (50) ()
+ 7:    (84) ()
+ 8:    ()    ()
+ 9:    (42) ()
+ 10:  (21) (65)
+
+L1, L2, E2
+
+- Se intenta agregar la clave 45 en la direccion 1, se produce overflow, se busca la proxima
+  direccion con espacio disponible, se agrega en la direccion 2
+
+-------------------------------------------------------------------------------------------------------------------------------------------------
+
++89 --> f(89) = 1
+
+ 0:    (55) ()
+ 1:    (23) (34)
+ 2:    (46) (45)
+ 3:    (89) ()
+ 4:    (70) ()
+ 5:    (60) ()
+ 6:    (50) ()
+ 7:    (84) ()
+ 8:    ()    ()
+ 9:    (42) ()
+ 10:  (21) (65)
+
+L1, L2, L3, E3
+
+- Se intenta agregar la clave 89 en la direccion 1, se produce overflow, se busca la proxima
+  direccion con espacio disponible, se agrega en la direccion 3
+
+-------------------------------------------------------------------------------------------------------------------------------------------------
+
+-70 --> f(70) = 4
+
+ 0:    (55) ()
+ 1:    (23) (34)
+ 2:    (46) (45)
+ 3:    (89) ()
+ 4:    () ()
+ 5:    (60) ()
+ 6:    (50) ()
+ 7:    (84) ()
+ 8:    ()    ()
+ 9:    (42) ()
+ 10:  (21) (65)
+
+L4, E4
+
+- Se da de baja la clave 70 de la direccion 4, no se deja marca porque direccion esta vacia
+
+-------------------------------------------------------------------------------------------------------------------------------------------------
+
+-34 --> f(34) = 1
+
+ 0:    (55) ()
+ 1:    (23) (##)
+ 2:    (46) (45)
+ 3:    (89) ()
+ 4:    () ()
+ 5:    (60) ()
+ 6:    (50) ()
+ 7:    (84) ()
+ 8:    ()    ()
+ 9:    (42) ()
+ 10:  (21) (65)
+
+L1, E1
+
+- Se da de baja la clave 34 de la direccion 1, se deja marca porque la direccion estaba llena
+  y en la siguiente direccion hay claves
+
+-------------------------------------------------------------------------------------------------------------------------------------------------
+
+11 / (11*2) = 0.5
+0.5 * 100 = 50%

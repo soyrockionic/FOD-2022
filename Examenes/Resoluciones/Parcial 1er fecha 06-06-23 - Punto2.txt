@@ -1,0 +1,71 @@
+Dado un arbol B de orden 4 y con politica derecha para la resolución de underflow,
+para cada operación dada debe:
+
+a. Dibujar el árbolresultante.
+b. Explicar las decisiones tomadas.
+c. Indicar las lecturas y escrituras en el orden de ocurrencia.
+
+Las operaciones a realizar son: +260, -310, -490, -60
+
+Arbol inicial:
+
+               2: 0 (100) 1 (310) 4 (600) 3
+
+0: (60)    1: (160) (210) (240)    4: (420) (490)    3: (800)
+
+-------------------------------------------------------------------------------------------------------------------------------------------------
++260
+
+                                     7:  2 (310) 6
+
+               2: 0 (100) 1 (240)5         6 :4(600) 3
+
+0: (60)    1:(160) (210)     5: (260)   4:(420) (490)    3: (800)
+
+- Intento gregar  la clave 260 en el nodo 1, se produce overflow, se divvide, se crea el
+  nuevo nodo 5, se promociona la clave 240, se intenta agregar en la nodo raiz, se produce
+  overflow, se divide, se crea el nuevo nodo 6, se promociona la clave 310, y se crea el
+  nuevo nodo raiz 7.
+
+L2, L1, E1, E5, E2, E6, E7
+
+-------------------------------------------------------------------------------------------------------------------------------------------------
+-310
+
+                                     7: 2(420)6
+
+               2: 0 (100) 1 (240)5         6: 4(600) 3
+
+0: (60)    1: (160) (210)     5: (260)   4: (490)    3: (800)
+
+- Baja de la clave 310 del nodo raiz 7, se reemplaza por la menor clave del subarbol
+  derecho.
+
+L7, L6, L4, E4, E7
+
+-------------------------------------------------------------------------------------------------------------------------------------------------
+-490                                   
+
+                             7: 2 (240) 6
+
+               2: 0 (100) 1         6: 5 (420) 4
+
+0: (60)    1: (160) (210)     5: (260)   4: (600) (800)
+
+- Baja de la clave 490 del nodo 4, se produce underflow, como no se puede redistribuir
+  por que tiene el minimo de elementos, se fusiona con este.
+
+L7, L6, L4, E4, E6, E7, E2
+
+-------------------------------------------------------------------------------------------------------------------------------------------------
+-60
+
+                           7: 2 (240) 6
+
+             2: 0 (160) 1         6: 5 (420) 4
+
+0: (100)    1: (210)     5: (260)   4: (600) (800)
+
+- Baja de la clave 60 del nodo 0, se redistribuye con su hermano derecho
+
+L7, L2, L0, E0, E1, E2

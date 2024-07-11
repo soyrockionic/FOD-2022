@@ -1,0 +1,120 @@
+Dado el archivo dispersado a continuacion, grafique los estados sucesivos para
+las siguientes operaciones: +12, +45, +89, +26, -45
+
+Tecnica de resolucion de colisiones: Saturacion progresiva encadenada
+
+NOTA: Indicar Lecturas y Escrituras
+
+f(x) = x MOD 11
+
+-------------------------------------------------------------------------------------------------------------------------------------------------
+
++12 --> f(12) = 1
+
+ 0:    (-1)  ()
+ 1:    (2)   (78)
+ 2:    (-1)  (12)
+ 3:    (-1)  (47)
+ 4:    (-1)  ()
+ 5:    (-1)  (27)
+ 6:    (-1)  ()
+ 7:    (-1)  (51)
+ 8:    (-1)  ()
+ 9:    (-1)  (53)
+ 10:  (-1)  ()
+
+L1, L2, E2, E1
+
+- Se intenta agregar la clave 12 en la direcccion 1, se produce overflow, se busca la proxima
+  direccion con espacio disponible, se agrega en la direccion 2 y se enlaza con su direccion
+  base
+
+-------------------------------------------------------------------------------------------------------------------------------------------------
+
++45 --> f(45) = 1
+
+ 0:    (-1)  ()
+ 1:    (4)   (78)
+ 2:    (-1)  (12)
+ 3:    (-1)  (47)
+ 4:    (2)   (45)
+ 5:    (-1)  (27)
+ 6:    (-1)  ()
+ 7:    (-1)  (51)
+ 8:    (-1)  ()
+ 9:    (-1)  (53)
+ 10:  (-1)  ()
+
+L1, L2, L3, L4, E4, E1
+
+- Se intenta agregar la clave 45 en la direccion 1, se produce overflow, se busca la proxima
+  direccion con espacio disponible, se agrega en la direccion 4 y se actualiza el enlace de
+  referencia
+
+-------------------------------------------------------------------------------------------------------------------------------------------------
+
++89 --> f(89) = 1
+
+ 0:    (-1)  ()
+ 1:    (6)   (78)
+ 2:    (-1)  (12)
+ 3:    (-1)  (47)
+ 4:    (2)   (45)
+ 5:    (-1)  (27)
+ 6:    (4)   (89)
+ 7:    (-1)  (51)
+ 8:    (-1)  ()
+ 9:    (-1)  (53)
+ 10:  (-1)  ()
+
+L1, L2, L3, L4, L5, L6, E6
+
+- Se intenta agregar la clave 89 en la direccion 1, se genera overflow, se busca la proxima  direccion con espacio disponible, se agrega en la direccion 6 y se actualiza el enlace de
+  referencia
+
+-------------------------------------------------------------------------------------------------------------------------------------------------
+
++26 --> f(26) = 4
+
+ 0:    (-1)  ()
+ 1:    (6)   (78)
+ 2:    (-1)  (12)
+ 3:    (-1)  (47)
+ 4:    (-1)  (26)
+ 5:    (-1)  (27)
+ 6:    (8)   (89)
+ 7:    (-1)  (51)
+ 8:    (2)   (45)
+ 9:    (-1)  (53)
+ 10:  (-1)  ()
+
+L4, L5, L6, L7, L8, E8, E6, E4
+
+- Se agrega la clave 26 en la dirección 4, se produce overflow, pero como la
+  clave 45 es intrusa se le busca una nueva dirección con espacio disponible, se agrega
+  enla direccion 8, se actualiza el enlace de referencia
+
+-------------------------------------------------------------------------------------------------------------------------------------------------
+
+-45 --> f(45) = 1
+
+ 0:    (-1)  ()
+ 1:    (6)   (78)
+ 2:    (-1)  (12)
+ 3:    (-1)  (47)
+ 4:    (-1)  (26)
+ 5:    (-1)  (27)
+ 6:    (2)   (89)
+ 7:    (-1)  (51)
+ 8:    (-1)  ()
+ 9:    (-1)  (53)
+ 10:  (-1)  ()
+
+L1, L6, L8, E8, E6
+
+- Se da de baja la clave 45 de la direccion 8 y se actualiza el enlace de referencia
+
+-------------------------------------------------------------------------------------------------------------------------------------------------
+
+8 / 11 = 0.7272
+0.7272 * 100 = 72.72%

@@ -1,0 +1,82 @@
+program Parcial1eraFecha2018;
+Uses crt, sysutils;
+const
+  valorAlto = '9999';
+type
+
+  acceso = record
+    anio : String[4];
+    mes :  String[2];
+    dia : String[2];
+    idUsuario : String[4];
+    tiempo : integer;
+  end;
+  
+  archivo = file of acceso;
+
+procedure leer(var arch : archivo; var reg : acceso);
+begin
+  if(not eof(arch)) then
+    read(arch,reg)
+  else
+    reg.anio := valorAlto;
+end;
+
+procedure informar(var arch : archivo; anio : String);
+var
+  reg : acceso;
+  mes, dia : String[2];
+  totalUsuario, totalDia, totalMes, totalAnio : integer;
+begin
+  reset(arch);
+  leer(arch,reg);
+  while(reg.anio <> valorAlto) and (reg.anio <> anio) do
+    leer(arch,reg);
+  if(reg.anio = anio) then begin
+    writeln('Año: ',anio);
+    totalAnio := 0;
+    while(reg.anio = anio) do begin
+      mes := reg.mes;
+      totalMes := 0;
+      writeln('  Mes: ',mes);
+      while(reg.anio = anio) and (reg.mes = mes) do begin
+        dia := reg.dia;
+        totalDia := 0;
+        writeln('    Dia: ',dia);
+        while(reg.anio = anio) and (reg.mes = mes) and (reg.dia = dia) do begin
+          id := reg.idUsuario;
+          totalUsuario := 0;
+          while(reg.anio = anio) and (reg.mes = mes) and (reg.dia = dia) and ( reg.idUsuario = id) do begin
+            totalUsuario := totalUsuario + reg.tiempo;
+            leer(arch,reg);
+          end;
+          writeln('      idUsuario ',id,' tiempo total de acceso: ',totalUsuario);
+          totalDia := totalDia + totalUsuario;
+        end;
+        writeln('    Tiempo total de acceso dia ,dia,' totalDia);
+        totalMes := totalMes + totalDia;
+      end;
+      writeln('  Tiempo total de acceso mes ,mes,' totalMes);
+    end;
+    writeln('  Tiempo total de acceso anio ,anio,' totalAnio);
+  end
+  else
+    writeln('El anio ingresado no existe en el archivo');
+  close(arch);
+end;
+
+var
+  arch : archivo;
+  anio : String[4];
+begin
+  clrscr;
+
+  assign(arch,'accesos');
+
+  write('Ingrese año a informar ');
+  readln(anio);
+
+  informe(arch,anio);  
+
+  readln;
+end.

@@ -1,0 +1,53 @@
+a)
+program arbolito;
+const 
+    ORDEN = 5;
+type 
+    tnodo = record 
+        hijos: array [1..ORDEN] of integer;
+        claves: array [1..ORDEN-1] of integer;
+        enlaces: array [1..ORDEN-1] of integer;
+        cant_elementos: integer;
+    end;
+
+    tindice = file of tnodo;
+
+begin
+   
+end.
+
+-------------------------------------------------------------------------------------------------------------------------------------------------
+Orden 5        b) +280        c) -120
+
+                                         8: 2(150)7
+        2: 0(120)3                                               7: 4(210)6(300)1(600)9
+
+0: (30)    3: (130)      4: (160)(170)    6: (220)(230)(240)(250)    1: (400) (500)    9: (700)
+
+-------------------------------------------------------------------------------------------------------------------------------------------------
+b) +280
+
+                                         8: 2(150)7
+        2: 0(120)3                                               7: 4(210)6(240)5(300)1(600)9
+
+0: (30)    3: (130)      4: (160)(170)    6: (220)(230)    5: (250)(280)    1: (400) (500)    9: (700)
+
+L8, L7, L6, E6, E5, E7
+
+- Se intenta agregar la clave 280 al nodo 6, se genera overflow, se divide, se crea el nuevo
+  nodo 5, y se promociona la clave 240
+
+-------------------------------------------------------------------------------------------------------------------------------------------------
+c) -120
+
+                                       8: 2(210)7
+           2: 0(150)4                                        7: 6(240)5(300)1(600)9
+
+0: (30)(130)    4: (160)(170)    6: (220)(230)    5: (250)(280)    1: (400) (500)    9: (700)
+
+L8, L2, L3, L0, L7, E2, E0, E2, E7, E8
+
+- Baja de la clave 120 del nodo 2, como no es nodo hoja, se reemplaza por la menor clave
+  de su subarblo derecho, se genera underflow en el nodo 3, como no puede redistribuirse
+  con su unico hermano, se fusiona con este, liberando el nodo 3, el underflow se propaga
+  al nodo 2 y se redistribuye con su hermano derech ya que es posible

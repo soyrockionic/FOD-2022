@@ -1,0 +1,93 @@
+program Parcial1eraFecha2024;
+Uses crt, sysutils;
+const
+  valorAlto = 9999;
+type
+
+  prestamo = record
+    codSucursal : integer;
+    dniEmpleado : longint;
+    codPrestamo : integer;
+    fecha : String[25];
+    monto : real;
+  end;
+
+  archivo = file of prestamo;
+
+procedure leer(var arch : archivo; var reg : prestamo);
+begin
+  if(not eof(arch)) then
+    read(arch,reg)
+  else
+    reg.codSucursal := valorAlto;
+end;
+
+function extraerAnio(f : String) : String;
+begin
+  extraerAnio := copy(f,1,4);
+end;
+
+procedure generarReporte(var arch : archivo);
+var
+  reg : prestamo;
+  txt : Text;
+  auxCod, cantVentas, cantVentasEmp, cantVentasSuc, cantVentasEmpresa : integer;
+  auxDni : longint;
+  montoTotalAnio, montoTotalEmp, montoTotalSuc, montoTotalEmpresa : real;
+  anio : String[25];
+begin
+  cantVentasEmpresa := 0;
+  montoTotalEmpresa := 0;
+  assign(txt,'reporte.txt');
+  rewrite(txt);
+  reset(arch);
+  leer(arch,reg);
+  while(reg.codSucursal <> valorAlto) do begin
+    auxCod := reg.codSucursal;
+    cantVentasSuc := 0;
+    montoTotalSuc := 0;
+    writeln(txt, 'Sucursal ',auxCod);
+    while(auxCod = reg.codSucursal) do begin
+      auxDni := reg.dniEmpleado;
+      cantVentasEmp := 0;
+      montoTotalEmp := 0;
+      writeln(txt,'        Empleado: DNI ',auxDni);
+      while(auxCod = reg.codSucursal) and (auxDni = reg.dniEmpleado) do begin
+        anio := extraerAnio(reg.fecha);
+        cantVentas := 0;
+        montoTotalAnio := 0;
+        while(auxCod = reg.codSucursal) and (auxDni = reg.dniEmpleado) and (anio = extraerAnio(reg.fecha)) do begin
+           cantVentas := cantVentas + 1;
+           montoTotalAnio :=  montoTotalAnio + reg.monto;
+           leer(arch,reg);
+        end;
+        writeln(txt,'        ',anio,' ',cantVentas,' ',montoTotalAnio:2:2);
+        cantVentasEmp := cantVentasEmp + cantVentas;
+        montoTotalEmp := montoTotalEmp + montoTotalAnio;
+      end;
+      writeln(txt,'        Totales ',cantVentasEmp,' ',montoTotalEmp:2:2);
+      cantVentasSuc := cantVentasSuc + cantVentasEmp;
+      montoTotalSuc := montoTotalSuc + montoTotalEmp;
+    end;
+    writeln(txt,'    Cantidad total de ventas de la sucursal: ',cantVentasSuc);
+    writeln(txt,'    Monto total vendido por la sucursal: ',montoTotalSuc:2:2);
+    cantVentasEmpresa := cantVentasEmpresa + cantVentasSuc;
+    montoTotalEmpresa := montoTotalEmpresa + montoTotalSuc;
+  end;
+  writeln(txt,'Cantidad de ventas de la empresa ',cantVentasEmpresa);
+  writeln(txt,'Monto total vendido por la empresa ',montoTotalEmpresa:2:2);
+  close(arch);
+  close(txt);
+end;
+
+var
+  arch : archivo;
+begin
+  clrscr;
+
+  assign(arch,'prestamos');
+
+  generarReporte(arch);
+
+  readln;
+end.

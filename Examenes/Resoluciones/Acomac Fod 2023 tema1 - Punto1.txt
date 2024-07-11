@@ -1,0 +1,130 @@
+program ParcialAcomac2023Tema1;
+Uses crt, sysutils;
+const
+  valorAlto = 9999;
+type
+
+  dinosaurio = record
+    codigo : integer;
+    tipo : string[30];
+    altura : integer;
+    peso : real;
+    descripcion : string[50];
+    zona_geografica : string[30];
+  end;
+
+  archivo = file of dinosaurio;
+
+procedure leer(var arch : archivo; var reg : dinosaurio);
+begin
+  if(not eof(arch)) then
+    read(arch,reg)
+  else
+    reg.codigo := valorAlto;
+end;
+
+procedure eliminar_dinos(var arch : archivo);
+var
+  reg, aux : dinosaurio;
+  cod, pos : integer;
+begin
+  reset(arch);
+  write('Ingrese codigo de dinosaurio ha eliminar ');
+  readln(cod);
+  while(cod <> -1) do begin
+    leer(arch,reg);
+    while(reg.codigo <> valorAlto) and (reg.codigo <> cod) do
+      leer(arch,reg);
+    if(reg.codigo = cod) then begin
+      pos := filepos(arch)-1;
+      reg.codigo := pos*-1;
+      seek(arch,0);
+      leer(arch,aux);
+      seek(arch,0);
+      write(arch,reg);
+      seek(arch,pos);
+      write(arch,aux);
+    end
+    else
+      writeln('El codigo ingresado no existe en el archivo');
+    seek(arch,0);
+    write('Ingrese codigo de dinosaurio ha eliminar ');
+    readln(cod);
+  end;
+  close(arch);
+end;
+
+procedure leer_dino(var dino : dinosaurio);
+begin
+  write('Ingrese codigo ');
+  readln(dino.codigo);
+  write('Ingrese tipo ');
+  readln(dino.tipo);
+  write('Ingrese altura ');
+  readln(dino.altura);
+  write('Ingrese peso ');
+  readln(dino.peso);
+  write('Ingrese descripcion ');
+  readln(dino.descripcion);
+  write('Ingrese zona geografica ');
+  readln(dino.zona_geografica);
+end;
+
+procedure agregar_dino(var arch : archivo; dino : dinosaurio);
+var
+  reg, aux : dinosaurio;
+  pos : integer;
+begin
+  reset(arch);
+  leer(arch,reg);
+  if(reg.codigo < 0) then begin
+    pos := reg.codigo*-1;
+    seek(arch,pos);
+    leer(arch,aux);
+    seek(arch,filepos(arch)-1);
+    write(arch,dino);
+    seek(arch,0);
+    write(arch,aux);
+  end
+  else begin
+    seek(arch,filesize(arch));
+    write(arch,dino);
+  end;
+  close(arch);
+end;
+
+procedure crear_reporte(var arch : archivo);
+var
+  reg : dinosaurio;
+  txt : text;
+begin
+  assign(txt,'reporte.txt');
+  reset(arch);
+  rewrite(txt);
+  leer(arch,reg);
+  while(reg.codigo <> valorAlto) do begin
+    if(reg.codigo > 0) then
+      writeln(txt,reg.codigo,' ',reg.tipo,' ',reg.altura,' ',reg.peso:2:2,' ',reg.descripcion,' ',reg.zona_geografica);
+    leer(arch,reg);
+  end;
+  close(arch);
+  close(txt);
+end;
+
+var
+  arch : archivo;
+  dino : dinosaurio;
+begin
+  clrscr;
+
+  assign(arch,'001dinosaurios');
+
+  eliminar_dinos(arch);
+
+  leer_dino(dino);
+  agregar_dino(arch,dino);
+
+  crear_reporte(arch);
+
+  readln;
+end.
