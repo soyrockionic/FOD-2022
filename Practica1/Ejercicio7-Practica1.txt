@@ -126,13 +126,27 @@ end;
 
 var
   arch : archivo;
+  aux : string[50];
+  op : char;
 begin
   clrscr;
-  assign(arch, 'novelas');
 
-  cargarArchivo(arch);
+  write('Ingrese nombre del archivo: ');
+  readln(aux);
 
-  actualizarArchivo(arch);
+  assign(arch,aux);
+
+  writeln('a : cargar el archivo');
+  writeln('b : actualizar archivo');
+  readln(op);
+
+  if(op = 'a') then
+    cargarArchivo(arch)
+  else
+    if(op = 'b') then
+      actualizarArchivo(arch)
+    else
+      writeln('Opcion incorrecta');
 
   readln;
 end.
