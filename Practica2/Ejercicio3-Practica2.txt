@@ -88,7 +88,7 @@ begin
       minimo(vec,vecR,min);
     end;
     read(arch,reg);
-    while(reg.codigo <> valorAlto) and (reg.codigo <> aux) do
+    while(not eof(mae)) and (reg.codigo <> aux) do
       read(arch,reg);
     if(reg.codigo = aux) then begin
       seek(arch,filepos(arch)-1);
