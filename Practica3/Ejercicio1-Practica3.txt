@@ -209,7 +209,7 @@ begin
   writeln('5 : modificar edad');
   writeln('6 : exportar a un txt');
   writeln('7 : empleados sin dni');
-  writeln('8 : eminar registros');
+  writeln('8 : eliminar registros');
   writeln();
   write('Ingrese que eperacion desea ');
   readln(op);
