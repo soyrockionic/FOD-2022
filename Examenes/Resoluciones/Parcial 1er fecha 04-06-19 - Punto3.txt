@@ -1,0 +1,206 @@
+ (0)   (0)
+        ()   ()
+	  
+--------------------------------------------------------------------------------------------------------------------------------------------------
+1 Alfa Romeo 10100111
+
+ (0)   (0)
+        (Alfa Romeo)   ()
+	   
+- No se toma ningun bit de la funcion hash
+- Se agrega la clave Alfa Romeo a la cubeta
+
+--------------------------------------------------------------------------------------------------------------------------------------------------
+2 Peugeot 10101010
+
+ (0)   (0)
+        (Alfa Romeo)   (Peugeot)
+	   
+- No se toma ningun bit de la funcion hash
+- Se agrega la clave Peugeot a la cubeta
+
+--------------------------------------------------------------------------------------------------------------------------------------------------
+3 Audi 00111110
+
+ (1)   (1)
+ 0:    (Audi)         (Peugeot)
+
+        (1)
+ 1:    (Alfa Romeo)   ()
+ 
+- Se toma 1 bit de la funcion hash
+- Se intenta agregar la clave Audi a la cubeta, se produce overflow y se incrementa en 1 su
+  profundidad creando una nueva cubeta con l misma profundidad
+- Se agrega la clave Audi a la cubeta correspondiente a la celda 0
+- El valor global de la tabla en memoria es menor que la de la cubeta saturada entonces se
+  incrementa en 1 su valor y se duplican las celdas de la tabla
+  
+--------------------------------------------------------------------------------------------------------------------------------------------------
+4 Nissan 01101111
+
+ (1)   (1)
+ 0:    (Audi)         (Peugeot)
+ 
+        (1)
+ 1:    (Alfa Romeo)   (Nissan)
+ 
+- Se toman 1 bit de la funcion hash
+- Se agrega la clave Nissan a la cubeta correspondiente a la celda 1
+
+--------------------------------------------------------------------------------------------------------------------------------------------------
+5 BMW 01101011
+
+ (3)    (1)
+ 000:  (Audi)         (Peugeot)
+ 100
+ 010
+ 110
+ 
+ 001
+ 101
+         (3)
+ 011:  (BMW)          ()
+
+         (3)
+ 111:  (Alfa Romeo)   (Nissan)
+ 
+- Se usan 3 bits de la funcion hash
+- Se intenta agregar la clave BMW a la cubeta corresppondiente 1, se produce overflow
+   y se incrementa en 2 su profundidad
+- Se crea una nueva cubeta con la misma profundidad a  la saturada
+- Se agrega la clave BMW a la cubeta correspondiente a la celda 011
+- El valor global de la tabla en memoria es menor  al de la cubeta saturada entonces se
+  incrementa en 2 su valor y se cautriplican las celdas de la tabla
+  
+--------------------------------------------------------------------------------------------------------------------------------------------------
+6 Toyota 11110000
+
+ (3)    (2)
+ 000:  (Toyota)       ()
+ 100
+ 
+         (2)
+ 010:  (Audi)         (Peugeot)
+ 110
+ 
+ 001
+ 101
+         (3)
+ 011:  (BMW)          ()
+
+         (3)
+ 111:  (Alfa Romeo)   (Nissan)
+ 
+- Se toman 2 bits de la funcion hash
+- Se intenta agregar la clave Toyota a la cubeta correspondiente a 000, se produce overflow,
+  y se incrementa en 1 su profundidad
+- Se crea una nueva cubeta con la misma profundidad
+- Se agrega la clave Toyota a la cubeta correspondiente a 000
+
+--------------------------------------------------------------------------------------------------------------------------------------------------
+7 Fiat 01011101
+
+ (3)    (2)
+ 000:  (Toyota)       ()
+ 100
+ 
+         (2)
+ 010:  (Audi)         (Peugeot)
+ 110
+ 
+         (2)
+ 001:  (Fiat)         ()
+ 101
+         (3)
+ 011:  (BMW)          ()
+
+         (3)
+ 111:  (Alfa Romeo)   (Nissan)
+ 
+- Se toman 2 bits de la funcion hash
+- Se agrega la clave Fiat a la cubeta recien creada correspondiente a la celda 001
+
+--------------------------------------------------------------------------------------------------------------------------------------------------
+8 Suzuki 01011011
+
+ (3)    (2)
+ 000:  (Toyota)       ()
+ 100
+ 
+         (2)
+ 010:  (Audi)         (Peugeot)
+ 110
+ 
+         (2)
+ 001:  (Fiat)         ()
+ 101
+         (3)
+ 011:  (BMW)          (Suzuki)
+
+         (3)
+ 111:  (Alfa Romeo)   (Nissan)
+ 
+- Se toman 3 bits de la funcion hash
+- Se agrega la clave Suzuki a la cubeta correspondiente a la celda 011
+
+--------------------------------------------------------------------------------------------------------------------------------------------------
+9 Ford 00110100
+
+ (3)     (2)
+ 000:  (Toyota)       (Ford)
+ 100
+ 
+         (2)
+ 010:  (Audi)         (Peugeot)
+ 110
+ 
+         (2)
+ 001:  (Fiat)         ()
+ 101
+         (3)
+ 011:  (BMW)          (Suzuki)
+
+         (3)
+ 111:  (Alfa Romeo)   (Nissan)
+ 
+- Se toman 2 bits de la funcion hash
+- Se agrega la clave Ford a la cubeta correspondiente a la celda 000
+
+--------------------------------------------------------------------------------------------------------------------------------------------------
+10 Renault 11100011
+
+ (4)     (2)
+ 0000: (Toyota)       (Ford)
+ 1000
+ 0100
+ 1100
+ 
+          (2)
+ 0010: (Audi)         (Peugeot)
+ 1010
+ 0110
+ 1110
+ 
+          (2)
+ 0001: (Fiat)         ()
+ 1001
+ 0101
+ 1101
+ 
+          (4)
+ 0011: (Renault)      ()
+ 
+          (4)
+ 1011: (BMW)          (Suzuki)
+
+          (3)
+ 0111: (Alfa Romeo)   (Nissan)
+ 1111
+ 
+- Se toman 4 bits de la funcion hash
+- Se intente agregar la clave Renault a la cubeta correspondiente a 011, se produce overflow
+  y se incrementa en 1 la profundidad de la cubeta saturada
+- Se crea una nueva cubeta con la misma profundidad
+- Se agrega la clave Renault a la cubeta correspondiente a la celda 0011
+- El valor global de la tabla en memoria es menor al de la cubeta saturada entonces se
+  incrementa en 1 su valor y se duplican las celdas en la tabla
