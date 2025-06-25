@@ -93,12 +93,9 @@ begin
   readln(dni);
   if(dni > 0) then
     if(existeEmpleado(dni,arch)) then begin
-      seek(arch,0);
-      leer(arch,reg);
-      while(reg.dni <> dni) do
-        leer(arch,reg);
       pos := filepos(arch)-1;
-      reg.dni := pos*-1;
+      seek(arch,pos);
+      leer(arch,reg);
       seek(arch,0);
       leer(arch,aux);
       seek(arch,0);
